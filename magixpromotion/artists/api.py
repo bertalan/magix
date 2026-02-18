@@ -105,6 +105,11 @@ class ArtistAPIViewSet(PagesAPIViewSet):
         "base_country",
         "base_region",
         "base_city",
+        "image_url",
+        "genre_display",
+        "tags",
+        "socials",
+        "events",
     ]
 
     listing_default_fields = PagesAPIViewSet.listing_default_fields + [
@@ -114,6 +119,7 @@ class ArtistAPIViewSet(PagesAPIViewSet):
         "genre_display",
         "tags",
         "socials",
+        "events",
     ]
 
     known_query_parameters = PagesAPIViewSet.known_query_parameters.union(

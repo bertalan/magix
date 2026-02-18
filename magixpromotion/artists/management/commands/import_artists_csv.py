@@ -128,9 +128,10 @@ class Command(BaseCommand):
         """Corregge URL YouTube con typo comuni."""
         if not url:
             return ""
+        # Rimuovi spazi interni e esterni (typo frequente nei dati CSV)
+        url = url.strip().replace(" ", "")
         if url.startswith("ttps://"):
             url = "h" + url
-        url = url.strip()
         url = re.sub(
             r"https?://youtu\.be/([^\s?]+)",
             r"https://www.youtube.com/watch?v=\1",

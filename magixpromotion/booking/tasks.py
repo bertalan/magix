@@ -53,7 +53,7 @@ def send_booking_notification(submission_id: int) -> None:
         submission = FormSubmission.objects.get(pk=submission_id)
         data = submission.get_data()
 
-        artist_name = data.get("artista_richiesto", "N/A")
+        artist_name = data.get("requested_artist", "N/A")
 
         from booking.email_routing import get_manager_email
 

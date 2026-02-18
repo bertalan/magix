@@ -1,4 +1,5 @@
 import React from "react";
+import { useSiteSettings } from "@/hooks/useSiteSettings";
 
 interface SEOHeadProps {
   title: string;
@@ -22,9 +23,12 @@ const SEOHead: React.FC<SEOHeadProps> = ({
   url,
   type = "website",
 }) => {
+  const { data: settings } = useSiteSettings();
+  const siteName = settings?.company_name || "Magix Promotion";
+
   React.useEffect(() => {
     // Title
-    document.title = `${title} | Magix Promotion`;
+    document.title = `${title} | ${siteName}`;
 
     // Meta tags
     const metas: Record<string, string> = {
@@ -32,7 +36,7 @@ const SEOHead: React.FC<SEOHeadProps> = ({
       "og:title": title,
       "og:description": description,
       "og:type": type,
-      "og:site_name": "Magix Promotion",
+      "og:site_name": siteName,
       "twitter:card": "summary_large_image",
       "twitter:title": title,
       "twitter:description": description,
@@ -60,7 +64,7 @@ const SEOHead: React.FC<SEOHeadProps> = ({
       }
       el.content = content;
     });
-  }, [title, description, image, url, type]);
+  }, [title, description, image, url, type, siteName]);
 
   return null;
 };

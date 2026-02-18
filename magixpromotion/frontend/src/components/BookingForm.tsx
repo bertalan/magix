@@ -31,31 +31,31 @@ const BUDGET_RANGES = [
 type FormStatus = "idle" | "submitting" | "success" | "error";
 
 /**
- * Booking request form with client-side validation.
- * Required fields: nome, email, artista, tipo_evento, data_evento, luogo, privacy.
- * State machine: idle -> submitting -> success | error.
- * CSRF token is included in the POST request via cookie.
+ * Form richiesta preventivo con validazione client-side.
+ * Campi obbligatori: full_name, email, requested_artist, event_type, event_date, event_location, privacy.
+ * Macchina a stati: idle -> submitting -> success | error.
+ * Il token CSRF viene incluso nella richiesta POST via cookie.
  */
 const BookingForm: React.FC<BookingFormProps> = ({ preselectedArtist }) => {
   const [formData, setFormData] = React.useState<BookingFormData>({
-    nome: "",
+    full_name: "",
     email: "",
-    telefono: "",
-    artista: preselectedArtist || "",
-    tipo_evento: "",
-    data_evento: "",
-    luogo: "",
-    budget: "",
-    note: "",
+    phone: "",
+    requested_artist: preselectedArtist || "",
+    event_type: "",
+    event_date: "",
+    event_location: "",
+    estimated_budget: "",
+    message: "",
     privacy: false,
   });
   const [status, setStatus] = React.useState<FormStatus>("idle");
   const [errorMessage, setErrorMessage] = React.useState("");
 
-  // Update artista when preselectedArtist changes after mount
+  // Aggiorna artista quando cambia dopo il mount
   React.useEffect(() => {
     if (preselectedArtist) {
-      setFormData((prev) => ({ ...prev, artista: preselectedArtist }));
+      setFormData((prev) => ({ ...prev, requested_artist: preselectedArtist }));
     }
   }, [preselectedArtist]);
 
@@ -76,12 +76,12 @@ const BookingForm: React.FC<BookingFormProps> = ({ preselectedArtist }) => {
 
   const isValid = (): boolean => {
     return (
-      formData.nome.trim() !== "" &&
+      formData.full_name.trim() !== "" &&
       formData.email.includes("@") &&
-      formData.artista.trim() !== "" &&
-      formData.tipo_evento !== "" &&
-      formData.data_evento !== "" &&
-      formData.luogo.trim() !== "" &&
+      formData.requested_artist.trim() !== "" &&
+      formData.event_type !== "" &&
+      formData.event_date !== "" &&
+      formData.event_location.trim() !== "" &&
       formData.privacy === true
     );
   };
@@ -107,14 +107,14 @@ const BookingForm: React.FC<BookingFormProps> = ({ preselectedArtist }) => {
     }
   };
 
-  // Shared input styling
+  // Stile condiviso per gli input
   const inputClass =
     "w-full bg-[var(--glass)] border border-[var(--glass-border)] px-5 py-4 rounded-2xl text-[var(--text-main)] placeholder:text-[var(--text-muted)]/40 focus:outline-none focus:border-[var(--accent)]/50 transition-all";
 
-  // Minimum date for the date picker (today)
+  // Data minima per il date picker (oggi)
   const minDate = new Date().toISOString().split("T")[0];
 
-  // --- Success state ---
+  // --- Stato successo ---
   if (status === "success") {
     return (
       <div className="text-center py-16">
@@ -130,15 +130,15 @@ const BookingForm: React.FC<BookingFormProps> = ({ preselectedArtist }) => {
           onClick={() => {
             setStatus("idle");
             setFormData({
-              nome: "",
+              full_name: "",
               email: "",
-              telefono: "",
-              artista: preselectedArtist || "",
-              tipo_evento: "",
-              data_evento: "",
-              luogo: "",
-              budget: "",
-              note: "",
+              phone: "",
+              requested_artist: preselectedArtist || "",
+              event_type: "",
+              event_date: "",
+              event_location: "",
+              estimated_budget: "",
+              message: "",
               privacy: false,
             });
           }}
@@ -153,7 +153,7 @@ const BookingForm: React.FC<BookingFormProps> = ({ preselectedArtist }) => {
   // --- Form ---
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      {/* Error banner */}
+      {/* Banner errore */}
       {status === "error" && (
         <div
           className="flex items-center gap-3 p-4 rounded-2xl border border-rose-500/30 bg-rose-500/5 text-rose-500"
@@ -165,13 +165,13 @@ const BookingForm: React.FC<BookingFormProps> = ({ preselectedArtist }) => {
         </div>
       )}
 
-      {/* Row 1: Nome + Email */}
+      {/* Riga 1: Nome + Email */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <input
           type="text"
-          name="nome"
+          name="full_name"
           placeholder="Il tuo nome *"
-          value={formData.nome}
+          value={formData.full_name}
           onChange={handleChange}
           required
           aria-required="true"
@@ -193,22 +193,22 @@ const BookingForm: React.FC<BookingFormProps> = ({ preselectedArtist }) => {
         />
       </div>
 
-      {/* Row 2: Telefono + Artista */}
+      {/* Riga 2: Telefono + Artista */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <input
           type="tel"
-          name="telefono"
+          name="phone"
           placeholder="Telefono (opzionale)"
-          value={formData.telefono}
+          value={formData.phone}
           onChange={handleChange}
           aria-label="Telefono"
           className={inputClass}
         />
         <input
           type="text"
-          name="artista"
+          name="requested_artist"
           placeholder="Artista / Band richiesta *"
-          value={formData.artista}
+          value={formData.requested_artist}
           onChange={handleChange}
           required
           aria-required="true"
@@ -217,11 +217,11 @@ const BookingForm: React.FC<BookingFormProps> = ({ preselectedArtist }) => {
         />
       </div>
 
-      {/* Row 3: Tipo evento + Data */}
+      {/* Riga 3: Tipo evento + Data */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <select
-          name="tipo_evento"
-          value={formData.tipo_evento}
+          name="event_type"
+          value={formData.event_type}
           onChange={handleChange}
           required
           aria-required="true"
@@ -236,8 +236,8 @@ const BookingForm: React.FC<BookingFormProps> = ({ preselectedArtist }) => {
         </select>
         <input
           type="date"
-          name="data_evento"
-          value={formData.data_evento}
+          name="event_date"
+          value={formData.event_date}
           onChange={handleChange}
           required
           aria-required="true"
@@ -247,13 +247,13 @@ const BookingForm: React.FC<BookingFormProps> = ({ preselectedArtist }) => {
         />
       </div>
 
-      {/* Row 4: Luogo + Budget */}
+      {/* Riga 4: Luogo + Budget */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <input
           type="text"
-          name="luogo"
+          name="event_location"
           placeholder="Citta' / Provincia *"
-          value={formData.luogo}
+          value={formData.event_location}
           onChange={handleChange}
           required
           aria-required="true"
@@ -261,8 +261,8 @@ const BookingForm: React.FC<BookingFormProps> = ({ preselectedArtist }) => {
           className={inputClass}
         />
         <select
-          name="budget"
-          value={formData.budget}
+          name="estimated_budget"
+          value={formData.estimated_budget}
           onChange={handleChange}
           aria-label="Fascia di budget"
           className={inputClass}
@@ -275,18 +275,18 @@ const BookingForm: React.FC<BookingFormProps> = ({ preselectedArtist }) => {
         </select>
       </div>
 
-      {/* Note */}
+      {/* Messaggio */}
       <textarea
-        name="note"
+        name="message"
         placeholder="Note aggiuntive (orario, location, richieste speciali...)"
-        value={formData.note}
+        value={formData.message}
         onChange={handleChange}
         rows={4}
         aria-label="Note aggiuntive"
         className={inputClass + " resize-none"}
       />
 
-      {/* Privacy GDPR checkbox */}
+      {/* Checkbox GDPR privacy */}
       <label className="flex items-start gap-3 cursor-pointer">
         <input
           type="checkbox"
@@ -310,7 +310,7 @@ const BookingForm: React.FC<BookingFormProps> = ({ preselectedArtist }) => {
         </span>
       </label>
 
-      {/* Submit button */}
+      {/* Pulsante invio */}
       <button
         type="submit"
         disabled={!isValid() || status === "submitting"}

@@ -9,15 +9,15 @@ const Footer: React.FC = () => {
 
   const legalLinks = legalMenu?.items || [];
 
-  /** Genera deep link navigazione per mobile/desktop */
+  /** Genera deep link navigazione verso OpenStreetMap */
   const getNavigationUrl = () => {
     if (!settings) return "#";
     const addr = settings.address;
     if (addr.latitude && addr.longitude) {
-      return `https://www.google.com/maps/dir/?api=1&destination=${addr.latitude},${addr.longitude}`;
+      return `https://www.openstreetmap.org/directions?engine=fossgis_osrm_car&route=;${addr.latitude},${addr.longitude}`;
     }
     const fullAddr = `${addr.street}, ${addr.zip_code} ${addr.city}`;
-    return `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(fullAddr)}`;
+    return `https://www.openstreetmap.org/search?query=${encodeURIComponent(fullAddr)}`;
   };
 
   return (

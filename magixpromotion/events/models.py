@@ -105,12 +105,12 @@ class Venue(models.Model):
 
     @property
     def navigation_url(self) -> str:
-        """URL deep link per navigazione mobile (Google Maps / Apple Maps)."""
+        """URL deep link per navigazione (OpenStreetMap)."""
         if self.latitude and self.longitude:
-            return f"https://www.google.com/maps/dir/?api=1&destination={self.latitude},{self.longitude}&travelmode=driving"
+            return f"https://www.openstreetmap.org/directions?engine=fossgis_osrm_car&route=;{self.latitude},{self.longitude}"
         from urllib.parse import quote
         addr = self.full_address
-        return f"https://www.google.com/maps/dir/?api=1&destination={quote(addr)}&travelmode=driving"
+        return f"https://www.openstreetmap.org/search?query={quote(addr)}"
 
     def geocode_with_nominatim(self) -> bool:
         """Geocodifica indirizzo con Nominatim (OpenStreetMap). Ritorna True se successo."""

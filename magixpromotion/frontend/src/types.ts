@@ -139,15 +139,15 @@ export interface SiteSettings {
 // --- Booking ---
 
 export interface BookingFormData {
-  nome: string;
+  full_name: string;
   email: string;
-  telefono?: string;
-  artista: string;
-  tipo_evento: string;
-  data_evento: string;
-  luogo: string;
-  budget?: string;
-  note?: string;
+  phone?: string;
+  requested_artist: string;
+  event_type: string;
+  event_date: string;
+  event_location: string;
+  estimated_budget?: string;
+  message?: string;
   privacy: boolean;
 }
 

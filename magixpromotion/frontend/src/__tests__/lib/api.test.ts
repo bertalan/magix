@@ -128,15 +128,15 @@ describe("fetchSiteSettings", () => {
 // ---------------------------------------------------------------
 describe("submitBooking", () => {
   const validBooking = {
-    nome: "Mario Rossi",
+    full_name: "Mario Rossi",
     email: "mario@example.com",
-    telefono: "+39 333 1234567",
-    artista: "The Groove Machine",
-    tipo_evento: "matrimonio",
-    data_evento: "2025-09-15",
-    luogo: "Milano",
-    budget: "2500-5000",
-    note: "Grande evento",
+    phone: "+39 333 1234567",
+    requested_artist: "The Groove Machine",
+    event_type: "matrimonio",
+    event_date: "2025-09-15",
+    event_location: "Milano",
+    estimated_budget: "2500-5000",
+    message: "Grande evento",
     privacy: true,
   };
 

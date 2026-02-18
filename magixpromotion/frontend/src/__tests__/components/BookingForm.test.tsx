@@ -61,7 +61,7 @@ describe("BookingForm", () => {
     await user.selectOptions(eventTypeSelect, "matrimonio");
 
     // Fill date (type=date)
-    const dateInput = document.querySelector('input[name="data_evento"]') as HTMLInputElement;
+    const dateInput = document.querySelector('input[name="event_date"]') as HTMLInputElement;
     await user.type(dateInput, "2025-09-15");
 
     // Fill location
@@ -88,7 +88,7 @@ describe("BookingForm", () => {
     );
     const eventTypeSelect = screen.getAllByRole("combobox")[0];
     await user.selectOptions(eventTypeSelect, "matrimonio");
-    const dateInput = document.querySelector('input[name="data_evento"]') as HTMLInputElement;
+    const dateInput = document.querySelector('input[name="event_date"]') as HTMLInputElement;
     await user.type(dateInput, "2025-09-15");
     await user.type(screen.getByPlaceholderText("Citta' / Provincia *"), "Milano");
     const privacyCheckbox = screen.getByRole("checkbox");
@@ -129,7 +129,7 @@ describe("BookingForm", () => {
     );
     const eventTypeSelect = screen.getAllByRole("combobox")[0];
     await user.selectOptions(eventTypeSelect, "matrimonio");
-    const dateInput = document.querySelector('input[name="data_evento"]') as HTMLInputElement;
+    const dateInput = document.querySelector('input[name="event_date"]') as HTMLInputElement;
     await user.type(dateInput, "2025-09-15");
     await user.type(screen.getByPlaceholderText("Citta' / Provincia *"), "Milano");
     const privacyCheckbox = screen.getByRole("checkbox");
@@ -157,7 +157,7 @@ describe("BookingForm", () => {
     );
     const eventTypeSelect = screen.getAllByRole("combobox")[0];
     await user.selectOptions(eventTypeSelect, "matrimonio");
-    const dateInput = document.querySelector('input[name="data_evento"]') as HTMLInputElement;
+    const dateInput = document.querySelector('input[name="event_date"]') as HTMLInputElement;
     await user.type(dateInput, "2025-09-15");
     await user.type(screen.getByPlaceholderText("Citta' / Provincia *"), "Milano");
     const privacyCheckbox = screen.getByRole("checkbox");

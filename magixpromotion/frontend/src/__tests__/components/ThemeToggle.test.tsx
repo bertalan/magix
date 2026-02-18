@@ -13,7 +13,7 @@ describe("ThemeToggle", () => {
       <ThemeToggle currentTheme="electric-night" toggleTheme={() => {}} />,
     );
 
-    const button = screen.getByRole("button", { name: "Cambia tema" });
+    const button = screen.getByRole("button", { name: "Passa al tema chiaro" });
     expect(button).toBeInTheDocument();
   });
 
@@ -22,7 +22,7 @@ describe("ThemeToggle", () => {
       <ThemeToggle currentTheme="electric-night" toggleTheme={() => {}} />,
     );
 
-    const button = screen.getByRole("button", { name: "Cambia tema" });
+    const button = screen.getByRole("button", { name: "Passa al tema chiaro" });
     expect(button).toHaveAttribute("title", "Tema chiaro");
   });
 
@@ -31,7 +31,7 @@ describe("ThemeToggle", () => {
       <ThemeToggle currentTheme="pastel-dream" toggleTheme={() => {}} />,
     );
 
-    const button = screen.getByRole("button", { name: "Cambia tema" });
+    const button = screen.getByRole("button", { name: "Passa al tema scuro" });
     expect(button).toHaveAttribute("title", "Tema scuro");
   });
 
@@ -43,7 +43,7 @@ describe("ThemeToggle", () => {
       <ThemeToggle currentTheme="electric-night" toggleTheme={toggleTheme} />,
     );
 
-    const button = screen.getByRole("button", { name: "Cambia tema" });
+    const button = screen.getByRole("button", { name: "Passa al tema chiaro" });
     await user.click(button);
 
     expect(toggleTheme).toHaveBeenCalledTimes(1);

@@ -18,7 +18,7 @@ EVENT_TYPE_CHOICES = [
 class BookingForm(forms.Form):
     """Form con campi fissi per richiesta preventivo."""
 
-    nome_cognome = forms.CharField(
+    full_name = forms.CharField(
         max_length=200,
         label="Nome e Cognome *",
         widget=forms.TextInput(attrs={"placeholder": "Mario Rossi"}),
@@ -27,45 +27,45 @@ class BookingForm(forms.Form):
         label="Email *",
         widget=forms.EmailInput(attrs={"placeholder": "mario@esempio.it"}),
     )
-    telefono = forms.CharField(
+    phone = forms.CharField(
         max_length=30,
         required=False,
         label="Telefono",
         widget=forms.TextInput(attrs={"placeholder": "+39 ..."}),
     )
-    azienda = forms.CharField(
+    company = forms.CharField(
         max_length=200,
         required=False,
         label="Azienda / Ente",
         help_text="Se applicabile.",
     )
-    artista_richiesto = forms.CharField(
+    requested_artist = forms.CharField(
         max_length=200,
         label="Artista / Band richiesto *",
         help_text="Se arrivi dalla scheda artista, questo campo e' precompilato.",
     )
-    tipo_evento = forms.ChoiceField(
+    event_type = forms.ChoiceField(
         choices=EVENT_TYPE_CHOICES,
         label="Tipo di evento *",
     )
-    data_evento = forms.DateField(
+    event_date = forms.DateField(
         required=False,
         label="Data evento (indicativa)",
         widget=forms.DateInput(attrs={"type": "date"}),
     )
-    luogo_evento = forms.CharField(
+    event_location = forms.CharField(
         max_length=300,
         required=False,
         label="Luogo evento",
         widget=forms.TextInput(attrs={"placeholder": "Citta, Venue..."}),
     )
-    budget_indicativo = forms.CharField(
+    estimated_budget = forms.CharField(
         max_length=100,
         required=False,
         label="Budget indicativo",
         help_text="Opzionale. Ci aiuta a proporti la soluzione migliore.",
     )
-    messaggio = forms.CharField(
+    message = forms.CharField(
         widget=forms.Textarea(attrs={"rows": 4, "placeholder": "Descrivi il tuo evento..."}),
         label="Messaggio",
     )

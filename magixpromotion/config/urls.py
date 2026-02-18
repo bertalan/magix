@@ -13,6 +13,7 @@ from wagtail.documents.api.v2.views import DocumentsAPIViewSet
 from wagtail.images.api.v2.views import ImagesAPIViewSet
 
 from artists.api import ArtistAPIViewSet
+from booking.views import booking_submit_api
 from core.search import autocomplete_api, search_api
 from events.api import EventAPIViewSet
 from navigation.api import menu_api
@@ -36,6 +37,8 @@ urlpatterns = [
     # Search API
     path("api/v2/search/autocomplete/", autocomplete_api, name="autocomplete_api"),
     path("api/v2/search/", search_api, name="search_api"),
+    # Booking API
+    path("api/v2/booking/submit/", booking_submit_api, name="booking_submit_api"),
     # SEO
     path("sitemap.xml", wagtail_sitemap),
     # EPK download protetto

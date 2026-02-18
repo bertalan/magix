@@ -3,6 +3,7 @@ import { Sparkles, Wand2, ArrowRight } from "lucide-react";
 import { scoutTalent, ScoutResult } from "@/services/geminiService";
 import { Artist } from "@/types";
 import { useArtists } from "@/hooks/useArtists";
+import { useSiteSettings } from "@/hooks/useSiteSettings";
 
 interface BandFinderProps {
   onArtistSelect: (artist: Artist) => void;
@@ -26,6 +27,9 @@ const BandFinder: React.FC<BandFinderProps> = ({ onArtistSelect }) => {
   const { data } = useArtists({ limit: 100 });
   const artists = data?.items || [];
 
+  // Dati azienda dal CMS per il prompt AI
+  const { data: settings } = useSiteSettings();
+
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!query.trim() || artists.length === 0) return;
@@ -43,7 +47,14 @@ const BandFinder: React.FC<BandFinderProps> = ({ onArtistSelect }) => {
       tags: a.tags || [],
     }));
 
-    const response = await scoutTalent(query, pool);
+    const companyInfo = settings
+      ? {
+          name: settings.company_name,
+          location: `${settings.address.city}, ${settings.address.province}`,
+        }
+      : undefined;
+
+    const response = await scoutTalent(query, pool, companyInfo);
     setResult(response);
     setLoading(false);
   };

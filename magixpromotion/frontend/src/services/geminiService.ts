@@ -20,13 +20,17 @@ export const scoutTalent = async (
     artist_type: string;
     tags: string[];
   }>,
+  companyInfo?: { name: string; location: string },
 ): Promise<ScoutResult | null> => {
   const model = "gemini-2.0-flash";
 
-  const systemInstruction = `Sei l'assistente BandFinder di Magix Promotion, agenzia di band e artisti musicali.
+  const agencyName = companyInfo?.name || "l'agenzia";
+  const agencyLocation = companyInfo?.location || "Italia";
+
+  const systemInstruction = `Sei l'assistente BandFinder di ${agencyName}, agenzia di band e artisti musicali.
 Il tuo compito è trovare l'artista o band più adatta alla richiesta dell'utente nel nostro roster.
 
-Contesto: L'agenzia ha sede in Italia (Novi Ligure, AL) ma gestisce eventi anche all'estero.
+Contesto: L'agenzia ha sede in ${agencyLocation} ma gestisce eventi anche all'estero.
 Le tipologie includono: Dance Show Band, Tributo Italiano, Tributo Internazionale, DJ Set, Rock Band, Folk Band.
 
 Roster disponibile:

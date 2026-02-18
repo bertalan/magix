@@ -1,5 +1,6 @@
 import React from "react";
 import BookingForm from "./BookingForm";
+import { useSiteSettings } from "@/hooks/useSiteSettings";
 import { Mail } from "lucide-react";
 
 interface BookingPageProps {
@@ -7,12 +8,15 @@ interface BookingPageProps {
 }
 
 /**
- * Wrapper page for the booking form.
- * Shows a hero section with title and description,
- * then the BookingForm component inside a glass panel,
- * and an alternative contact line at the bottom.
+ * Pagina wrapper per il form di booking.
+ * Mostra una hero section con titolo e descrizione,
+ * il componente BookingForm in un pannello glass,
+ * e un contatto alternativo in fondo (da SiteSettings).
  */
 const BookingPage: React.FC<BookingPageProps> = ({ preselectedArtist }) => {
+  const { data: settings } = useSiteSettings();
+  const contactEmail = settings?.email || "";
+
   return (
     <div className="max-w-3xl mx-auto px-6 py-24">
       {/* Header */}
@@ -35,18 +39,20 @@ const BookingPage: React.FC<BookingPageProps> = ({ preselectedArtist }) => {
         <BookingForm preselectedArtist={preselectedArtist} />
       </div>
 
-      {/* Alternative contact info */}
-      <div className="mt-12 text-center text-[var(--text-muted)] text-sm">
-        <p>
-          Preferisci parlare direttamente? Scrivici a{" "}
-          <a
-            href="mailto:info@magixpromotion.it"
-            className="text-[var(--accent)] hover:underline"
-          >
-            info@magixpromotion.it
-          </a>
-        </p>
-      </div>
+      {/* Contatto alternativo (da SiteSettings) */}
+      {contactEmail && (
+        <div className="mt-12 text-center text-[var(--text-muted)] text-sm">
+          <p>
+            Preferisci parlare direttamente? Scrivici a{" "}
+            <a
+              href={`mailto:${contactEmail}`}
+              className="text-[var(--accent)] hover:underline"
+            >
+              {contactEmail}
+            </a>
+          </p>
+        </div>
+      )}
     </div>
   );
 };

@@ -74,7 +74,7 @@ class BookingFormPage(AbstractEmailForm):
         """Routing email in base all'artista selezionato + salvataggio."""
         submission = super().process_form_submission(form)
 
-        artist_name = form.cleaned_data.get("artista_richiesto", "")
+        artist_name = form.cleaned_data.get("requested_artist", "")
         if artist_name:
             from .email_routing import get_manager_email
 

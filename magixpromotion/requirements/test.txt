@@ -3,3 +3,5 @@ pytest
 pytest-django
 pytest-cov
 factory-boy
+freezegun>=1.2
+wagtail-factories>=4.1

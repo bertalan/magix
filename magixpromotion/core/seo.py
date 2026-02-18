@@ -13,10 +13,11 @@ def homepage_jsonld() -> str:
     """
     from core.models import MagixSiteSettings
 
+    site = None
     try:
         site = Site.objects.get(is_default_site=True)
         settings = MagixSiteSettings.for_site(site)
-    except Exception:
+    except Site.DoesNotExist:
         settings = None
 
     data = {
@@ -27,7 +28,7 @@ def homepage_jsonld() -> str:
             "Agenzia di band e artisti musicali per eventi "
             "in Italia e nel mondo."
         ),
-        "url": "https://www.magixpromotion.it",
+        "url": site.root_url if site else "https://www.magixpromotion.it",
         "telephone": getattr(settings, "phone", "+39 335 523 0855"),
         "email": getattr(settings, "email", "info@magixpromotion.it"),
         "address": {

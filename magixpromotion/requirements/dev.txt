@@ -2,6 +2,8 @@
 pytest
 pytest-django
 factory-boy
+freezegun>=1.2
+wagtail-factories>=4.1
 black
 flake8
 mypy

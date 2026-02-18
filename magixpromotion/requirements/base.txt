@@ -11,3 +11,5 @@ django-countries>=8.0
 geopy>=2.4
 django-modelcluster>=6.0
 django-taggit>=5.0
+requests>=2.31
+django-cors-headers>=4.3

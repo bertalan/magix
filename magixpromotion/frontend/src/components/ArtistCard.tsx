@@ -1,6 +1,7 @@
 import React from "react";
 import { Artist } from "@/types";
-import { Plus } from "lucide-react";
+import { Plus, Play } from "lucide-react";
+import VideoModal from "./VideoModal";
 
 interface ArtistCardProps {
   artist: Artist;
@@ -8,7 +9,18 @@ interface ArtistCardProps {
 }
 
 const ArtistCard: React.FC<ArtistCardProps> = ({ artist, onClick }) => {
+  const [showVideo, setShowVideo] = React.useState(false);
+
+  /** Apri il video modal senza propagare il click alla card */
+  const handlePlayClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (artist.hero_video_url) {
+      setShowVideo(true);
+    }
+  };
+
   return (
+    <>
     <article
       className="group relative cursor-pointer overflow-hidden rounded-3xl aspect-[3/4] glass-panel transition-all duration-500 hover:-translate-y-2 shadow-[var(--card-shadow)] hover:shadow-[0_30px_60px_rgba(0,0,0,0.3)]"
       onClick={onClick}
@@ -32,6 +44,17 @@ const ArtistCard: React.FC<ArtistCardProps> = ({ artist, onClick }) => {
       <div className="absolute top-6 right-6 w-12 h-12 rounded-full glass-panel border border-[var(--glass-border)] flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-500 transform translate-x-4 group-hover:translate-x-0">
         <Plus className="text-[var(--text-main)]" />
       </div>
+
+      {/* Play Video button */}
+      {artist.hero_video_url && (
+        <button
+          onClick={handlePlayClick}
+          className="absolute top-6 left-6 w-12 h-12 rounded-full bg-[var(--accent)] flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-500 transform -translate-x-4 group-hover:translate-x-0 hover:scale-110 shadow-lg z-10"
+          aria-label={`Guarda video promo di ${artist.title}`}
+        >
+          <Play fill="currentColor" size={18} className="text-[var(--bg-color)] ml-0.5" />
+        </button>
+      )}
 
       {/* Contenuto */}
       <div className="absolute bottom-0 left-0 right-0 p-8 transform transition-transform duration-500 group-hover:translate-y-[-8px]">
@@ -57,6 +80,16 @@ const ArtistCard: React.FC<ArtistCardProps> = ({ artist, onClick }) => {
       {/* Hover highlight line */}
       <div className="absolute bottom-0 left-0 w-0 h-1.5 bg-[var(--accent-gradient)] transition-all duration-500 group-hover:w-full" />
     </article>
+
+    {/* Video Modal (renderizzato fuori dalla card per z-index corretto) */}
+    {showVideo && artist.hero_video_url && (
+      <VideoModal
+        videoUrl={artist.hero_video_url}
+        artistName={artist.title}
+        onClose={() => setShowVideo(false)}
+      />
+    )}
+    </>
   );
 };
 

@@ -1,8 +1,0 @@
-{
-  "name": "UTA Music Reimagined",
-  "description": "A high-performance, youthful reimagining of the United Talent Agency music division, featuring AI-powered talent scouting and modern glassmorphic UI.",
-  "requestFramePermissions": [
-    "camera",
-    "microphone"
-  ]
-}

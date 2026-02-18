@@ -22,6 +22,7 @@ frontend/.vite
 
 # Docker
 deploy/
+!deploy/scripts/
 docker-compose*.yml
 Dockerfile*
 

@@ -22,10 +22,11 @@ services:
       context: ..
       dockerfile: deploy/Dockerfile
       target: runtime
+    entrypoint: []
     command: >
-      python manage.py runserver 0.0.0.0:8000
+      sh -c "python manage.py migrate --noinput && python manage.py runserver 0.0.0.0:8000"
     environment:
-      - DJANGO_SETTINGS_MODULE=config.settings.dev
+      - DJANGO_SETTINGS_MODULE=config.settings.docker_dev
       - DB_NAME=magix
       - DB_USER=magix
       - DB_PASSWORD=magix_dev
@@ -52,10 +53,11 @@ services:
       context: ..
       dockerfile: deploy/Dockerfile
       target: runtime
+    entrypoint: []
     command: >
       celery -A config worker -l info -B
     environment:
-      - DJANGO_SETTINGS_MODULE=config.settings.dev
+      - DJANGO_SETTINGS_MODULE=config.settings.docker_dev
       - DB_NAME=magix
       - DB_USER=magix
       - DB_PASSWORD=magix_dev
@@ -75,11 +77,12 @@ services:
   frontend:
     image: node:22-alpine
     working_dir: /app
-    command: npm run dev -- --host 0.0.0.0
+    command: sh -c "npm install && npm run dev -- --host 0.0.0.0"
     ports:
       - "3000:3000"
     volumes:
       - ../frontend:/app
+      - frontend_node_modules:/app/node_modules
     environment:
       - VITE_API_URL=http://localhost:8000
 
@@ -87,3 +90,4 @@ volumes:
   postgres_data:
   static_files:
   media_files:
+  frontend_node_modules:

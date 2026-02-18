@@ -7,6 +7,7 @@ def create_groups_and_workflow(apps, schema_editor):
     Workflow = apps.get_model("wagtailcore", "Workflow")
     GroupApprovalTask = apps.get_model("wagtailcore", "GroupApprovalTask")
     WorkflowTask = apps.get_model("wagtailcore", "WorkflowTask")
+    ContentType = apps.get_model("contenttypes", "ContentType")
 
     # Crea gruppi
     Group.objects.get_or_create(name="Collaboratori Esterni")
@@ -18,10 +19,16 @@ def create_groups_and_workflow(apps, schema_editor):
         defaults={"active": True},
     )
 
+    # Content type necessario per Wagtail 7.x Task (polimorfismo)
+    ct, _ = ContentType.objects.get_or_create(
+        app_label="wagtailcore",
+        model="groupapprovaltask",
+    )
+
     # Crea task di approvazione
     task, created = GroupApprovalTask.objects.get_or_create(
         name="Revisione Staff",
-        defaults={"active": True},
+        defaults={"active": True, "content_type": ct},
     )
     if created:
         task.groups.add(staff_group)

@@ -30,12 +30,16 @@ const ArtistCard: React.FC<ArtistCardProps> = ({ artist, onClick }) => {
       aria-label={`Vedi dettagli di ${artist.title}`}
     >
       {/* Immagine artista */}
-      <img
-        src={artist.image_url || ""}
-        alt={artist.title}
-        loading="lazy"
-        className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 grayscale group-hover:grayscale-0 opacity-60 group-hover:opacity-100"
-      />
+      {artist.image_url ? (
+        <img
+          src={artist.image_url}
+          alt={artist.title}
+          loading="lazy"
+          className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 grayscale group-hover:grayscale-0 opacity-60 group-hover:opacity-100"
+        />
+      ) : (
+        <div className="absolute inset-0 w-full h-full bg-gradient-to-br from-[var(--glass)] to-[var(--bg-color)]" aria-hidden="true" />
+      )}
 
       {/* Overlay gradient */}
       <div className="absolute inset-0 bg-gradient-to-t from-[var(--bg-color)] via-transparent to-transparent group-hover:via-[var(--bg-color)]/20 transition-all duration-500" />

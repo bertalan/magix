@@ -110,11 +110,15 @@ const BandFinder: React.FC<BandFinderProps> = ({ onArtistSelect }) => {
             <div className="flex flex-col md:flex-row">
               {/* Immagine */}
               <div className="md:w-1/3 aspect-square md:aspect-auto">
-                <img
-                  src={matchedArtist.image_url || ""}
-                  alt={matchedArtist.title}
-                  className="w-full h-full object-cover grayscale brightness-90"
-                />
+                {matchedArtist.image_url ? (
+                  <img
+                    src={matchedArtist.image_url}
+                    alt={matchedArtist.title}
+                    className="w-full h-full object-cover grayscale brightness-90"
+                  />
+                ) : (
+                  <div className="w-full h-full bg-gradient-to-br from-[var(--glass)] to-[var(--bg-color)]" aria-hidden="true" />
+                )}
               </div>
 
               {/* Dettagli */}

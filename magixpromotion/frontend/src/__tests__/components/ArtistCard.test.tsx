@@ -79,7 +79,9 @@ describe("ArtistCard", () => {
   it("renders gracefully with null image_url", () => {
     const artistNoImage = { ...mockArtist, image_url: null };
     render(<ArtistCard artist={artistNoImage} onClick={() => {}} />);
-    const img = screen.getByAltText("The Groove Machine");
-    expect(img).toHaveAttribute("src", "");
+    // Nessun tag <img> renderizzato, al suo posto un div placeholder
+    expect(screen.queryByRole("img")).toBeNull();
+    // La card è comunque presente e cliccabile
+    expect(screen.getByText("The Groove Machine")).toBeInTheDocument();
   });
 });

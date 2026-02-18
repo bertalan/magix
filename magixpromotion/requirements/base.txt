@@ -1,0 +1,13 @@
+Django>=5.2,<6.0
+wagtail>=7.0,<8.0
+wagtail-localize>=1.13
+django-extensions
+django-dotenv
+psycopg[binary]>=3.1
+Pillow>=10.0
+celery[redis]>=5.3
+django-celery-beat
+django-countries>=8.0
+geopy>=2.4
+django-modelcluster>=6.0
+django-taggit>=5.0

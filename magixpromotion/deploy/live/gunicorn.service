@@ -1,0 +1,28 @@
+# /etc/systemd/system/gunicorn.service
+[Unit]
+Description=Gunicorn daemon for Magix Promotion
+Requires=gunicorn.socket
+After=network.target postgresql.service redis.service
+
+[Service]
+User=magix
+Group=www-data
+WorkingDirectory=/opt/magix-promotion
+EnvironmentFile=/opt/magix-promotion/.env.prod
+ExecStart=/opt/magix-promotion/venv/bin/gunicorn config.wsgi:application \
+    --bind unix:/run/gunicorn/magix.sock \
+    --workers 3 \
+    --timeout 120 \
+    --access-logfile /var/log/gunicorn/access.log \
+    --error-logfile /var/log/gunicorn/error.log
+ExecReload=/bin/kill -s HUP $MAINPID
+Restart=on-failure
+RestartSec=5
+
+# Hardening
+PrivateTmp=true
+ProtectSystem=strict
+ReadWritePaths=/opt/magix-promotion/media /opt/magix-promotion/staticfiles /var/log/gunicorn
+
+[Install]
+WantedBy=multi-user.target

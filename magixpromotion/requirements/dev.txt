@@ -1,0 +1,8 @@
+-r base.txt
+pytest
+pytest-django
+factory-boy
+black
+flake8
+mypy
+django-debug-toolbar

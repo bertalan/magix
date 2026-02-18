@@ -1,0 +1,7 @@
+{% load wagtailembeds_tags %}
+<div class="video-embed {% if self.is_featured == 'featured' %}video-featured{% endif %}">
+    {% embed self.video %}
+    {% if self.caption %}
+    <p class="video-caption">{{ self.caption }}</p>
+    {% endif %}
+</div>

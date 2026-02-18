@@ -1,0 +1,90 @@
+# Ruolo
+Agisci come Senior Technical Lead specializzato in stack Python/Django e Wagtail CMS.
+
+# Obiettivo
+Redigere la documentazione tecnica esecutiva per il rifacimento del sito corporate di [Nome Agenzia], agenzia di booking e management artistico.
+Il documento deve servire da "Blue Print" per il team di sviluppo, garantendo l'aderenza alle best practices di Wagtail.
+
+# Output Richiesto
+Genera 5 file markdown con le seguenti specifiche dettagliate:
+
+## 1. architettura-dati-wagtail.md (Backend & Data Model)
+Definisci i modelli seguendo rigorosamente la logica Wagtail:
+* **Page Models (Struttura ad Albero):**
+    * `HomePage`: Unica radice.
+    * `ArtistListingPage` (Index) -> `ArtistPage` (Detail).
+    * `EventListingPage` (Index) -> `EventPage` (Detail).
+    * Definisci le regole `parent_page_types` e `subpage_types` per impedire errori editoriali (es. un Evento non può essere figlio di un Artista).
+* **Snippets (Dati Riutilizzabili):**
+    * Definisci entità che non necessitano di URL propri ma servono per relazioni trasversali: `Genre`, `Venue`, `Promoter`.
+    * Specifica l'uso di `ModelCluster` per le relazioni Many-to-Many (es. Un Artista ha più Generi).
+* **StreamFields (Layout Flessibili):**
+    * Progetta un set di blocchi custom (`ArtistBioBlock`, `DiscographyBlock`, `VideoEmbedBlock`) per sostituire l'editor di testo classico, garantendo rigidità di design ma flessibilità di contenuto.
+* **Media & EPK:**
+    * Specifica un modello `EPKDownload` protetto da permessi (Wagtail Collection permissions) per asset ad alta risoluzione.
+
+## 2. logica-navigazione-i18n.md (Routing & Localizzazione)
+* **Strategia Traduzione:**
+    * Imporre l'uso di `wagtail-localize` (sincronizzazione alberi) invece di alberi separati manualmente.
+    * Logica di routing: `/it/artista/nome` vs `/en/artist/name`.
+    * Gestione campi non traducibili (es. date tour, ID Spotify) vs campi traducibili (Bio).
+* **Menu & Navigazione:**
+    * Utilizzo di `Orderable` per menu dinamici gestibili da CMS, sganciati dalla struttura ad albero rigida.
+
+## 3. funzionalita-booking.md (Business Logic)
+* **Contextual Booking Form:**
+    * Il form di contatto (Wagtail FormBuilder esteso) deve ereditare il contesto della pagina (es. Se inviato da `ArtistPage`, il campo "Oggetto" è precompilato e in sola lettura).
+* **Integrazione Calendario:**
+    * Logica per mostrare date passate vs future.
+    * Disattivazione automatica (unpublish) o archiviazione eventi passati tramite job schedulato (Celery/Django-Cron).
+
+## 4. dev-guidelines.md (Istruzioni per i Programmatori)
+* **Standard di Codice:**
+    * Python: Black formatter, Flake8, Typing (Mypy).
+    * Django: Class-Based Views (dove non gestito da Wagtail), logica "Fat Models, Thin Views".
+* **Gestione Immagini:**
+    * Uso obbligatorio del tag `{% image %}` con regole di rendition specifiche (`fill-800x600|format-webp`) per evitare caricamenti pesanti.
+* **Performance & Caching:**
+    * Configurazione cache per blocchi pesanti (Template Fragment Caching).
+    * Utilizzo di Wagtail API v2 solo se si prevede un frontend frontend (React/Vue), altrimenti focus su Django Templates.
+* **Search Backend:**
+    * Configurazione PostgreSQL Search (o Elasticsearch se il traffico è elevato) indicizzando campi specifici (`search_fields` in `ArtistPage`).
+
+## 5. frontend-ux-inclusive.md (UI & Accessibilità)
+* **Accessibilità Nativa (No Overlay):**
+    * Requisiti WCAG 2.1 AA integrati nel CSS/HTML.
+    * i18n: ogni feature testata in entrambe le lingue, URL corretti, switch senza loss of context
+    * a11y: Lighthouse 100% su entrambi i template, navigabile keyboard-only, screen reader friendly
+    * Supporto `prefers-reduced-motion` per le animazioni dello slider artisti.
+    * Struttura semantica corretta (H1-H6) generata automaticamente dagli StreamBlock.
+* **SEO Tecnico:**
+    * Implementazione automatica JSON-LD (Schema.org `MusicGroup`, `Event`) derivato dai campi del DB Wagtail.
+    * Meta tags OpenGraph automatici (immagine featured come fallback).
+
+## 6. confronto-b2b-concorrenti.md (Analisi Competitor)
+* **Obiettivo:**
+    * Mappare feature B2B critiche (funnel acquisizione lead, gestione roster).
+    * Identificare gap rispetto ai competitor (es. assenza sezione "International").
+* **Perimetro Analisi:**
+    * **B2B Booking:** Verifica flow richiesta preventivi e disponibilità.
+    * **Operations:** Policy eventi, accessibilità, gestione rinvii/cancellazioni.
+* **Target:** Promoter, Venue, Corporate Buyer.
+
+## 7. note-strategiche-progetto.md (Integrazioni Data-Driven)
+* **Architettura Dati Estesa:**
+    * Nuova tassonomia: Show Band (Video-First), Tribute Band (campo `tribute_to`), DJ.
+    * Geolocalizzazione: Campo `base_location` per Artisti e `region` per Venue (Nord Italia).
+* **UX Video-First:**
+    * Header pagina artista con background video/loop per le Show Band.
+* **Booking Intelligente:**
+    * Form preventivo contestuale (Tipo evento, Data, Location) per calcolo budget e trasferta.
+
+# Riferimenti
+I dettagli implementativi sono stati generati nella cartella [idea/](idea/):
+- [1. Architettura Dati](idea/architettura-dati-wagtail.md)
+- [2. Logica Navigazione & i18n](idea/logica-navigazione-i18n.md)
+- [3. Funzionalità Booking](idea/funzionalita-booking.md)
+- [4. Dev Guidelines](idea/dev-guidelines.md)
+- [5. Frontend & UX](idea/frontend-ux-inclusive.md)
+- [6. Confronto Competitor](idea/confronto-b2b-concorrenti.md)
+- [7. Note Strategiche](idea/note-strategiche-progetto.md)

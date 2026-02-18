@@ -1,0 +1,89 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: magix
+      POSTGRES_USER: magix
+      POSTGRES_PASSWORD: magix_dev
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+
+  django:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile
+      target: runtime
+    command: >
+      python manage.py runserver 0.0.0.0:8000
+    environment:
+      - DJANGO_SETTINGS_MODULE=config.settings.dev
+      - DB_NAME=magix
+      - DB_USER=magix
+      - DB_PASSWORD=magix_dev
+      - DB_HOST=db
+      - DB_PORT=5432
+      - REDIS_URL=redis://redis:6379/0
+      - DJANGO_SECRET_KEY=dev-secret-key-not-for-production
+      - CELERY_BROKER_URL=redis://redis:6379/1
+      - WAGTAILADMIN_BASE_URL=http://localhost:8000
+      - GEMINI_API_KEY=${GEMINI_API_KEY:-placeholder}
+      - NOMINATIM_USER_AGENT=magix-promotion-dev
+    ports:
+      - "8000:8000"
+    volumes:
+      - ..:/app
+      - static_files:/app/staticfiles
+      - media_files:/app/media
+    depends_on:
+      - db
+      - redis
+
+  celery:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile
+      target: runtime
+    command: >
+      celery -A config worker -l info -B
+    environment:
+      - DJANGO_SETTINGS_MODULE=config.settings.dev
+      - DB_NAME=magix
+      - DB_USER=magix
+      - DB_PASSWORD=magix_dev
+      - DB_HOST=db
+      - DB_PORT=5432
+      - REDIS_URL=redis://redis:6379/0
+      - CELERY_BROKER_URL=redis://redis:6379/1
+      - DJANGO_SECRET_KEY=dev-secret-key-not-for-production
+      - GEMINI_API_KEY=${GEMINI_API_KEY:-placeholder}
+      - NOMINATIM_USER_AGENT=magix-promotion-dev
+    volumes:
+      - ..:/app
+    depends_on:
+      - db
+      - redis
+
+  frontend:
+    image: node:22-alpine
+    working_dir: /app
+    command: npm run dev -- --host 0.0.0.0
+    ports:
+      - "3000:3000"
+    volumes:
+      - ../frontend:/app
+    environment:
+      - VITE_API_URL=http://localhost:8000
+
+volumes:
+  postgres_data:
+  static_files:
+  media_files:

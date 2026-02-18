@@ -1,0 +1,12 @@
+{% load wagtailcore_tags %}
+<div class="bio-section">
+    <div class="bio-text">{{ self.body|richtext }}</div>
+    {% if self.quote %}
+    <blockquote class="bio-quote">
+        <p>"{{ self.quote }}"</p>
+        {% if self.quote_attribution %}
+        <cite>— {{ self.quote_attribution }}</cite>
+        {% endif %}
+    </blockquote>
+    {% endif %}
+</div>

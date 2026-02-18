@@ -1,0 +1,15 @@
+{% load wagtailcore_tags %}
+<section class="discography">
+    <h2>{{ self.heading }}</h2>
+    {% for album in self.albums %}
+    <div class="album">
+        {% if album.value.cover_image %}
+        {% image album.value.cover_image fill-200x200 %}
+        {% endif %}
+        <h3>{{ album.value.title }} ({{ album.value.year }})</h3>
+        {% if album.value.spotify_url %}
+        <a href="{{ album.value.spotify_url }}" target="_blank" rel="noopener">Ascolta su Spotify</a>
+        {% endif %}
+    </div>
+    {% endfor %}
+</section>

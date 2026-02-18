@@ -1,0 +1,13 @@
+{% load wagtailimages_tags %}
+<section class="gallery gallery-{{ self.layout }}">
+    {% if self.heading %}<h2>{{ self.heading }}</h2>{% endif %}
+    <div class="gallery-grid">
+        {% for item in self.images %}
+        <figure>
+            {% image item.value.image fill-400x300 %}
+            {% if item.value.caption %}<figcaption>{{ item.value.caption }}</figcaption>{% endif %}
+            {% if item.value.credit %}<small>Foto: {{ item.value.credit }}</small>{% endif %}
+        </figure>
+        {% endfor %}
+    </div>
+</section>

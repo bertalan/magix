@@ -1,0 +1,10 @@
+# /etc/systemd/system/gunicorn.socket
+[Unit]
+Description=Gunicorn socket for Magix Promotion
+
+[Socket]
+ListenStream=/run/gunicorn/magix.sock
+SocketUser=www-data
+
+[Install]
+WantedBy=sockets.target

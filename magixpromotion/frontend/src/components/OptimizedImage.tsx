@@ -40,9 +40,13 @@ const OptimizedImage: React.FC<OptimizedImageProps> = ({
     .filter(Boolean)
     .join(", ");
 
+  const fallbackSrc = renditions.card || renditions.thumbnail;
+
+  if (!fallbackSrc) return null;
+
   return (
     <img
-      src={renditions.card || renditions.thumbnail || ""}
+      src={fallbackSrc}
       srcSet={srcSet || undefined}
       sizes={srcSet ? sizes : undefined}
       alt={alt}

@@ -117,11 +117,15 @@ const ArtistDetail: React.FC<ArtistDetailProps> = ({
       <div className="flex flex-col lg:flex-row min-h-screen">
         {/* Lato sinistro: Immagine */}
         <div className="lg:w-1/2 relative h-[50vh] lg:h-screen lg:sticky lg:top-0">
-          <img
-            src={artist.image_url || ""}
-            alt={artist.title}
-            className="w-full h-full object-cover grayscale brightness-75 lg:brightness-100"
-          />
+          {artist.image_url ? (
+            <img
+              src={artist.image_url}
+              alt={artist.title}
+              className="w-full h-full object-cover grayscale brightness-75 lg:brightness-100"
+            />
+          ) : (
+            <div className="w-full h-full bg-gradient-to-br from-[var(--glass)] to-[var(--bg-color)]" aria-hidden="true" />
+          )}
           <div className="absolute inset-0 bg-gradient-to-r from-transparent to-[var(--bg-color)] lg:block hidden" />
           <div className="absolute inset-0 bg-gradient-to-t from-[var(--bg-color)] to-transparent lg:hidden block" />
         </div>

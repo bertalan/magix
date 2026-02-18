@@ -136,7 +136,7 @@ const VideoModal: React.FC<VideoModalProps> = ({
               title={`Video promo di ${artistName}`}
               className="absolute inset-0 w-full h-full"
               loading="lazy"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allow="autoplay; fullscreen; picture-in-picture; encrypted-media"
               allowFullScreen
               referrerPolicy="no-referrer"
             />

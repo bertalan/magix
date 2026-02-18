@@ -61,17 +61,23 @@ export interface Artist {
 
 // --- Events ---
 
+export interface EventArtist {
+  id: number;
+  name: string;
+  slug: string;
+  image_url: string | null;
+}
+
 export interface EventVenue {
   id: number;
   name: string;
   city: string;
-  province: string;
   region: string;
   country: string;
   address: string;
   latitude: number | null;
   longitude: number | null;
-  capacity: number | null;
+  navigation_url: string | null;
 }
 
 export interface EventPage {
@@ -93,7 +99,8 @@ export interface EventPage {
   ticket_price: string;
   description: string;
   venue?: EventVenue;
-  artist_name?: string;
+  artist?: EventArtist;
+  featured_image_url?: string | null;
 }
 
 // --- Wagtail API envelope ---

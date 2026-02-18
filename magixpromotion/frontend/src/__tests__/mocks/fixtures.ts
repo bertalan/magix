@@ -108,15 +108,20 @@ export const mockEvent: EventPage = {
     id: 1,
     name: "Piazza Duomo",
     city: "Milano",
-    province: "MI",
     region: "Lombardia",
     country: "IT",
     address: "Piazza del Duomo, 1",
     latitude: 45.4642,
     longitude: 9.1900,
-    capacity: 5000,
+    navigation_url: null,
   },
-  artist_name: "The Groove Machine",
+  artist: {
+    id: 1,
+    name: "The Groove Machine",
+    slug: "the-groove-machine",
+    image_url: null,
+  },
+  featured_image_url: null,
 };
 
 export const mockEventSoldOut: EventPage = {
@@ -141,15 +146,20 @@ export const mockEventSoldOut: EventPage = {
     id: 2,
     name: "Arena di Verona",
     city: "Verona",
-    province: "VR",
     region: "Veneto",
     country: "IT",
     address: "Piazza Bra, 1",
     latitude: 45.4395,
     longitude: 10.9944,
-    capacity: 15000,
+    navigation_url: null,
   },
-  artist_name: "Queen Forever",
+  artist: {
+    id: 2,
+    name: "Queen Forever",
+    slug: "queen-forever",
+    image_url: null,
+  },
+  featured_image_url: null,
 };
 
 export const mockEventsResponse: WagtailListResponse<EventPage> = {

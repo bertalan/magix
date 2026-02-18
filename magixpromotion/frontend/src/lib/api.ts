@@ -98,7 +98,7 @@ export async function fetchEvents(params?: {
 
   searchParams.set(
     "fields",
-    "start_date,end_date,doors_time,start_time,status,ticket_url,ticket_price,description,venue,artist_name",
+    "start_date,end_date,doors_time,start_time,status,ticket_url,ticket_price,description,venue,artist,featured_image_url",
   );
 
   const qs = searchParams.toString();

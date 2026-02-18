@@ -60,9 +60,10 @@ describe("EventCard", () => {
 
   it("renders venue name and city via AddressLink", () => {
     render(<EventCard event={mockEvent} />);
-    // AddressLink renders venue and city text
-    expect(screen.getByText(/Piazza Duomo/)).toBeInTheDocument();
-    expect(screen.getByText(/Milano/)).toBeInTheDocument();
+    // AddressLink combines venue + city with a dash
+    const addressLink = screen.getByLabelText(/Naviga verso Piazza Duomo/);
+    expect(addressLink).toBeInTheDocument();
+    expect(addressLink).toHaveTextContent(/Milano/);
   });
 
   it("does not crash with no venue", () => {

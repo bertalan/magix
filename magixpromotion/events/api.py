@@ -98,10 +98,11 @@ class EventAPIViewSet(PagesAPIViewSet):
         "ticket_price",
         "venue",
         "artist",
+        "featured_image_url",
     ]
 
     known_query_parameters = PagesAPIViewSet.known_query_parameters.union(
-        {"artist", "venue", "region", "country", "future_only"}
+        {"artist", "venue", "region", "country", "future_only", "date_from", "date_to", "city"}
     )
 
     def get_serializer_class(self):
@@ -137,5 +138,17 @@ class EventAPIViewSet(PagesAPIViewSet):
         future_only = self.request.query_params.get("future_only")
         if future_only == "true":
             qs = qs.filter(start_date__gte=timezone.now().date())
+
+        date_from = self.request.query_params.get("date_from")
+        if date_from:
+            qs = qs.filter(start_date__gte=date_from)
+
+        date_to = self.request.query_params.get("date_to")
+        if date_to:
+            qs = qs.filter(start_date__lte=date_to)
+
+        city = self.request.query_params.get("city")
+        if city:
+            qs = qs.filter(venue__city__iexact=city)
 
         return qs.select_related("venue", "related_artist", "featured_image")

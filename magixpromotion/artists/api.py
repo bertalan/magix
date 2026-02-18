@@ -62,7 +62,7 @@ class ArtistEventsField(Field):
         return [
             {
                 "id": str(e.pk),
-                "date": e.start_date.strftime("%d %b").upper(),
+                "date": e.start_date.isoformat(),
                 "venue": e.venue.name if e.venue else "TBA",
                 "city": e.venue.city if e.venue else "",
                 "status": e.display_status,

@@ -13,6 +13,8 @@ from wagtail.snippets.models import register_snippet
 
 from wagtail_localize.fields import SynchronizedField, TranslatableField
 
+from core.widgets import IconPickerWidget
+
 from core.blocks import ARTIST_BODY_BLOCKS
 
 
@@ -76,7 +78,7 @@ class TargetEvent(models.Model):
     panels = [
         FieldPanel("name"),
         FieldPanel("slug"),
-        FieldPanel("icon"),
+        FieldPanel("icon", widget=IconPickerWidget),
     ]
 
     class Meta:

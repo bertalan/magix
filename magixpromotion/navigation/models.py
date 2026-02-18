@@ -10,6 +10,8 @@ from wagtail.admin.panels import (
 from wagtail.models import Orderable
 from wagtail.snippets.models import register_snippet
 
+from core.widgets import IconPickerWidget
+
 
 MENU_LOCATION_CHOICES = [
     ("header", "Header (Navigazione principale)"),
@@ -100,7 +102,7 @@ class MenuItem(Orderable):
         PageChooserPanel("page_link"),
         FieldPanel("external_url"),
         FieldPanel("open_in_new_tab"),
-        FieldPanel("icon"),
+        FieldPanel("icon", widget=IconPickerWidget),
     ]
 
     class Meta:

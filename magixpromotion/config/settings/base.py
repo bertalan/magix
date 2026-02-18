@@ -124,6 +124,7 @@ WAGTAIL_SITE_NAME = "MagixPromotion"
 WAGTAILADMIN_BASE_URL = os.environ.get("WAGTAILADMIN_BASE_URL", "http://localhost:8000")
 WAGTAILIMAGES_MAX_UPLOAD_SIZE = 10 * 1024 * 1024  # 10MB
 WAGTAIL_ALLOW_UNICODE_SLUGS = True
+WAGTAILAPI_LIMIT_MAX = 50  # Max results per API request (default: 20)
 
 # Cache — Redis (prod), LocMem in dev override
 CACHES = {

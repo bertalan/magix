@@ -1,0 +1,195 @@
+/* ── Icon Picker Widget ─────────────────────────────────── */
+
+.icon-picker-wrapper {
+  position: relative;
+  max-width: 600px;
+}
+
+/* ── Field row ─────────────────────────────────────────── */
+.icon-picker-field {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.icon-picker-input {
+  flex: 1;
+  min-width: 0;
+}
+
+.icon-picker-preview {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 40px;
+  height: 40px;
+}
+
+.icon-picker-preview-img {
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+}
+
+.icon-picker-preview-name {
+  font-size: 13px;
+  color: #666;
+  white-space: nowrap;
+}
+
+.icon-picker-btn {
+  white-space: nowrap;
+  padding: 8px 14px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background: #f5f5f5;
+  cursor: pointer;
+  font-size: 13px;
+  color: #333;
+  transition: background 0.15s, border-color 0.15s;
+}
+.icon-picker-btn:hover {
+  background: #e8e8e8;
+  border-color: #999;
+}
+
+.icon-picker-clear-btn {
+  padding: 4px 8px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 18px;
+  color: #999;
+  line-height: 1;
+  transition: color 0.15s;
+}
+.icon-picker-clear-btn:hover {
+  color: #d00;
+}
+
+/* ── Dropdown ──────────────────────────────────────────── */
+.icon-picker-dropdown {
+  position: absolute;
+  z-index: 1000;
+  top: 100%;
+  left: 0;
+  right: 0;
+  margin-top: 4px;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  max-height: 420px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.icon-picker-search {
+  display: block;
+  width: 100%;
+  padding: 10px 12px;
+  border: none;
+  border-bottom: 1px solid #eee;
+  font-size: 14px;
+  outline: none;
+  box-sizing: border-box;
+}
+.icon-picker-search:focus {
+  border-bottom-color: #007d7e;
+}
+
+/* ── Grid ──────────────────────────────────────────────── */
+.icon-picker-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(72px, 1fr));
+  gap: 4px;
+  padding: 8px;
+  overflow-y: auto;
+  max-height: 350px;
+}
+
+.icon-picker-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 8px 4px;
+  border: 2px solid transparent;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.12s, border-color 0.12s;
+  text-align: center;
+}
+.icon-picker-item:hover {
+  background: #f0f0f0;
+  border-color: #ddd;
+}
+.icon-picker-item.selected {
+  background: #e6f7f7;
+  border-color: #007d7e;
+}
+.icon-picker-item img {
+  width: 24px;
+  height: 24px;
+  pointer-events: none;
+}
+.icon-picker-item span {
+  font-size: 10px;
+  color: #666;
+  line-height: 1.2;
+  max-width: 68px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+/* ── Empty / no results ────────────────────────────────── */
+.icon-picker-empty {
+  padding: 24px;
+  text-align: center;
+  color: #999;
+  font-size: 13px;
+}
+
+/* ── Dark-mode compatibility (Wagtail dark theme) ──────── */
+.w-theme-dark .icon-picker-dropdown {
+  background: #262626;
+  border-color: #444;
+}
+.w-theme-dark .icon-picker-search {
+  background: #333;
+  color: #eee;
+  border-bottom-color: #444;
+}
+.w-theme-dark .icon-picker-item:hover {
+  background: #333;
+  border-color: #555;
+}
+.w-theme-dark .icon-picker-item.selected {
+  background: #1a3a3a;
+  border-color: #007d7e;
+}
+.w-theme-dark .icon-picker-item span {
+  color: #aaa;
+}
+.w-theme-dark .icon-picker-preview-name {
+  color: #aaa;
+}
+.w-theme-dark .icon-picker-preview-img {
+  filter: invert(1);
+}
+.w-theme-dark .icon-picker-item img {
+  filter: invert(0.85);
+}
+.w-theme-dark .icon-picker-btn {
+  background: #333;
+  color: #ddd;
+  border-color: #555;
+}
+.w-theme-dark .icon-picker-btn:hover {
+  background: #444;
+  border-color: #777;
+}

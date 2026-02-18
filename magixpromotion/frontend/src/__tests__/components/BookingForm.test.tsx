@@ -9,6 +9,11 @@ import { http, HttpResponse } from "msw";
 import { server } from "../mocks/server";
 import BookingForm from "@/components/BookingForm";
 
+/** Data futura dinamica per evitare che il campo date min={oggi} blocchi il submit */
+const FUTURE_DATE = new Date(Date.now() + 90 * 24 * 60 * 60 * 1000)
+  .toISOString()
+  .split("T")[0]; // ~3 mesi da oggi
+
 describe("BookingForm", () => {
   it("renders all required form fields", () => {
     render(<BookingForm />);
@@ -62,7 +67,7 @@ describe("BookingForm", () => {
 
     // Fill date (type=date)
     const dateInput = document.querySelector('input[name="event_date"]') as HTMLInputElement;
-    await user.type(dateInput, "2025-09-15");
+    await user.type(dateInput, FUTURE_DATE);
 
     // Fill location
     await user.type(screen.getByPlaceholderText("Citta' / Provincia *"), "Milano");
@@ -89,7 +94,7 @@ describe("BookingForm", () => {
     const eventTypeSelect = screen.getAllByRole("combobox")[0];
     await user.selectOptions(eventTypeSelect, "matrimonio");
     const dateInput = document.querySelector('input[name="event_date"]') as HTMLInputElement;
-    await user.type(dateInput, "2025-09-15");
+    await user.type(dateInput, FUTURE_DATE);
     await user.type(screen.getByPlaceholderText("Citta' / Provincia *"), "Milano");
     const privacyCheckbox = screen.getByRole("checkbox");
     await user.click(privacyCheckbox);
@@ -130,7 +135,7 @@ describe("BookingForm", () => {
     const eventTypeSelect = screen.getAllByRole("combobox")[0];
     await user.selectOptions(eventTypeSelect, "matrimonio");
     const dateInput = document.querySelector('input[name="event_date"]') as HTMLInputElement;
-    await user.type(dateInput, "2025-09-15");
+    await user.type(dateInput, FUTURE_DATE);
     await user.type(screen.getByPlaceholderText("Citta' / Provincia *"), "Milano");
     const privacyCheckbox = screen.getByRole("checkbox");
     await user.click(privacyCheckbox);
@@ -158,7 +163,7 @@ describe("BookingForm", () => {
     const eventTypeSelect = screen.getAllByRole("combobox")[0];
     await user.selectOptions(eventTypeSelect, "matrimonio");
     const dateInput = document.querySelector('input[name="event_date"]') as HTMLInputElement;
-    await user.type(dateInput, "2025-09-15");
+    await user.type(dateInput, FUTURE_DATE);
     await user.type(screen.getByPlaceholderText("Citta' / Provincia *"), "Milano");
     const privacyCheckbox = screen.getByRole("checkbox");
     await user.click(privacyCheckbox);

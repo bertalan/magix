@@ -33,7 +33,18 @@ def search_api(request):
         artist_results = ArtistPage.objects.live().search(
             query_string, operator="or"
         )[:limit]
-        for page in artist_results:
+        # Prefetch genres e immagine per evitare N+1 query
+        artist_ids = [p.id for p in artist_results]
+        prefetched = {
+            a.id: a
+            for a in ArtistPage.objects.filter(
+                id__in=artist_ids
+            ).prefetch_related("genres").select_related("main_image")
+        }
+        for page_id in artist_ids:
+            page = prefetched.get(page_id)
+            if not page:
+                continue
             image_url = None
             if page.main_image:
                 try:
@@ -110,6 +121,15 @@ def autocomplete_api(request):
 
     results = ArtistPage.objects.live().autocomplete(query_string)[:limit]
 
+    # Prefetch genres per evitare N+1 query
+    result_ids = [p.id for p in results]
+    prefetched = {
+        a.id: a
+        for a in ArtistPage.objects.filter(
+            id__in=result_ids
+        ).prefetch_related("genres")
+    }
+
     suggestions = [
         {
             "id": page.id,
@@ -117,7 +137,8 @@ def autocomplete_api(request):
             "slug": page.slug,
             "genre": ", ".join(g.name for g in page.genres.all()),
         }
-        for page in results
+        for page in (prefetched.get(pid) for pid in result_ids)
+        if page is not None
     ]
 
     return JsonResponse({"query": query_string, "suggestions": suggestions})

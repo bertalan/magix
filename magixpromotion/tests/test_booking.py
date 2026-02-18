@@ -9,11 +9,11 @@ class TestBookingForm:
     def _valid_data(self):
         """Return a dict with all required fields populated."""
         return {
-            "nome_cognome": "Mario Rossi",
+            "full_name": "Mario Rossi",
             "email": "mario@test.com",
-            "artista_richiesto": "Red Moon",
-            "tipo_evento": "matrimonio",
-            "messaggio": "Vorremmo la band per il nostro matrimonio.",
+            "requested_artist": "Red Moon",
+            "event_type": "matrimonio",
+            "message": "Vorremmo la band per il nostro matrimonio.",
             "privacy": True,
         }
 
@@ -35,33 +35,33 @@ class TestBookingForm:
         assert not form.is_valid()
         assert "email" in form.errors
 
-    def test_missing_nome_cognome(self):
+    def test_missing_full_name(self):
         data = self._valid_data()
-        del data["nome_cognome"]
+        del data["full_name"]
         form = BookingForm(data=data)
         assert not form.is_valid()
-        assert "nome_cognome" in form.errors
+        assert "full_name" in form.errors
 
     def test_missing_artista(self):
         data = self._valid_data()
-        del data["artista_richiesto"]
+        del data["requested_artist"]
         form = BookingForm(data=data)
         assert not form.is_valid()
-        assert "artista_richiesto" in form.errors
+        assert "requested_artist" in form.errors
 
-    def test_missing_tipo_evento(self):
+    def test_missing_event_type(self):
         data = self._valid_data()
-        del data["tipo_evento"]
+        del data["event_type"]
         form = BookingForm(data=data)
         assert not form.is_valid()
-        assert "tipo_evento" in form.errors
+        assert "event_type" in form.errors
 
-    def test_missing_messaggio(self):
+    def test_missing_message(self):
         data = self._valid_data()
-        del data["messaggio"]
+        del data["message"]
         form = BookingForm(data=data)
         assert not form.is_valid()
-        assert "messaggio" in form.errors
+        assert "message" in form.errors
 
     def test_privacy_false(self):
         data = self._valid_data()
@@ -83,30 +83,30 @@ class TestBookingForm:
         # These are all optional
         form = BookingForm(data=data)
         assert form.is_valid()
-        # telefono, azienda, data_evento, luogo_evento, budget_indicativo are optional
-        assert "telefono" not in form.errors
-        assert "azienda" not in form.errors
-        assert "data_evento" not in form.errors
-        assert "luogo_evento" not in form.errors
-        assert "budget_indicativo" not in form.errors
+        # phone, company, event_date, event_location, estimated_budget are optional
+        assert "phone" not in form.errors
+        assert "company" not in form.errors
+        assert "event_date" not in form.errors
+        assert "event_location" not in form.errors
+        assert "estimated_budget" not in form.errors
 
     def test_all_fields_populated(self):
         data = self._valid_data()
         data.update(
             {
-                "telefono": "+39 335 123 4567",
-                "azienda": "Azienda Test SRL",
-                "data_evento": "2026-09-15",
-                "luogo_evento": "Como, Villa Olmo",
-                "budget_indicativo": "5000 EUR",
+                "phone": "+39 335 123 4567",
+                "company": "Azienda Test SRL",
+                "event_date": "2026-09-15",
+                "event_location": "Como, Villa Olmo",
+                "estimated_budget": "5000 EUR",
             }
         )
         form = BookingForm(data=data)
         assert form.is_valid(), form.errors
 
-    def test_tipo_evento_invalid_choice(self):
+    def test_event_type_invalid_choice(self):
         data = self._valid_data()
-        data["tipo_evento"] = "invalid_choice"
+        data["event_type"] = "invalid_choice"
         form = BookingForm(data=data)
         assert not form.is_valid()
-        assert "tipo_evento" in form.errors
+        assert "event_type" in form.errors

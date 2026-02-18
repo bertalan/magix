@@ -35,11 +35,11 @@ def nominatim_geocode(
         _last_request_time = time.time()
 
         if location:
-            logger.info(f"Geocodificato: {address} -> ({location.latitude}, {location.longitude})")
+            logger.info("Geocodificato: %s -> (%s, %s)", address, location.latitude, location.longitude)
             return (location.latitude, location.longitude)
 
-        logger.warning(f"Indirizzo non trovato: {address}")
+        logger.warning("Indirizzo non trovato: %s", address)
         return None
     except (GeocoderTimedOut, GeocoderServiceError) as e:
-        logger.error(f"Errore geocoding Nominatim: {e}")
+        logger.error("Errore geocoding Nominatim: %s", e)
         return None

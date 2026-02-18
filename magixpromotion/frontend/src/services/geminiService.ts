@@ -1,15 +1,21 @@
-import { GoogleGenAI, Type } from "@google/genai";
-
-const ai = new GoogleGenAI({
-  apiKey: import.meta.env.VITE_GEMINI_API_KEY || "",
-});
-
 export interface ScoutResult {
   artistId: number;
   reasoning: string;
   vibeScore: number;
 }
 
+/**
+ * Read the CSRF token from the Django csrftoken cookie.
+ */
+function getCsrfToken(): string {
+  const match = document.cookie.match(/csrftoken=([^;]+)/);
+  return match ? match[1] : "";
+}
+
+/**
+ * Call the backend BandFinder proxy instead of Gemini directly.
+ * The API key is kept server-side — no secrets in the browser.
+ */
 export const scoutTalent = async (
   query: string,
   artistPool: Array<{
@@ -20,60 +26,29 @@ export const scoutTalent = async (
     artist_type: string;
     tags: string[];
   }>,
-  companyInfo?: { name: string; location: string },
 ): Promise<ScoutResult | null> => {
-  const model = "gemini-2.0-flash";
-
-  const agencyName = companyInfo?.name || "l'agenzia";
-  const agencyLocation = companyInfo?.location || "Italia";
-
-  const systemInstruction = `Sei l'assistente BandFinder di ${agencyName}, agenzia di band e artisti musicali.
-Il tuo compito è trovare l'artista o band più adatta alla richiesta dell'utente nel nostro roster.
-
-Contesto: L'agenzia ha sede in ${agencyLocation} ma gestisce eventi anche all'estero.
-Le tipologie includono: Dance Show Band, Tributo Italiano, Tributo Internazionale, DJ Set, Rock Band, Folk Band.
-
-Roster disponibile:
-${JSON.stringify(
-  artistPool.map((a) => ({
-    id: a.id,
-    name: a.name,
-    genre: a.genre,
-    bio: a.bio,
-    type: a.artist_type,
-    tags: a.tags,
-  })),
-)}
-
-REGOLE:
-- Rispondi SEMPRE in italiano
-- Sii professionale ma amichevole
-- Il reasoning deve essere una frase breve e incisiva che spiega il match
-- Il vibeScore va da 1 a 10 dove 10 è match perfetto
-- Scegli SOLO artisti dal roster fornito`;
-
   try {
-    const response = await ai.models.generateContent({
-      model,
-      contents: query,
-      config: {
-        systemInstruction,
-        responseMimeType: "application/json",
-        responseSchema: {
-          type: Type.OBJECT,
-          properties: {
-            artistId: { type: Type.NUMBER },
-            reasoning: { type: Type.STRING },
-            vibeScore: { type: Type.NUMBER },
-          },
-          required: ["artistId", "reasoning", "vibeScore"],
-        },
+    const res = await fetch("/api/v2/band-finder/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": getCsrfToken(),
       },
+      body: JSON.stringify({
+        query,
+        artist_pool: artistPool,
+      }),
     });
 
-    return JSON.parse(response.text || "{}") as ScoutResult;
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      console.error("BandFinder API error:", (err as { detail?: string }).detail || res.statusText);
+      return null;
+    }
+
+    return (await res.json()) as ScoutResult;
   } catch (error) {
-    console.error("Errore Gemini Scout:", error);
+    console.error("Errore BandFinder:", error);
     return null;
   }
 };

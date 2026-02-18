@@ -35,7 +35,7 @@ def archive_past_events(self) -> dict:
         return {"archived": 0, "date": str(yesterday)}
 
     updated = events_to_archive.update(is_archived=True)
-    logger.info(f"Archiviati {updated} eventi con data precedente a {yesterday}.")
+    logger.info("Archiviati %d eventi con data precedente a %s.", updated, yesterday)
 
     return {
         "archived": updated,
@@ -69,9 +69,9 @@ def send_booking_notification(submission_id: int) -> None:
             fail_silently=False,
         )
 
-        logger.info(f"Notifica booking inviata per submission {submission_id}")
+        logger.info("Notifica booking inviata per submission %d", submission_id)
 
     except FormSubmission.DoesNotExist:
-        logger.error(f"Submission {submission_id} non trovata.")
+        logger.error("Submission %d non trovata.", submission_id)
     except Exception as exc:
-        logger.exception(f"Errore invio notifica booking: {exc}")
+        logger.exception("Errore invio notifica booking: %s", exc)

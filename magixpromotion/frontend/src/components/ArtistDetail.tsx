@@ -1,6 +1,7 @@
 import React from "react";
 import { Artist, ViewState } from "@/types";
 import { useFocusTrap } from "@/hooks/useFocusTrap";
+import VideoModal from "./VideoModal";
 import {
   X,
   Instagram,
@@ -25,21 +26,23 @@ const ArtistDetail: React.FC<ArtistDetailProps> = ({
   setView,
 }) => {
   const [isPlaying, setIsPlaying] = React.useState(false);
+  const [showVideoModal, setShowVideoModal] = React.useState(false);
   const eventsRef = React.useRef<HTMLDivElement>(null);
   const trapRef = useFocusTrap<HTMLDivElement>();
 
   // Close on Escape key
   React.useEffect(() => {
     const handler = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
+      // Non chiudere il detail se il video modal è aperto
+      if (e.key === "Escape" && !showVideoModal) onClose();
     };
     document.addEventListener("keydown", handler);
     return () => document.removeEventListener("keydown", handler);
-  }, [onClose]);
+  }, [onClose, showVideoModal]);
 
   const handlePlayClick = () => {
     if (artist.hero_video_url) {
-      window.open(artist.hero_video_url, "_blank", "noopener");
+      setShowVideoModal(true);
     }
     setIsPlaying(true);
     setTimeout(() => setIsPlaying(false), 3000);
@@ -310,6 +313,15 @@ const ArtistDetail: React.FC<ArtistDetailProps> = ({
           </div>
         </div>
       </div>
+
+      {/* Video Modal overlay */}
+      {showVideoModal && artist.hero_video_url && (
+        <VideoModal
+          videoUrl={artist.hero_video_url}
+          artistName={artist.title}
+          onClose={() => setShowVideoModal(false)}
+        />
+      )}
     </div>
   );
 };

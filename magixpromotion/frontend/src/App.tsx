@@ -20,6 +20,10 @@ const App: React.FC = () => {
     return saved === "pastel-dream" ? "pastel-dream" : "electric-night";
   });
 
+  const [bookingArtistName, setBookingArtistName] = React.useState<
+    string | undefined
+  >(undefined);
+
   // Applica il tema al document
   React.useEffect(() => {
     document.documentElement.setAttribute("data-theme", currentTheme);
@@ -37,6 +41,9 @@ const App: React.FC = () => {
     if (view !== "DETAIL") {
       setSelectedArtist(null);
     }
+    if (view !== "BOOKING") {
+      setBookingArtistName(undefined);
+    }
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
@@ -48,6 +55,14 @@ const App: React.FC = () => {
   const handleCloseDetail = () => {
     setSelectedArtist(null);
     setActiveView("TALENT");
+  };
+
+  /** Naviga a Booking con artista preselezionato (da ArtistDetail) */
+  const handleBookArtist = (artistName: string) => {
+    setBookingArtistName(artistName);
+    setSelectedArtist(null);
+    setActiveView("BOOKING");
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const renderView = () => {
@@ -69,7 +84,7 @@ const App: React.FC = () => {
       case "BOOKING":
         return (
           <BookingPage
-            preselectedArtist={selectedArtist?.title}
+            preselectedArtist={bookingArtistName}
           />
         );
 
@@ -95,6 +110,7 @@ const App: React.FC = () => {
           artist={selectedArtist}
           onClose={handleCloseDetail}
           setView={setView}
+          onBookArtist={handleBookArtist}
         />
       )}
     </Layout>

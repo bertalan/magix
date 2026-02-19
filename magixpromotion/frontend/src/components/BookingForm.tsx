@@ -2,6 +2,7 @@ import React from "react";
 import type { BookingFormData } from "@/types";
 import { submitBooking } from "@/lib/api";
 import { Send, CheckCircle, AlertCircle, Loader } from "lucide-react";
+import ArtistAutocomplete from "./ArtistAutocomplete";
 
 interface BookingFormProps {
   /** Nome artista preselezionato (da navigazione) */
@@ -204,15 +205,12 @@ const BookingForm: React.FC<BookingFormProps> = ({ preselectedArtist }) => {
           aria-label="Telefono"
           className={inputClass}
         />
-        <input
-          type="text"
-          name="requested_artist"
-          placeholder="Artista / Band richiesta *"
+        <ArtistAutocomplete
           value={formData.requested_artist}
-          onChange={handleChange}
-          required
-          aria-required="true"
-          aria-label="Artista o band richiesta"
+          onChange={(val) =>
+            setFormData((prev) => ({ ...prev, requested_artist: val }))
+          }
+          locked={!!preselectedArtist}
           className={inputClass}
         />
       </div>

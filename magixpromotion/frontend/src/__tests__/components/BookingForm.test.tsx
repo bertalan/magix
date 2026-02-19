@@ -14,27 +14,80 @@ const FUTURE_DATE = new Date(Date.now() + 90 * 24 * 60 * 60 * 1000)
   .toISOString()
   .split("T")[0]; // ~3 mesi da oggi
 
+/**
+ * Helper: compila il campo artista tramite l'autocomplete.
+ * Digita il testo e poi seleziona il suggerimento (o lascia testo libero).
+ */
+async function fillArtistField(
+  user: ReturnType<typeof userEvent.setup>,
+  text: string,
+) {
+  const artistInput = screen.getByPlaceholderText("Artista / Band richiesta *");
+  await user.type(artistInput, text);
+}
+
+/**
+ * Helper: compila tutti i campi obbligatori del form.
+ */
+async function fillRequiredFields(user: ReturnType<typeof userEvent.setup>) {
+  await user.type(screen.getByPlaceholderText("Il tuo nome *"), "Mario Rossi");
+  await user.type(screen.getByPlaceholderText("Email *"), "mario@example.com");
+  await fillArtistField(user, "The Groove Machine");
+
+  // Select event type (primo combobox visibile)
+  const eventTypeSelect = screen.getByLabelText("Tipo evento");
+  await user.selectOptions(eventTypeSelect, "matrimonio");
+
+  // Data evento
+  const dateInput = document.querySelector(
+    'input[name="event_date"]',
+  ) as HTMLInputElement;
+  await user.type(dateInput, FUTURE_DATE);
+
+  // Location
+  await user.type(
+    screen.getByPlaceholderText("Citta' / Provincia *"),
+    "Milano",
+  );
+
+  // Privacy checkbox
+  const privacyCheckbox = screen.getByRole("checkbox");
+  await user.click(privacyCheckbox);
+}
+
 describe("BookingForm", () => {
   it("renders all required form fields", () => {
     render(<BookingForm />);
 
     expect(screen.getByPlaceholderText("Il tuo nome *")).toBeInTheDocument();
     expect(screen.getByPlaceholderText("Email *")).toBeInTheDocument();
-    expect(screen.getByPlaceholderText("Telefono (opzionale)")).toBeInTheDocument();
-    expect(screen.getByPlaceholderText("Artista / Band richiesta *")).toBeInTheDocument();
-    expect(screen.getByPlaceholderText("Citta' / Provincia *")).toBeInTheDocument();
+    expect(
+      screen.getByPlaceholderText("Telefono (opzionale)"),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByPlaceholderText("Artista / Band richiesta *"),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByPlaceholderText("Citta' / Provincia *"),
+    ).toBeInTheDocument();
     expect(screen.getByText("Seleziona tipo evento...")).toBeInTheDocument();
-    expect(screen.getByText("Fascia di budget (opzionale)")).toBeInTheDocument();
+    expect(
+      screen.getByText("Fascia di budget (opzionale)"),
+    ).toBeInTheDocument();
   });
 
   it("renders privacy checkbox", () => {
     render(<BookingForm />);
-    expect(screen.getByText(/Acconsento al trattamento dei dati/)).toBeInTheDocument();
+    expect(
+      screen.getByText(/Acconsento al trattamento dei dati/),
+    ).toBeInTheDocument();
   });
 
   it("renders submit button", () => {
     render(<BookingForm />);
-    expect(screen.getByRole("button", { name: /INVIA RICHIESTA/ })).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /INVIA RICHIESTA/ }),
+    ).toBeInTheDocument();
   });
 
   it("submit button is disabled when form is incomplete", () => {
@@ -45,36 +98,32 @@ describe("BookingForm", () => {
 
   it("pre-fills artist name when preselectedArtist is provided", () => {
     render(<BookingForm preselectedArtist="The Groove Machine" />);
-    const artistInput = screen.getByPlaceholderText("Artista / Band richiesta *");
+    // Il campo è readonly (locked) con il valore preselezionato
+    const artistInput = screen.getByLabelText("Artista o band richiesta");
     expect(artistInput).toHaveValue("The Groove Machine");
+    expect(artistInput).toHaveAttribute("readOnly");
+  });
+
+  it("shows autocomplete dropdown when typing", async () => {
+    const user = userEvent.setup();
+    render(<BookingForm />);
+
+    const artistInput = screen.getByPlaceholderText(
+      "Artista / Band richiesta *",
+    );
+    await user.click(artistInput);
+
+    // Il dropdown dovrebbe aprirsi con le opzioni dal mock
+    await waitFor(() => {
+      expect(screen.getByText("Altro / Non in elenco...")).toBeInTheDocument();
+    });
   });
 
   it("enables submit button after filling all required fields", async () => {
     const user = userEvent.setup();
     render(<BookingForm />);
 
-    // Fill required fields
-    await user.type(screen.getByPlaceholderText("Il tuo nome *"), "Mario Rossi");
-    await user.type(screen.getByPlaceholderText("Email *"), "mario@example.com");
-    await user.type(
-      screen.getByPlaceholderText("Artista / Band richiesta *"),
-      "The Groove Machine",
-    );
-
-    // Select event type
-    const eventTypeSelect = screen.getAllByRole("combobox")[0];
-    await user.selectOptions(eventTypeSelect, "matrimonio");
-
-    // Fill date (type=date)
-    const dateInput = document.querySelector('input[name="event_date"]') as HTMLInputElement;
-    await user.type(dateInput, FUTURE_DATE);
-
-    // Fill location
-    await user.type(screen.getByPlaceholderText("Citta' / Provincia *"), "Milano");
-
-    // Check privacy
-    const privacyCheckbox = screen.getByRole("checkbox");
-    await user.click(privacyCheckbox);
+    await fillRequiredFields(user);
 
     const button = screen.getByRole("button", { name: /INVIA RICHIESTA/ });
     expect(button).not.toBeDisabled();
@@ -84,22 +133,8 @@ describe("BookingForm", () => {
     const user = userEvent.setup();
     render(<BookingForm />);
 
-    // Fill all required fields
-    await user.type(screen.getByPlaceholderText("Il tuo nome *"), "Mario Rossi");
-    await user.type(screen.getByPlaceholderText("Email *"), "mario@example.com");
-    await user.type(
-      screen.getByPlaceholderText("Artista / Band richiesta *"),
-      "The Groove Machine",
-    );
-    const eventTypeSelect = screen.getAllByRole("combobox")[0];
-    await user.selectOptions(eventTypeSelect, "matrimonio");
-    const dateInput = document.querySelector('input[name="event_date"]') as HTMLInputElement;
-    await user.type(dateInput, FUTURE_DATE);
-    await user.type(screen.getByPlaceholderText("Citta' / Provincia *"), "Milano");
-    const privacyCheckbox = screen.getByRole("checkbox");
-    await user.click(privacyCheckbox);
+    await fillRequiredFields(user);
 
-    // Submit
     const button = screen.getByRole("button", { name: /INVIA RICHIESTA/ });
     await user.click(button);
 
@@ -125,22 +160,8 @@ describe("BookingForm", () => {
     const user = userEvent.setup();
     render(<BookingForm />);
 
-    // Fill all required fields
-    await user.type(screen.getByPlaceholderText("Il tuo nome *"), "Mario Rossi");
-    await user.type(screen.getByPlaceholderText("Email *"), "mario@example.com");
-    await user.type(
-      screen.getByPlaceholderText("Artista / Band richiesta *"),
-      "The Groove Machine",
-    );
-    const eventTypeSelect = screen.getAllByRole("combobox")[0];
-    await user.selectOptions(eventTypeSelect, "matrimonio");
-    const dateInput = document.querySelector('input[name="event_date"]') as HTMLInputElement;
-    await user.type(dateInput, FUTURE_DATE);
-    await user.type(screen.getByPlaceholderText("Citta' / Provincia *"), "Milano");
-    const privacyCheckbox = screen.getByRole("checkbox");
-    await user.click(privacyCheckbox);
+    await fillRequiredFields(user);
 
-    // Submit
     const button = screen.getByRole("button", { name: /INVIA RICHIESTA/ });
     await user.click(button);
 
@@ -153,20 +174,7 @@ describe("BookingForm", () => {
     const user = userEvent.setup();
     render(<BookingForm />);
 
-    // Fill and submit
-    await user.type(screen.getByPlaceholderText("Il tuo nome *"), "Mario Rossi");
-    await user.type(screen.getByPlaceholderText("Email *"), "mario@example.com");
-    await user.type(
-      screen.getByPlaceholderText("Artista / Band richiesta *"),
-      "The Groove Machine",
-    );
-    const eventTypeSelect = screen.getAllByRole("combobox")[0];
-    await user.selectOptions(eventTypeSelect, "matrimonio");
-    const dateInput = document.querySelector('input[name="event_date"]') as HTMLInputElement;
-    await user.type(dateInput, FUTURE_DATE);
-    await user.type(screen.getByPlaceholderText("Citta' / Provincia *"), "Milano");
-    const privacyCheckbox = screen.getByRole("checkbox");
-    await user.click(privacyCheckbox);
+    await fillRequiredFields(user);
 
     const button = screen.getByRole("button", { name: /INVIA RICHIESTA/ });
     await user.click(button);

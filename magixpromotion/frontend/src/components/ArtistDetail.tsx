@@ -18,12 +18,15 @@ interface ArtistDetailProps {
   artist: Artist;
   onClose: () => void;
   setView?: (v: ViewState) => void;
+  /** Callback per navigare a Booking con artista preselezionato */
+  onBookArtist?: (artistName: string) => void;
 }
 
 const ArtistDetail: React.FC<ArtistDetailProps> = ({
   artist,
   onClose,
   setView,
+  onBookArtist,
 }) => {
   const [isPlaying, setIsPlaying] = React.useState(false);
   const [showVideoModal, setShowVideoModal] = React.useState(false);
@@ -49,10 +52,13 @@ const ArtistDetail: React.FC<ArtistDetailProps> = ({
   };
 
   const handleBooking = () => {
-    onClose();
-    // Naviga a booking con artista preselezionato
-    if (setView) {
-      setView("BOOKING");
+    if (onBookArtist) {
+      onBookArtist(artist.title);
+    } else {
+      onClose();
+      if (setView) {
+        setView("BOOKING");
+      }
     }
   };
 

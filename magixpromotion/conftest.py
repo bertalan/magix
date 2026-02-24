@@ -14,8 +14,18 @@ from tests.factories import (
 
 @pytest.fixture
 def home_page(db):
-    """Crea una HomePage come root del sito."""
+    """Crea una HomePage come root del sito.
+
+    Rimuove la Welcome Page di default creata dalla migration iniziale
+    di Wagtail, che ha slug 'home' e causerebbe un conflitto.
+    Usa il metodo corretto di treebeard per non corrompere l'albero.
+    """
     root = Page.objects.get(depth=1)
+    # Elimina ogni pagina figlia esistente (Welcome to Wagtail) una ad una
+    for child in root.get_children():
+        child.delete()
+    # Ricarica root per aggiornare lo stato treebeard
+    root.refresh_from_db()
     home = HomePageFactory(parent=root)
     Site.objects.update_or_create(
         is_default_site=True,

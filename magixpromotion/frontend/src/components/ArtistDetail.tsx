@@ -1,6 +1,8 @@
 import React from "react";
 import { Artist, ViewState } from "@/types";
 import { useFocusTrap } from "@/hooks/useFocusTrap";
+import { useImageRotator, ImagePair } from "@/hooks/useImageRotator";
+import ProgressiveImage from "./ProgressiveImage";
 import VideoModal from "./VideoModal";
 import {
   X,
@@ -20,6 +22,8 @@ interface ArtistDetailProps {
   setView?: (v: ViewState) => void;
   /** Callback per navigare a Booking con artista preselezionato */
   onBookArtist?: (artistName: string) => void;
+  /** Callback per aprire il dettaglio evento (fetch + overlay) */
+  onEventClick?: (eventSlug: string) => void;
 }
 
 const ArtistDetail: React.FC<ArtistDetailProps> = ({
@@ -27,11 +31,34 @@ const ArtistDetail: React.FC<ArtistDetailProps> = ({
   onClose,
   setView,
   onBookArtist,
+  onEventClick,
 }) => {
   const [isPlaying, setIsPlaying] = React.useState(false);
   const [showVideoModal, setShowVideoModal] = React.useState(false);
   const eventsRef = React.useRef<HTMLDivElement>(null);
   const trapRef = useFocusTrap<HTMLDivElement>();
+
+  // Costruisci array immagini paired: full-res + LQIP thumb
+  const allImages = React.useMemo<ImagePair[]>(() => {
+    const pairs: ImagePair[] = [];
+    if (artist.image_url) {
+      pairs.push({
+        src: artist.image_url,
+        thumb: artist.image_thumb ?? artist.image_url,
+      });
+    }
+    if (artist.gallery_images) {
+      artist.gallery_images.forEach((img, i) => {
+        pairs.push({
+          src: img,
+          thumb: artist.gallery_thumbs?.[i] ?? img,
+        });
+      });
+    }
+    return pairs;
+  }, [artist.image_url, artist.image_thumb, artist.gallery_images, artist.gallery_thumbs]);
+
+  const { currentSrc, currentThumb, prevSrc, transitioning } = useImageRotator(allImages);
 
   // Close on Escape key
   React.useEffect(() => {
@@ -122,13 +149,29 @@ const ArtistDetail: React.FC<ArtistDetailProps> = ({
 
       <div className="flex flex-col lg:flex-row min-h-screen">
         {/* Lato sinistro: Immagine */}
-        <div className="lg:w-1/2 relative h-[50vh] lg:h-screen lg:sticky lg:top-0">
-          {artist.image_url ? (
-            <img
-              src={artist.image_url}
-              alt={artist.title}
-              className="w-full h-full object-cover grayscale brightness-75 lg:brightness-100"
-            />
+        <div className="lg:w-1/2 relative h-[50vh] lg:h-screen lg:sticky lg:top-0 overflow-hidden">
+          {currentSrc ? (
+            <>
+              {/* Immagine precedente (in uscita) */}
+              {prevSrc && transitioning && (
+                <img
+                  src={prevSrc}
+                  alt=""
+                  aria-hidden="true"
+                  className="absolute inset-0 w-full h-full object-cover brightness-75 transition-opacity duration-[600ms] opacity-0"
+                />
+              )}
+              {/* Immagine corrente con caricamento progressivo */}
+              <ProgressiveImage
+                src={currentSrc}
+                placeholder={currentThumb}
+                alt={artist.title}
+                className={`grayscale brightness-75 lg:brightness-100 ${
+                  transitioning ? "animate-fade-in" : ""
+                }`}
+                loading="eager"
+              />
+            </>
           ) : (
             <div className="w-full h-full bg-gradient-to-br from-[var(--glass)] to-[var(--bg-color)]" aria-hidden="true" />
           )}
@@ -264,7 +307,11 @@ const ArtistDetail: React.FC<ArtistDetailProps> = ({
                   artist.events.map((event) => (
                     <div
                       key={event.id}
-                      className="glass-panel group p-6 rounded-2xl border border-[var(--glass-border)] flex flex-col sm:flex-row sm:items-center justify-between gap-6 hover:bg-[var(--glass)] hover:border-[var(--accent)]/30 transition-all"
+                      onClick={() => onEventClick?.(event.slug)}
+                      role="button"
+                      tabIndex={0}
+                      onKeyDown={(e) => e.key === "Enter" && onEventClick?.(event.slug)}
+                      className="glass-panel group p-6 rounded-2xl border border-[var(--glass-border)] flex flex-col sm:flex-row sm:items-center justify-between gap-6 hover:bg-[var(--glass)] hover:border-[var(--accent)]/30 transition-all cursor-pointer"
                     >
                       <div className="flex items-center gap-6">
                         <div className="flex flex-col items-center justify-center min-w-[70px] h-[70px] rounded-xl bg-[var(--bg-secondary)] border border-[var(--glass-border)] text-center">

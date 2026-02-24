@@ -1,10 +1,12 @@
 import React from "react";
 import type { EventPage } from "@/types";
-import { MapPin, Ticket } from "lucide-react";
-import AddressLink from "./AddressLink";
+import { MapPin, Music, Ticket } from "lucide-react";
 
 interface EventCardProps {
   event: EventPage;
+  onArtistClick?: (artistId: number) => void;
+  onEventClick?: (event: EventPage) => void;
+  highlighted?: boolean;
 }
 
 /**
@@ -49,8 +51,16 @@ const getStatusLabel = (status: EventPage["status"]): string => {
  * Single event card showing date-box, venue, city, status badge,
  * and a ticket button linking to the external ticket URL.
  */
-const EventCard: React.FC<EventCardProps> = ({ event }) => {
+const EventCard: React.FC<EventCardProps> = ({ event, onArtistClick, onEventClick, highlighted }) => {
   const date = new Date(event.start_date);
+  const cardRef = React.useRef<HTMLElement>(null);
+
+  // Auto-scroll to the highlighted card on mount
+  React.useEffect(() => {
+    if (highlighted && cardRef.current) {
+      cardRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+  }, [highlighted]);
 
   const venueName = event.venue?.name ?? "";
   const city = event.venue?.city ?? "";
@@ -60,18 +70,32 @@ const EventCard: React.FC<EventCardProps> = ({ event }) => {
 
   return (
     <article
-      className="glass-panel group p-6 rounded-2xl border border-[var(--glass-border)] flex flex-col sm:flex-row sm:items-center justify-between gap-6 hover:bg-[var(--glass)] hover:border-[var(--accent)]/30 transition-all"
+      ref={cardRef}
+      className={`glass-panel group p-6 rounded-2xl border flex flex-col sm:flex-row sm:items-center justify-between gap-6 hover:bg-[var(--glass)] hover:border-[var(--accent)]/30 transition-all cursor-pointer ${
+        highlighted
+          ? "border-[var(--accent)] ring-2 ring-[var(--accent)]/30 bg-[var(--accent)]/5"
+          : "border-[var(--glass-border)]"
+      }`}
       aria-label={`${event.title || venueName} — ${date.toLocaleDateString("it-IT", { day: "numeric", month: "long", year: "numeric" })}${city ? `, ${city}` : ""}`}
+      onClick={() => onEventClick?.(event)}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => e.key === "Enter" && onEventClick?.(event)}
     >
       <div className="flex items-center gap-6">
-        {/* Date box */}
-        <div className="flex flex-col items-center justify-center min-w-[70px] h-[70px] rounded-xl bg-[var(--bg-secondary)] border border-[var(--glass-border)] text-center">
+        {/* Date box con orario */}
+        <div className="flex flex-col items-center justify-center min-w-[70px] rounded-xl bg-[var(--bg-secondary)] border border-[var(--glass-border)] text-center px-2 py-2">
           <span className="text-xs font-bold text-[var(--text-muted)] uppercase leading-none mb-1">
             {date.toLocaleDateString("it-IT", { month: "short" })}
           </span>
           <span className="text-2xl font-black text-[var(--text-main)] leading-none">
             {date.getDate()}
           </span>
+          {event.start_time && (
+            <span className="text-[11px] font-semibold text-[var(--accent)] leading-none mt-1">
+              {event.start_time.slice(0, 5)}
+            </span>
+          )}
         </div>
 
         {/* Event info */}
@@ -79,22 +103,45 @@ const EventCard: React.FC<EventCardProps> = ({ event }) => {
           <h4 className="text-xl font-bold text-[var(--text-main)] mb-1 group-hover:text-[var(--accent)] transition-colors">
             {event.title || venueName}
           </h4>
+          {event.artist?.name && (
+            <p className="flex items-center gap-1.5 text-sm font-semibold text-[var(--accent)] mb-1">
+              <Music size={13} className="opacity-70" />
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (onArtistClick && event.artist) onArtistClick(event.artist.id);
+                }}
+                className="hover:underline hover:text-[var(--text-main)] transition-colors cursor-pointer bg-transparent border-none p-0 font-semibold text-sm text-[var(--accent)] text-left"
+              >
+                {event.artist.name}
+              </button>
+            </p>
+          )}
           {(venueName || city) && (
             <div className="flex items-center gap-2 text-[var(--text-muted)] text-sm font-medium">
               <MapPin size={14} className="text-[var(--accent)]/60" />
-              <AddressLink
-                venueName={venueName}
-                city={city}
-                country={country}
-                lat={lat}
-                lng={lng}
-              />
+              <a
+                href={
+                  lat && lng
+                    ? `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`
+                    : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${venueName}, ${city}`)}`
+                }
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={(e) => e.stopPropagation()}
+                className="hover:text-[var(--accent)] transition-colors"
+                aria-label={`Naviga verso ${venueName}, ${city}`}
+              >
+                {country && country !== "IT"
+                  ? `${venueName} \u2014 ${city} (${country})`
+                  : `${venueName} \u2014 ${city}`}
+              </a>
             </div>
           )}
-          {event.start_time && (
+          {event.doors_time && (
             <p className="text-xs text-[var(--text-muted)] mt-1">
-              Ore {event.start_time.slice(0, 5)}
-              {event.doors_time && ` (Porte ${event.doors_time.slice(0, 5)})`}
+              Porte {event.doors_time.slice(0, 5)}
             </p>
           )}
         </div>
@@ -114,6 +161,7 @@ const EventCard: React.FC<EventCardProps> = ({ event }) => {
             href={event.ticket_url}
             target="_blank"
             rel="noopener noreferrer"
+            onClick={(e) => e.stopPropagation()}
             className="p-3 rounded-full bg-[var(--text-main)] text-[var(--bg-color)] hover:scale-110 transition-transform group-hover:bg-[var(--accent)]"
             aria-label={`Biglietti per ${event.title || venueName}`}
           >

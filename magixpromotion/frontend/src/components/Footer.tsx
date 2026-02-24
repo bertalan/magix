@@ -1,9 +1,14 @@
 import React from "react";
+import { ViewState } from "@/types";
 import { useMenu } from "@/hooks/useMenu";
 import { useSiteSettings } from "@/hooks/useSiteSettings";
 import { Phone, Mail, MapPin, ExternalLink } from "lucide-react";
 
-const Footer: React.FC = () => {
+interface FooterProps {
+  setView: (v: ViewState) => void;
+}
+
+const Footer: React.FC<FooterProps> = ({ setView }) => {
   const { data: legalMenu } = useMenu("footer_legal");
   const { data: settings } = useSiteSettings();
 
@@ -91,24 +96,24 @@ const Footer: React.FC = () => {
             ))
           ) : (
             <>
-              <a
-                href="#"
-                className="hover:text-[var(--text-main)] transition-colors"
+              <button
+                onClick={() => setView("PRIVACY")}
+                className="hover:text-[var(--text-main)] transition-colors text-left"
               >
                 PRIVACY
-              </a>
-              <a
-                href="#"
-                className="hover:text-[var(--text-main)] transition-colors"
+              </button>
+              <button
+                onClick={() => setView("TERMS")}
+                className="hover:text-[var(--text-main)] transition-colors text-left"
               >
                 TERMINI
-              </a>
-              <a
-                href="#"
-                className="hover:text-[var(--text-main)] transition-colors"
+              </button>
+              <button
+                onClick={() => setView("CONTACTS")}
+                className="hover:text-[var(--text-main)] transition-colors text-left"
               >
                 CONTATTI
-              </a>
+              </button>
             </>
           )}
         </div>

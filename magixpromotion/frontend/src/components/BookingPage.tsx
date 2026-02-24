@@ -29,7 +29,8 @@ const BookingPage: React.FC<BookingPageProps> = ({ preselectedArtist }) => {
           PRENOTA LA TUA <span className="gradient-text">BAND</span>
         </h2>
         <p className="text-[var(--text-muted)] text-lg max-w-xl mx-auto">
-          Compila il form e riceverai un preventivo personalizzato entro 24 ore.
+          Compila il form e riceverai un preventivo personalizzato.
+          <br />
           Nessun impegno, solo la musica giusta per il tuo evento.
         </p>
       </div>

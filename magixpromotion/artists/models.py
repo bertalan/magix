@@ -3,11 +3,13 @@ from django import forms
 from django.db import models
 from django.utils.text import slugify
 from django_countries.fields import CountryField
-from modelcluster.fields import ParentalManyToManyField
-from wagtail.admin.panels import FieldPanel, MultiFieldPanel
+from modelcluster.fields import ParentalKey, ParentalManyToManyField
+from modelcluster.models import ClusterableModel
+from wagtail.admin.panels import FieldPanel, InlinePanel, MultiFieldPanel
+from wagtail.models import Orderable
 from wagtail.fields import RichTextField, StreamField
 from wagtail.images import get_image_model_string
-from wagtail.models import Page
+from wagtail.models import Page  # Orderable imported above
 from wagtail.search import index
 from wagtail.snippets.models import register_snippet
 
@@ -150,6 +152,39 @@ class ArtistListingPage(Page):
         return context
 
 
+class ArtistGalleryImage(Orderable):
+    """Immagine aggiuntiva per la gallery / rotazione immagini artista."""
+
+    page = ParentalKey(
+        "artists.ArtistPage",
+        on_delete=models.CASCADE,
+        related_name="gallery_images",
+    )
+    image = models.ForeignKey(
+        get_image_model_string(),
+        on_delete=models.CASCADE,
+        related_name="+",
+        verbose_name="Immagine",
+    )
+    caption = models.CharField(
+        max_length=250,
+        blank=True,
+        verbose_name="Didascalia (opzionale)",
+    )
+
+    panels = [
+        FieldPanel("image"),
+        FieldPanel("caption"),
+    ]
+
+    class Meta(Orderable.Meta):
+        verbose_name = "Immagine gallery"
+        verbose_name_plural = "Immagini gallery"
+
+    def __str__(self) -> str:
+        return f"Gallery image {self.sort_order} for {self.page}"
+
+
 class ArtistPage(Page):
     """Scheda di dettaglio artista/band."""
 
@@ -263,6 +298,13 @@ class ArtistPage(Page):
                 FieldPanel("hero_video_url"),
             ],
             heading="Media principali",
+        ),
+        InlinePanel(
+            "gallery_images",
+            label="Immagini gallery",
+            min_num=0,
+            max_num=10,
+            heading="Gallery immagini (rotazione automatica)",
         ),
         FieldPanel("genres", widget=forms.CheckboxSelectMultiple),
         FieldPanel("target_events", widget=forms.CheckboxSelectMultiple),

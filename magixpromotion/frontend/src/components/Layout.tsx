@@ -31,7 +31,7 @@ const Layout: React.FC<LayoutProps> = ({
       <main id="main-content" className="flex-grow pt-20" role="main">
         {children}
       </main>
-      <Footer />
+      <Footer setView={setView} />
     </div>
   );
 };

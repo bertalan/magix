@@ -12,6 +12,23 @@ const HomePage: React.FC<HomePageProps> = ({ setView, onArtistClick }) => {
   return (
     <>
       <Hero setView={setView} />
+
+      {/* Chi Siamo — presentazione agenzia */}
+      <section className="max-w-4xl mx-auto px-6 py-20 text-center">
+        <h2 className="text-2xl md:text-4xl font-heading font-extrabold tracking-tight text-[var(--text-main)] mb-6 uppercase">
+          Chi <span className="gradient-text">Siamo</span>
+        </h2>
+        <p className="text-base md:text-lg text-[var(--text-muted)] leading-relaxed font-light">
+          Magix Promotion International Agency è un'agenzia che opera nel campo
+          della musica dal vivo per l'organizzazione di eventi, festival e altre
+          iniziative. Collaborazioni con i più importanti live club italiani ed
+          esteri ci permette di essere in grado di garantire la produzione di
+          eventi musicali curandone ogni aspetto: artistico, tecnico, logistico e
+          promozionale con grande professionalità grazie anche alla nostra
+          passione per la musica.
+        </p>
+      </section>
+
       <FeaturedArtists onArtistClick={onArtistClick} setView={setView} />
 
       {/* Sezione categorie rapide */}

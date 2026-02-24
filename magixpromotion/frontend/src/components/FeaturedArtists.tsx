@@ -12,9 +12,9 @@ const FeaturedArtists: React.FC<FeaturedArtistsProps> = ({
   onArtistClick,
   setView,
 }) => {
-  // Carica i primi 3 artisti come preview
-  const { data, loading } = useArtists({ limit: 3 });
-  const artists = data?.items || [];
+  // Carica i primi artisti; ne mostriamo solo 3 come preview
+  const { items, loading } = useArtists();
+  const artists = items.slice(0, 3);
 
   if (loading) {
     return (

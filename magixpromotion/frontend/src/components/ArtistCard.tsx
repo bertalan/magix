@@ -1,6 +1,8 @@
 import React from "react";
 import { Artist } from "@/types";
 import { Plus, Play } from "lucide-react";
+import { useImageRotator, ImagePair } from "@/hooks/useImageRotator";
+import ProgressiveImage from "./ProgressiveImage";
 import VideoModal from "./VideoModal";
 
 interface ArtistCardProps {
@@ -10,6 +12,28 @@ interface ArtistCardProps {
 
 const ArtistCard: React.FC<ArtistCardProps> = ({ artist, onClick }) => {
   const [showVideo, setShowVideo] = React.useState(false);
+
+  // Costruisci array immagini paired: full-res + LQIP thumb
+  const allImages = React.useMemo<ImagePair[]>(() => {
+    const pairs: ImagePair[] = [];
+    if (artist.image_url) {
+      pairs.push({
+        src: artist.image_url,
+        thumb: artist.image_thumb ?? artist.image_url,
+      });
+    }
+    if (artist.gallery_images) {
+      artist.gallery_images.forEach((img, i) => {
+        pairs.push({
+          src: img,
+          thumb: artist.gallery_thumbs?.[i] ?? img,
+        });
+      });
+    }
+    return pairs;
+  }, [artist.image_url, artist.image_thumb, artist.gallery_images, artist.gallery_thumbs]);
+
+  const { currentSrc, currentThumb, prevSrc, transitioning } = useImageRotator(allImages);
 
   /** Apri il video modal senza propagare il click alla card */
   const handlePlayClick = (e: React.MouseEvent) => {
@@ -29,14 +53,29 @@ const ArtistCard: React.FC<ArtistCardProps> = ({ artist, onClick }) => {
       onKeyDown={(e) => e.key === "Enter" && onClick()}
       aria-label={`Vedi dettagli di ${artist.title}`}
     >
-      {/* Immagine artista */}
-      {artist.image_url ? (
-        <img
-          src={artist.image_url}
-          alt={artist.title}
-          loading="lazy"
-          className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 grayscale group-hover:grayscale-0 opacity-60 group-hover:opacity-100"
-        />
+      {/* Immagini artista con caricamento progressivo + crossfade */}
+      {currentSrc ? (
+        <>
+          {/* Immagine precedente (in uscita) */}
+          {prevSrc && transitioning && (
+            <img
+              src={prevSrc}
+              alt=""
+              aria-hidden="true"
+              className="absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-[600ms] grayscale group-hover:grayscale-0"
+            />
+          )}
+          {/* Immagine corrente con caricamento progressivo */}
+          <ProgressiveImage
+            src={currentSrc}
+            placeholder={currentThumb}
+            alt={artist.title}
+            className={`transition-all duration-700 group-hover:scale-110 grayscale group-hover:grayscale-0 opacity-60 group-hover:opacity-100 ${
+              transitioning ? "animate-fade-in" : ""
+            }`}
+            loading="lazy"
+          />
+        </>
       ) : (
         <div className="absolute inset-0 w-full h-full bg-gradient-to-br from-[var(--glass)] to-[var(--bg-color)]" aria-hidden="true" />
       )}

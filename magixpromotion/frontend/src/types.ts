@@ -29,6 +29,7 @@ export interface ArtistSocials {
 
 export interface MusicEvent {
   id: string;
+  slug: string;
   date: string;
   venue: string;
   city: string;
@@ -53,6 +54,9 @@ export interface Artist {
   base_region: string;
   base_city: string;
   image_url: string | null;
+  image_thumb: string | null;
+  gallery_images: string[];
+  gallery_thumbs: string[];
   genre_display: string;
   tags: string[];
   socials: ArtistSocials;
@@ -66,6 +70,9 @@ export interface EventArtist {
   name: string;
   slug: string;
   image_url: string | null;
+  image_thumb: string | null;
+  gallery_images: string[];
+  gallery_thumbs: string[];
 }
 
 export interface EventVenue {
@@ -160,4 +167,4 @@ export interface BookingFormData {
 
 // --- View State ---
 
-export type ViewState = "HOME" | "TALENT" | "DETAIL" | "EVENTS" | "SCOUT" | "BOOKING";
+export type ViewState = "HOME" | "TALENT" | "DETAIL" | "EVENTS" | "SCOUT" | "BOOKING" | "PRIVACY" | "TERMS" | "CONTACTS";

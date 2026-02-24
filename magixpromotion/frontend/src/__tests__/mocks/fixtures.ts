@@ -31,6 +31,9 @@ export const mockArtist: Artist = {
   base_region: "Piemonte",
   base_city: "Novi Ligure",
   image_url: "/media/images/groove-machine.jpg",
+  image_thumb: "/media/images/groove-machine-thumb.jpg",
+  gallery_images: [],
+  gallery_thumbs: [],
   genre_display: "Dance / Pop",
   tags: ["matrimonio", "festival", "corporate"],
   socials: {
@@ -42,6 +45,7 @@ export const mockArtist: Artist = {
   events: [
     {
       id: "ev1",
+      slug: "concerto-piazza-duomo",
       date: "2025-06-15",
       venue: "Piazza Duomo",
       city: "Milano",
@@ -68,6 +72,9 @@ export const mockArtist2: Artist = {
   base_region: "Lombardia",
   base_city: "Milano",
   image_url: "/media/images/queen-forever.jpg",
+  image_thumb: "/media/images/queen-forever-thumb.jpg",
+  gallery_images: [],
+  gallery_thumbs: [],
   genre_display: "Rock",
   tags: ["tributo", "rock", "festival"],
   socials: {
@@ -120,6 +127,9 @@ export const mockEvent: EventPage = {
     name: "The Groove Machine",
     slug: "the-groove-machine",
     image_url: null,
+    image_thumb: null,
+    gallery_images: [],
+    gallery_thumbs: [],
   },
   featured_image_url: null,
 };
@@ -158,6 +168,9 @@ export const mockEventSoldOut: EventPage = {
     name: "Queen Forever",
     slug: "queen-forever",
     image_url: null,
+    image_thumb: null,
+    gallery_images: [],
+    gallery_thumbs: [],
   },
   featured_image_url: null,
 };

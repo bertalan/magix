@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}{{ page.title }} — MagixPromotion{% endblock %}
+{% block content %}
+<script>window.location.replace("/it/artisti/{{ page.slug }}/");</script>
+<noscript>
+  <meta http-equiv="refresh" content="0;url=/it/artisti/{{ page.slug }}/">
+  <p><a href="/it/artisti/{{ page.slug }}/">{{ page.title }}</a></p>
+</noscript>
+{% endblock %}

@@ -1,6 +1,7 @@
 import React from "react";
 import { Artist } from "@/types";
 import { useArtists } from "@/hooks/useArtists";
+import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import ArtistCard from "./ArtistCard";
 import ArtistFilters from "./ArtistFilters";
 
@@ -9,22 +10,20 @@ interface ArtistGridProps {
 }
 
 const ArtistGrid: React.FC<ArtistGridProps> = ({ onArtistClick }) => {
-  const [filter, setFilter] = React.useState("ALL");
   const [search, setSearch] = React.useState("");
   const [typeFilter, setTypeFilter] = React.useState("ALL");
 
-  // Costruisci parametri per API in base ai filtri attivi
-  const apiParams = React.useMemo(() => {
-    const p: Record<string, string | number | boolean> = { limit: 50 };
-    if (filter !== "ALL") p["genre"] = filter;
+  // Costruisci parametri filtro per API (senza limit/offset — gestiti dal hook)
+  const apiFilters = React.useMemo(() => {
+    const p: Record<string, string> = {};
     if (typeFilter !== "ALL") p["artist_type"] = typeFilter;
     return p;
-  }, [filter, typeFilter]);
+  }, [typeFilter]);
 
-  const { data, loading, error } = useArtists(apiParams);
-  const allArtists = data?.items || [];
+  const { items: allArtists, loading, loadingMore, error, hasMore, loadMore, totalCount } =
+    useArtists(apiFilters);
 
-  // Filtra lato client per search (la search testuale potrebbe non essere supportata dall'API)
+  // Filtra lato client per search testuale
   const artists = React.useMemo(() => {
     if (!search.trim()) return allArtists;
     const q = search.toLowerCase();
@@ -36,12 +35,12 @@ const ArtistGrid: React.FC<ArtistGridProps> = ({ onArtistClick }) => {
     );
   }, [allArtists, search]);
 
-  // Estrai generi unici per filtri (da tutti gli artisti caricati)
-  const genres = React.useMemo(() => {
-    const set = new Set(allArtists.map((a) => a.genre_display));
-    return ["ALL", ...Array.from(set).filter(Boolean).sort()];
-  }, [allArtists]);
+  // Disabilita infinite scroll quando c'è una ricerca testuale attiva
+  // (la search filtra lato client, quindi non serve caricare nuove pagine)
+  const scrollDisabled = loading || loadingMore || !hasMore || search.trim().length > 0;
+  const sentinelRef = useInfiniteScroll(loadMore, scrollDisabled);
 
+  // Estrai generi unici per filtri (da tutti gli artisti caricati)
   const artistTypes = ["ALL", "show_band", "tribute", "original", "dj", "cover"];
 
   return (
@@ -53,9 +52,6 @@ const ArtistGrid: React.FC<ArtistGridProps> = ({ onArtistClick }) => {
             Il Nostro Roster
           </h2>
           <ArtistFilters
-            genres={genres}
-            activeGenre={filter}
-            onGenreChange={setFilter}
             artistTypes={artistTypes}
             activeType={typeFilter}
             onTypeChange={setTypeFilter}
@@ -75,7 +71,16 @@ const ArtistGrid: React.FC<ArtistGridProps> = ({ onArtistClick }) => {
         </div>
       </div>
 
-      {/* Loading / Error states */}
+      {/* Conteggio risultati */}
+      {!loading && totalCount > 0 && (
+        <p className="text-sm text-[var(--text-muted)] mb-6">
+          {search.trim()
+            ? `${artists.length} risultati`
+            : `${allArtists.length} di ${totalCount} artisti`}
+        </p>
+      )}
+
+      {/* Skeleton caricamento iniziale */}
       {loading && (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-12">
           {Array.from({ length: 6 }).map((_, i) => (
@@ -95,23 +100,45 @@ const ArtistGrid: React.FC<ArtistGridProps> = ({ onArtistClick }) => {
 
       {/* Grid */}
       {!loading && !error && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-12">
-          {artists.length > 0 ? (
-            artists.map((artist) => (
-              <ArtistCard
-                key={artist.id}
-                artist={artist}
-                onClick={() => onArtistClick(artist)}
-              />
-            ))
-          ) : (
-            <div className="col-span-full py-24 text-center text-[var(--text-muted)]">
-              <p className="text-xl">
-                Nessun artista trovato con questi filtri.
-              </p>
+        <>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-12">
+            {artists.length > 0 ? (
+              artists.map((artist) => (
+                <ArtistCard
+                  key={artist.id}
+                  artist={artist}
+                  onClick={() => onArtistClick(artist)}
+                />
+              ))
+            ) : (
+              <div className="col-span-full py-24 text-center text-[var(--text-muted)]">
+                <p className="text-xl">
+                  Nessun artista trovato con questi filtri.
+                </p>
+              </div>
+            )}
+          </div>
+
+          {/* Skeleton per caricamento pagine successive */}
+          {loadingMore && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-12 mt-8">
+              {Array.from({ length: 3 }).map((_, i) => (
+                <div
+                  key={`more-${i}`}
+                  className="aspect-[3/4] rounded-3xl bg-[var(--glass)] animate-pulse"
+                />
+              ))}
             </div>
           )}
-        </div>
+
+          {/* Sentinella Intersection Observer per infinite scroll */}
+          <div
+            ref={sentinelRef}
+            className="h-4"
+            role="status"
+            aria-label={hasMore ? "Caricamento altri artisti" : ""}
+          />
+        </>
       )}
     </div>
   );

@@ -11,14 +11,14 @@ import os
 
 import requests as http_requests
 from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_protect
+from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 
 logger = logging.getLogger(__name__)
 
 GEMINI_ENDPOINT = (
     "https://generativelanguage.googleapis.com/v1beta/"
-    "models/gemini-2.0-flash:generateContent"
+    "models/gemini-2.0-flash-lite:generateContent"
 )
 
 
@@ -100,7 +100,7 @@ def _build_system_prompt(artist_pool: list, company_info: dict) -> str:
 
 
 @require_POST
-@csrf_protect
+@csrf_exempt
 def band_finder_api(request):
     """Endpoint POST /api/v2/band-finder/ — proxy verso Gemini AI."""
 

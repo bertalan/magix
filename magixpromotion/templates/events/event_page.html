@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}{{ page.title }} — MagixPromotion{% endblock %}
+{% block content %}
+{# Headless: questa pagina è servita dal frontend SPA. #}
+{# Redirect al frontend React. #}
+<script>window.location.replace("/it/eventi/{{ page.slug }}/");</script>
+<noscript>
+  <meta http-equiv="refresh" content="0;url=/it/eventi/{{ page.slug }}/">
+  <p><a href="/it/eventi/{{ page.slug }}/">{{ page.title }}</a></p>
+</noscript>
+{% endblock %}

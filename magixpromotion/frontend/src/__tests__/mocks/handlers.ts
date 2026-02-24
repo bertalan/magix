@@ -14,8 +14,19 @@ import {
 } from "./fixtures";
 
 export const handlers = [
-  // --- Artists list ---
-  http.get("/api/v2/artists/", () => {
+  // --- Artists list (supports ?slug= filter) ---
+  http.get("/api/v2/artists/", ({ request }) => {
+    const url = new URL(request.url);
+    const slugFilter = url.searchParams.get("slug");
+    if (slugFilter) {
+      const filtered = mockArtistsResponse.items.filter(
+        (a) => a.meta.slug === slugFilter,
+      );
+      return HttpResponse.json({
+        meta: { total_count: filtered.length },
+        items: filtered,
+      });
+    }
     return HttpResponse.json(mockArtistsResponse);
   }),
 
@@ -29,8 +40,19 @@ export const handlers = [
     return HttpResponse.json(artist);
   }),
 
-  // --- Events list ---
-  http.get("/api/v2/events/", () => {
+  // --- Events list (supports ?slug= filter) ---
+  http.get("/api/v2/events/", ({ request }) => {
+    const url = new URL(request.url);
+    const slugFilter = url.searchParams.get("slug");
+    if (slugFilter) {
+      const filtered = mockEventsResponse.items.filter(
+        (e) => e.meta.slug === slugFilter,
+      );
+      return HttpResponse.json({
+        meta: { total_count: filtered.length },
+        items: filtered,
+      });
+    }
     return HttpResponse.json(mockEventsResponse);
   }),
 

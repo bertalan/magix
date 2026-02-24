@@ -5,7 +5,7 @@
 import { describe, it, expect } from "vitest";
 import { http, HttpResponse } from "msw";
 import { server } from "../mocks/server";
-import { fetchArtists, fetchArtist, fetchEvents, fetchMenu, fetchSiteSettings, submitBooking } from "@/lib/api";
+import { fetchArtists, fetchArtist, fetchArtistBySlug, fetchEvents, fetchEventBySlug, fetchMenu, fetchSiteSettings, submitBooking } from "@/lib/api";
 import { mockArtistsResponse, mockEventsResponse } from "../mocks/fixtures";
 
 // ---------------------------------------------------------------
@@ -63,6 +63,22 @@ describe("fetchArtist", () => {
 });
 
 // ---------------------------------------------------------------
+// fetchArtistBySlug
+// ---------------------------------------------------------------
+describe("fetchArtistBySlug", () => {
+  it("returns an artist matching the slug", async () => {
+    const result = await fetchArtistBySlug("the-groove-machine");
+    expect(result).not.toBeNull();
+    expect(result!.title).toBe("The Groove Machine");
+  });
+
+  it("returns null for an unknown slug", async () => {
+    const result = await fetchArtistBySlug("non-existent-artist");
+    expect(result).toBeNull();
+  });
+});
+
+// ---------------------------------------------------------------
 // fetchEvents
 // ---------------------------------------------------------------
 describe("fetchEvents", () => {
@@ -97,6 +113,22 @@ describe("fetchEvents", () => {
     );
 
     await expect(fetchEvents()).rejects.toThrow("API error 503");
+  });
+});
+
+// ---------------------------------------------------------------
+// fetchEventBySlug
+// ---------------------------------------------------------------
+describe("fetchEventBySlug", () => {
+  it("returns an event matching the slug", async () => {
+    const result = await fetchEventBySlug("concerto-piazza-duomo");
+    expect(result).not.toBeNull();
+    expect(result!.title).toBe("Concerto in Piazza Duomo");
+  });
+
+  it("returns null for an unknown slug", async () => {
+    const result = await fetchEventBySlug("non-existent-event");
+    expect(result).toBeNull();
   });
 });
 

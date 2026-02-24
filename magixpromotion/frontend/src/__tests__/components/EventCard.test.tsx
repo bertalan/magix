@@ -2,8 +2,8 @@
  * Tests for src/components/EventCard.tsx
  * =================================================================== */
 
-import { describe, it, expect } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { describe, it, expect, vi } from "vitest";
+import { render, screen, fireEvent } from "@testing-library/react";
 import EventCard from "@/components/EventCard";
 import { mockEvent, mockEventSoldOut } from "../mocks/fixtures";
 
@@ -19,12 +19,12 @@ describe("EventCard", () => {
     expect(screen.getByText("20")).toBeInTheDocument();
   });
 
-  it("renders start time", () => {
+  it("renders start time inside date box", () => {
     render(<EventCard event={mockEvent} />);
-    expect(screen.getByText(/Ore 21:00/)).toBeInTheDocument();
+    expect(screen.getByText("21:00")).toBeInTheDocument();
   });
 
-  it("renders doors time when available", () => {
+  it("renders doors time separately", () => {
     render(<EventCard event={mockEvent} />);
     expect(screen.getByText(/Porte 20:00/)).toBeInTheDocument();
   });
@@ -58,12 +58,26 @@ describe("EventCard", () => {
     expect(noTickets).toBeInTheDocument();
   });
 
-  it("renders venue name and city via AddressLink", () => {
+  it("renders venue name and city with Google Maps link", () => {
     render(<EventCard event={mockEvent} />);
-    // AddressLink combines venue + city with a dash
     const addressLink = screen.getByLabelText(/Naviga verso Piazza Duomo/);
     expect(addressLink).toBeInTheDocument();
     expect(addressLink).toHaveTextContent(/Milano/);
+    expect(addressLink).toHaveAttribute(
+      "href",
+      expect.stringContaining("google.com/maps"),
+    );
+  });
+
+  it("renders artist name as clickable button that triggers callback", () => {
+    const handleClick = vi.fn();
+    render(<EventCard event={mockEvent} onArtistClick={handleClick} />);
+    const artistButton = screen.getByRole("button", {
+      name: "The Groove Machine",
+    });
+    expect(artistButton).toBeInTheDocument();
+    fireEvent.click(artistButton);
+    expect(handleClick).toHaveBeenCalledWith(1);
   });
 
   it("does not crash with no venue", () => {
@@ -72,9 +86,9 @@ describe("EventCard", () => {
     expect(screen.getByText("Concerto in Piazza Duomo")).toBeInTheDocument();
   });
 
-  it("does not render time section if start_time is null", () => {
+  it("does not render time in date box if start_time is null", () => {
     const eventNoTime = { ...mockEvent, start_time: null, doors_time: null };
     render(<EventCard event={eventNoTime} />);
-    expect(screen.queryByText(/Ore/)).not.toBeInTheDocument();
+    expect(screen.queryByText("21:00")).not.toBeInTheDocument();
   });
 });

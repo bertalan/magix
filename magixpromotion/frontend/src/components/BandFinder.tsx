@@ -22,9 +22,15 @@ const BandFinder: React.FC<BandFinderProps> = ({ onArtistSelect }) => {
   const [loading, setLoading] = React.useState(false);
   const [result, setResult] = React.useState<ScoutResult | null>(null);
 
-  // Carica tutti gli artisti per il pool AI
-  const { data } = useArtists({ limit: 100 });
-  const artists = data?.items || [];
+  // Carica progressivamente TUTTI gli artisti per il pool AI
+  const { items: artists, hasMore, loadMore, loading: artistsLoading } = useArtists();
+
+  // Carica automaticamente tutte le pagine per avere il pool completo
+  React.useEffect(() => {
+    if (hasMore && !artistsLoading) {
+      loadMore();
+    }
+  }, [hasMore, artistsLoading, loadMore]);
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();

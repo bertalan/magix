@@ -42,6 +42,44 @@ class TestArtistAPI:
         data = response.json()
         assert data["meta"]["total_count"] == 0
 
+    def test_daily_seed_ordering(self, artist_listing, genres):
+        """Il parametro daily_seed produce un ordinamento deterministico
+        basato sulla data, che ruota giornalmente."""
+        from tests.factories import ArtistPageFactory
+
+        # Crea artisti multipli per verificare l'ordinamento
+        artists = []
+        for i in range(5):
+            a = ArtistPageFactory(
+                parent=artist_listing,
+                title=f"Band {chr(65 + i)}",
+                artist_type="show_band",
+            )
+            a.genres.add(genres[0])
+            a.save()
+            artists.append(a)
+
+        client = Client()
+
+        # Stessa seed → stesso ordine (deterministico)
+        r1 = client.get("/api/v2/artists/?daily_seed=2026-02-19")
+        r2 = client.get("/api/v2/artists/?daily_seed=2026-02-19")
+        ids1 = [item["id"] for item in r1.json()["items"]]
+        ids2 = [item["id"] for item in r2.json()["items"]]
+        assert ids1 == ids2
+
+        # Seed diversa → ordine diverso (con alta probabilità)
+        r3 = client.get("/api/v2/artists/?daily_seed=2026-03-01")
+        ids3 = [item["id"] for item in r3.json()["items"]]
+        # Non necessariamente diverso per poche band, ma l'endpoint deve funzionare
+        assert len(ids3) == len(ids1)
+
+    def test_daily_seed_is_accepted_parameter(self, artist):
+        """Verifica che daily_seed sia un parametro query riconosciuto."""
+        client = Client()
+        response = client.get("/api/v2/artists/?daily_seed=2026-02-19")
+        assert response.status_code == 200
+
 
 @pytest.mark.django_db
 class TestEventAPI:

@@ -1,46 +1,56 @@
 import React from "react";
 import type { EventPage, ViewState } from "@/types";
 import { useEvents } from "@/hooks/useEvents";
+import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import EventCard from "./EventCard";
 import EventFilters from "./EventFilters";
 import { Calendar } from "lucide-react";
 
 interface EventsPageProps {
   setView: (v: ViewState) => void;
+  onArtistClick?: (artistId: number) => void;
+  onEventClick?: (event: EventPage) => void;
+  highlightedEventSlug?: string | null;
 }
 
 /**
- * Main events view with PROSSIMI / ARCHIVIO tabs,
- * city filter, and events grouped by month.
+ * Pagina eventi con tab PROSSIMI / ARCHIVIO,
+ * filtro per città, raggruppamento per mese e infinite scroll.
  */
-const EventsPage: React.FC<EventsPageProps> = ({ setView: _setView }) => {
+const EventsPage: React.FC<EventsPageProps> = ({ setView: _setView, onArtistClick, onEventClick, highlightedEventSlug }) => {
   const [tab, setTab] = React.useState<"upcoming" | "past">("upcoming");
   const [cityFilter, setCityFilter] = React.useState("ALL");
 
   const today = React.useMemo(() => new Date().toISOString().split("T")[0], []);
 
-  const apiParams = React.useMemo(() => {
+  // Parametri filtro (senza limit/offset — gestiti dal hook)
+  const apiFilters = React.useMemo(() => {
     const p: {
       date_from?: string;
       date_to?: string;
       city?: string;
-      limit?: number;
-    } = { limit: 50 };
+    } = {};
     if (tab === "upcoming") p.date_from = today;
     if (tab === "past") p.date_to = today;
     if (cityFilter !== "ALL") p.city = cityFilter;
     return p;
   }, [tab, cityFilter, today]);
 
-  const { data, loading, error } = useEvents(apiParams);
-  const events: EventPage[] = data?.items ?? [];
+  const { items: events, loading, loadingMore, error, hasMore, loadMore, totalCount } =
+    useEvents(apiFilters);
 
-  // Group events by month (e.g. "giugno 2025")
+  // Infinite scroll — sentinella in fondo alla lista
+  const scrollDisabled = loading || loadingMore || !hasMore;
+  const sentinelRef = useInfiniteScroll(loadMore, scrollDisabled);
+
+  // Raggruppa eventi per data singola (es. "Venerdì 20 febbraio 2026")
   const groupedEvents = React.useMemo(() => {
     const groups: Record<string, EventPage[]> = {};
     events.forEach((ev) => {
       const date = new Date(ev.start_date);
       const key = date.toLocaleDateString("it-IT", {
+        weekday: "long",
+        day: "numeric",
         month: "long",
         year: "numeric",
       });
@@ -118,7 +128,14 @@ const EventsPage: React.FC<EventsPageProps> = ({ setView: _setView }) => {
         onCityChange={setCityFilter}
       />
 
-      {/* Loading skeleton */}
+      {/* Conteggio eventi */}
+      {!loading && totalCount > 0 && (
+        <p className="text-sm text-[var(--text-muted)] mt-4">
+          {events.length} di {totalCount} eventi
+        </p>
+      )}
+
+      {/* Skeleton caricamento iniziale */}
       {loading && (
         <div className="space-y-4 mt-8">
           {[1, 2, 3, 4].map((i) => (
@@ -146,18 +163,40 @@ const EventsPage: React.FC<EventsPageProps> = ({ setView: _setView }) => {
           aria-labelledby={tab === "upcoming" ? "tab-upcoming" : "tab-past"}
         >
           {Object.keys(groupedEvents).length > 0 ? (
-            Object.entries(groupedEvents).map(([month, monthEvents]) => (
-              <div key={month} className="mb-12">
-                <h3 className="text-xl font-heading font-bold text-[var(--accent)] mb-6 uppercase tracking-widest">
-                  {month}
-                </h3>
-                <div className="flex flex-col gap-4">
-                  {monthEvents.map((event) => (
-                    <EventCard key={event.id} event={event} />
+            <>
+              {Object.entries(groupedEvents).map(([dateLabel, dateEvents]) => (
+                <div key={dateLabel} className="mb-10">
+                  <h3 className="text-lg font-heading font-bold text-[var(--accent)] mb-4 capitalize tracking-wide">
+                    {dateLabel}
+                  </h3>
+                  <div className="flex flex-col gap-4">
+                    {dateEvents.map((event) => (
+                      <EventCard key={event.id} event={event} onArtistClick={onArtistClick} onEventClick={onEventClick} highlighted={highlightedEventSlug === event.meta.slug} />
+                    ))}
+                  </div>
+                </div>
+              ))}
+
+              {/* Skeleton per caricamento pagine successive */}
+              {loadingMore && (
+                <div className="space-y-4">
+                  {[1, 2, 3].map((i) => (
+                    <div
+                      key={`more-${i}`}
+                      className="h-24 rounded-2xl bg-[var(--glass)] animate-pulse"
+                    />
                   ))}
                 </div>
-              </div>
-            ))
+              )}
+
+              {/* Sentinella Intersection Observer */}
+              <div
+                ref={sentinelRef}
+                className="h-4"
+                role="status"
+                aria-label={hasMore ? "Caricamento altri eventi" : ""}
+              />
+            </>
           ) : (
             <div className="text-center py-24 text-[var(--text-muted)]">
               <p className="text-xl">

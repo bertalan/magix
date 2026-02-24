@@ -40,18 +40,45 @@ class ArtistField(Field):
         artist = page.related_artist
         if not artist:
             return None
+
+        # Immagine principale (full-res + LQIP thumb)
         image_url = None
+        image_thumb = None
         if artist.main_image:
             try:
-                rendition = artist.main_image.get_rendition("fill-200x200|format-webp")
+                rendition = artist.main_image.get_rendition("fill-800x1200|format-webp")
                 image_url = rendition.full_url
             except Exception:
                 pass
+            try:
+                thumb = artist.main_image.get_rendition("fill-40x60|format-webp")
+                image_thumb = thumb.full_url
+            except Exception:
+                pass
+
+        # Gallery immagini (full-res + LQIP thumbs) per rotazione
+        gallery_images: list[str] = []
+        gallery_thumbs: list[str] = []
+        for item in artist.gallery_images.all():
+            try:
+                g_rendition = item.image.get_rendition("fill-800x1200|format-webp")
+                gallery_images.append(g_rendition.full_url)
+            except Exception:
+                continue
+            try:
+                g_thumb = item.image.get_rendition("fill-40x60|format-webp")
+                gallery_thumbs.append(g_thumb.full_url)
+            except Exception:
+                gallery_thumbs.append(g_rendition.full_url)
+
         return {
             "id": artist.pk,
             "name": artist.title,
             "slug": artist.slug,
             "image_url": image_url,
+            "image_thumb": image_thumb,
+            "gallery_images": gallery_images,
+            "gallery_thumbs": gallery_thumbs,
         }
 
 
@@ -65,7 +92,7 @@ class FeaturedImageField(Field):
         if not page.featured_image:
             return None
         try:
-            rendition = page.featured_image.get_rendition("fill-800x450|format-webp")
+            rendition = page.featured_image.get_rendition("fill-1200x1600|format-webp")
             return rendition.full_url
         except Exception:
             return None
@@ -119,6 +146,15 @@ class EventAPIViewSet(PagesAPIViewSet):
     def get_queryset(self):
         qs = super().get_queryset()
 
+        # Ordinamento per data (prossimi in ordine cronologico, archivio decrescente)
+        date_to = self.request.query_params.get("date_to")
+        if date_to:
+            # Tab ARCHIVIO: dal più recente al più lontano
+            qs = qs.order_by("-start_date")
+        else:
+            # Tab PROSSIMI (o default): dal più vicino al più lontano
+            qs = qs.order_by("start_date")
+
         artist = self.request.query_params.get("artist")
         if artist:
             qs = qs.filter(related_artist__slug=artist)
@@ -143,7 +179,6 @@ class EventAPIViewSet(PagesAPIViewSet):
         if date_from:
             qs = qs.filter(start_date__gte=date_from)
 
-        date_to = self.request.query_params.get("date_to")
         if date_to:
             qs = qs.filter(start_date__lte=date_to)
 

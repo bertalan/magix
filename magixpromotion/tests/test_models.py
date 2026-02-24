@@ -77,7 +77,7 @@ class TestVenue:
 
     def test_navigation_url_without_coords(self, venue):
         url = venue.navigation_url
-        assert "google.com/maps" in url
+        assert "openstreetmap.org" in url
 
     def test_navigation_url_with_coords(self):
         v = VenueFactory(

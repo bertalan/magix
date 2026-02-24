@@ -1,31 +1,63 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback, useRef, useMemo } from "react";
 import { fetchArtists, fetchArtist } from "@/lib/api";
 import type { Artist, WagtailListResponse } from "@/types";
 
-/**
- * Hook to fetch the artist list with optional filters.
- */
-export function useArtists(params?: {
+/** Parametri filtro (senza offset/limit, gestiti internamente) */
+export interface ArtistFilterParams {
   artist_type?: string;
   genre?: string;
   region?: string;
   country?: string;
-  limit?: number;
-  offset?: number;
-}) {
-  const [data, setData] = useState<WagtailListResponse<Artist> | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
+}
 
+/** Dimensione pagina per il caricamento incrementale */
+const PAGE_SIZE = 6;
+
+/** Genera la seed giornaliera in formato YYYY-MM-DD */
+function todaySeed(): string {
+  return new Date().toISOString().slice(0, 10);
+}
+
+/**
+ * Hook per caricare la lista artisti con infinite scroll.
+ *
+ * Espone:
+ * - `items`: array cumulativo di artisti
+ * - `loading`: true durante il primo caricamento
+ * - `loadingMore`: true durante il caricamento di pagine successive
+ * - `hasMore`: true se ci sono altri artisti da caricare
+ * - `totalCount`: numero totale di artisti dal backend
+ * - `loadMore()`: funzione per caricare la pagina successiva
+ * - `error`: eventuale errore
+ */
+export function useArtists(filters?: ArtistFilterParams) {
+  const [items, setItems] = useState<Artist[]>([]);
+  const [totalCount, setTotalCount] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+  const offsetRef = useRef(0);
+
+  // Seed giornaliera calcolata una sola volta per sessione del componente
+  const seed = useMemo(() => todaySeed(), []);
+
+  // Chiave filtri serializzata per rilevare cambi
+  const filterKey = JSON.stringify(filters ?? {});
+
+  // Reset e primo caricamento quando cambiano i filtri
   useEffect(() => {
     let cancelled = false;
+    offsetRef.current = 0;
+    setItems([]);
     setLoading(true);
+    setError(null);
 
-    fetchArtists(params)
+    fetchArtists({ ...filters, limit: PAGE_SIZE, offset: 0, daily_seed: seed })
       .then((res) => {
         if (!cancelled) {
-          setData(res);
-          setError(null);
+          setItems(res.items);
+          setTotalCount(res.meta.total_count);
+          offsetRef.current = res.items.length;
         }
       })
       .catch((err: Error) => {
@@ -38,11 +70,38 @@ export function useArtists(params?: {
     return () => {
       cancelled = true;
     };
-    // Stringify params to use as dependency
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [JSON.stringify(params)]);
+  }, [filterKey]);
 
-  return { data, loading, error };
+  const hasMore = items.length < totalCount;
+
+  /** Carica la pagina successiva (append) */
+  const loadMore = useCallback(() => {
+    if (loadingMore || !hasMore) return;
+    setLoadingMore(true);
+
+    fetchArtists({ ...filters, limit: PAGE_SIZE, offset: offsetRef.current, daily_seed: seed })
+      .then((res) => {
+        setItems((prev) => [...prev, ...res.items]);
+        setTotalCount(res.meta.total_count);
+        offsetRef.current += res.items.length;
+      })
+      .catch((err: Error) => {
+        setError(err);
+      })
+      .finally(() => {
+        setLoadingMore(false);
+      });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loadingMore, hasMore, filterKey]);
+
+  // Retrocompatibilità: esponi anche `data` nella forma WagtailListResponse
+  const data: WagtailListResponse<Artist> | null =
+    (items.length > 0 || !loading) && !error
+      ? { meta: { total_count: totalCount }, items }
+      : null;
+
+  return { data, items, loading, loadingMore, error, hasMore, totalCount, loadMore };
 }
 
 /**

@@ -68,12 +68,25 @@ fi
 
 # 5. Restart servizi
 info "Riavvio servizi…"
-systemctl restart magix-gunicorn
-systemctl restart magix-celery
+systemctl restart gunicorn-magix
+systemctl restart celery-magix
+
+# Nginx reload (PID file potrebbe essere vuoto su BT Panel)
+if /usr/sbin/nginx -s reload 2>/dev/null; then
+    info "Nginx ricaricato"
+else
+    MASTER_PID=$(pidof nginx | awk '{print $NF}')
+    if [[ -n "${MASTER_PID}" ]]; then
+        echo "${MASTER_PID}" > /run/nginx.pid
+        /usr/sbin/nginx -s reload && info "Nginx ricaricato (PID fix)" || warn "Nginx reload fallito"
+    else
+        warn "Nginx non in esecuzione — skip reload"
+    fi
+fi
 
 # 6. Verifica
 sleep 2
-for svc in magix-gunicorn magix-celery; do
+for svc in gunicorn-magix celery-magix; do
     if systemctl is-active --quiet "${svc}"; then
         info "${svc} — attivo ✓"
     else

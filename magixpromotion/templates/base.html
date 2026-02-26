@@ -1,9 +1,29 @@
+{% load seo_tags %}
 <!DOCTYPE html>
 <html lang="{{ LANGUAGE_CODE|default:'it' }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}MagixPromotion{% endblock %}</title>
+
+    {# SEO: meta description #}
+    {% block meta_description %}<meta name="description" content="Magix Promotion — Agenzia di booking e management musicale per eventi in Italia e nel mondo.">{% endblock %}
+
+    {# SEO: Open Graph #}
+    {% block og_tags %}
+    <meta property="og:site_name" content="Magix Promotion">
+    <meta property="og:locale" content="{{ LANGUAGE_CODE|default:'it' }}_{{ LANGUAGE_CODE|default:'IT'|upper }}">
+    {% endblock %}
+
+    {# SEO: Twitter Cards #}
+    <meta name="twitter:card" content="summary_large_image">
+
+    {# SEO: Canonical URL #}
+    {% block canonical %}{% endblock %}
+
+    {# SEO: JSON-LD Structured Data #}
+    {% page_jsonld %}
+
     {% block extra_head %}{% endblock %}
 </head>
 <body>

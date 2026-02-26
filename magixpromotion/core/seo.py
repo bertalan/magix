@@ -28,9 +28,9 @@ def homepage_jsonld() -> str:
             "Agenzia di band e artisti musicali per eventi "
             "in Italia e nel mondo."
         ),
-        "url": site.root_url if site else "https://www.magixpromotion.it",
+        "url": site.root_url if site else "https://www.magixpromotion.com",
         "telephone": getattr(settings, "phone", "+39 335 523 0855"),
-        "email": getattr(settings, "email", "info@magixpromotion.it"),
+        "email": getattr(settings, "email", "info@magixpromotion.com"),
         "address": {
             "@type": "PostalAddress",
             "streetAddress": getattr(settings, "address", "Via dello Scabiolo"),

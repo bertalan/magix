@@ -14,6 +14,8 @@ import { fetchEvents } from "@/lib/api";
 import { useFocusTrap } from "@/hooks/useFocusTrap";
 import { useImageRotator, ImagePair } from "@/hooks/useImageRotator";
 import ProgressiveImage from "./ProgressiveImage";
+import SEOHead from "./SEOHead";
+import { EventJsonLd } from "./JsonLdScript";
 import {
   X,
   Calendar,
@@ -194,6 +196,11 @@ const EventDetail: React.FC<EventDetailProps> = ({
     }
   };
 
+  const seoTitle = event.title;
+  const seoDescription = event.venue
+    ? `${event.title} @ ${event.venue.name}, ${event.venue.city}${event.start_date ? ` — ${event.start_date}` : ""}`
+    : event.title;
+
   return (
     <div
       ref={trapRef}
@@ -202,6 +209,15 @@ const EventDetail: React.FC<EventDetailProps> = ({
       aria-modal="true"
       aria-label={`Dettaglio evento: ${event.title}`}
     >
+      <SEOHead
+        title={seoTitle}
+        description={seoDescription}
+        image={event.featured_image_url || undefined}
+        url={`/it/eventi/${event.meta.slug}/`}
+        type="music.event"
+      />
+      <EventJsonLd event={event} />
+
       {/* Close */}
       <button
         onClick={onClose}

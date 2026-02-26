@@ -1,7 +1,10 @@
 import React from "react";
 import { Artist, ViewState } from "@/types";
+import { useSiteSettings } from "@/hooks/useSiteSettings";
 import Hero from "./Hero";
 import FeaturedArtists from "./FeaturedArtists";
+import SEOHead from "./SEOHead";
+import { HomepageJsonLd } from "./JsonLdScript";
 
 interface HomePageProps {
   setView: (v: ViewState) => void;
@@ -9,8 +12,17 @@ interface HomePageProps {
 }
 
 const HomePage: React.FC<HomePageProps> = ({ setView, onArtistClick }) => {
+  const { data: settings } = useSiteSettings();
+
   return (
     <>
+      <SEOHead
+        title="Magix Promotion — Booking & Management Musicale"
+        description="Agenzia di band e artisti musicali per eventi, concerti e feste private in Italia e nel mondo."
+        type="website"
+      />
+      <HomepageJsonLd settings={settings} />
+
       <Hero setView={setView} />
 
       {/* Chi Siamo — presentazione agenzia */}

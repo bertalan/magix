@@ -1,8 +1,28 @@
 {% extends "base.html" %}
 {% block title %}{{ page.title }} — MagixPromotion{% endblock %}
+
+{% block meta_description %}
+<meta name="description" content="{{ page.title }}{% if page.venue %} @ {{ page.venue.name }}, {{ page.venue.city }}{% endif %}{% if page.start_date %} — {{ page.start_date }}{% endif %}">
+{% endblock %}
+
+{% block og_tags %}
+{{ block.super }}
+<meta property="og:title" content="{{ page.title }}">
+<meta property="og:description" content="{{ page.title }}{% if page.venue %} @ {{ page.venue.name }}{% endif %}">
+<meta property="og:type" content="music.event">
+<meta property="og:url" content="{{ page.full_url }}">
+{% if page.featured_image %}<meta property="og:image" content="{{ page.featured_image.get_rendition.url }}">{% endif %}
+{% endblock %}
+
+{% block canonical %}<link rel="canonical" href="{{ page.full_url }}">{% endblock %}
+
 {% block content %}
-{# Headless: questa pagina è servita dal frontend SPA. #}
-{# Redirect al frontend React. #}
+{# Contenuto SEO visibile ai crawler prima del redirect alla SPA #}
+<h1>{{ page.title }}</h1>
+{% if page.start_date %}<time datetime="{{ page.start_date|date:'Y-m-d' }}">{{ page.start_date }}</time>{% endif %}
+{% if page.venue %}<p>{{ page.venue.name }} — {{ page.venue.city }}</p>{% endif %}
+{% if page.related_artist %}<p>Artista: {{ page.related_artist.title }}</p>{% endif %}
+
 <script>window.location.replace("/it/eventi/{{ page.slug }}/");</script>
 <noscript>
   <meta http-equiv="refresh" content="0;url=/it/eventi/{{ page.slug }}/">

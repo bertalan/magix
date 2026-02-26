@@ -3,6 +3,16 @@ import json
 from typing import Any
 
 
+# Mappa status interno → Schema.org eventStatus
+_STATUS_MAP = {
+    "confirmed": "https://schema.org/EventScheduled",
+    "tentative": "https://schema.org/EventScheduled",
+    "cancelled": "https://schema.org/EventCancelled",
+    "postponed": "https://schema.org/EventPostponed",
+    "sold_out": "https://schema.org/EventScheduled",
+}
+
+
 def event_jsonld(page) -> str:
     """Genera JSON-LD Schema.org/MusicEvent per una EventPage.
 
@@ -10,14 +20,19 @@ def event_jsonld(page) -> str:
     - start_date / end_date (non date_start / date_end)
     - related_artist (non artist)
     - venue.country usa CountryField
+    - eventStatus mappato da model status
     """
+    from wagtail.models import Site
+
     data: dict[str, Any] = {
         "@context": "https://schema.org",
         "@type": "MusicEvent",
         "name": page.title,
         "startDate": page.start_date.isoformat() if page.start_date else "",
         "url": page.full_url,
-        "eventStatus": "https://schema.org/EventScheduled",
+        "eventStatus": _STATUS_MAP.get(
+            page.status, "https://schema.org/EventScheduled"
+        ),
         "eventAttendanceMode": "https://schema.org/OfflineEventAttendanceMode",
     }
 
@@ -58,19 +73,30 @@ def event_jsonld(page) -> str:
             "url": page.related_artist.full_url,
         }
 
-    # Organizer
+    # Organizer — URL dinamico dal sito Wagtail
+    try:
+        site = Site.objects.get(is_default_site=True)
+        org_url = site.root_url
+    except Site.DoesNotExist:
+        org_url = "https://www.magixpromotion.com"
+
     data["organizer"] = {
         "@type": "Organization",
         "name": "Magix Promotion",
-        "url": "https://www.magixpromotion.it",
+        "url": org_url,
     }
 
-    # Ticket info
+    # Ticket info — con availability basata sullo status
     if page.ticket_url:
+        availability = (
+            "https://schema.org/SoldOut"
+            if page.status == "sold_out"
+            else "https://schema.org/InStock"
+        )
         data["offers"] = {
             "@type": "Offer",
             "url": page.ticket_url,
-            "availability": "https://schema.org/InStock",
+            "availability": availability,
         }
         if page.ticket_price:
             data["offers"]["price"] = page.ticket_price

@@ -1,6 +1,27 @@
 {% extends "base.html" %}
 {% block title %}{{ page.title }} — MagixPromotion{% endblock %}
+
+{% block meta_description %}
+<meta name="description" content="{{ page.short_bio|truncatewords:30|default:'Artista gestito da Magix Promotion' }}">
+{% endblock %}
+
+{% block og_tags %}
+{{ block.super }}
+<meta property="og:title" content="{{ page.title }}">
+<meta property="og:description" content="{{ page.short_bio|truncatewords:30|default:'' }}">
+<meta property="og:type" content="music.musician">
+<meta property="og:url" content="{{ page.full_url }}">
+{% if page.main_image %}<meta property="og:image" content="{{ page.main_image.get_rendition.url }}">{% endif %}
+{% endblock %}
+
+{% block canonical %}<link rel="canonical" href="{{ page.full_url }}">{% endblock %}
+
 {% block content %}
+{# Contenuto SEO visibile ai crawler prima del redirect alla SPA #}
+<h1>{{ page.title }}</h1>
+{% if page.short_bio %}<p>{{ page.short_bio }}</p>{% endif %}
+{% for genre in page.genres.all %}<span>{{ genre.name }}</span>{% endfor %}
+
 <script>window.location.replace("/it/artisti/{{ page.slug }}/");</script>
 <noscript>
   <meta http-equiv="refresh" content="0;url=/it/artisti/{{ page.slug }}/">

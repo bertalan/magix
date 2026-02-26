@@ -27,6 +27,11 @@ staticfiles/
 .env
 .env.local
 .env.production
+.env.prod
+*.env.secret
+
+# Local pip installs
+.local/
 
 # IDE
 .vscode/

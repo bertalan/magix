@@ -4,6 +4,8 @@ import { useFocusTrap } from "@/hooks/useFocusTrap";
 import { useImageRotator, ImagePair } from "@/hooks/useImageRotator";
 import ProgressiveImage from "./ProgressiveImage";
 import VideoModal from "./VideoModal";
+import SEOHead from "./SEOHead";
+import { ArtistJsonLd } from "./JsonLdScript";
 import {
   X,
   Instagram,
@@ -37,6 +39,9 @@ const ArtistDetail: React.FC<ArtistDetailProps> = ({
   const [showVideoModal, setShowVideoModal] = React.useState(false);
   const eventsRef = React.useRef<HTMLDivElement>(null);
   const trapRef = useFocusTrap<HTMLDivElement>();
+
+  // SEO: aggiorna meta tag e JSON-LD per l'artista corrente
+  const seoDescription = artist.short_bio?.slice(0, 160) || `${artist.title} — artista Magix Promotion`;
 
   // Costruisci array immagini paired: full-res + LQIP thumb
   const allImages = React.useMemo<ImagePair[]>(() => {
@@ -125,6 +130,15 @@ const ArtistDetail: React.FC<ArtistDetailProps> = ({
       aria-modal="true"
       aria-label={`Profilo artista: ${artist.title}`}
     >
+      <SEOHead
+        title={artist.title}
+        description={seoDescription}
+        image={artist.image_url || undefined}
+        url={`/it/artisti/${artist.meta.slug}/`}
+        type="music.musician"
+      />
+      <ArtistJsonLd artist={artist} />
+
       {/* Notifica riproduzione */}
       {isPlaying && (
         <div className="fixed top-12 left-1/2 -translate-x-1/2 z-[80] animate-in slide-in-from-top-8 duration-500">

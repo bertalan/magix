@@ -1,9 +1,32 @@
-"""View per download EPK con controllo permessi."""
+"""View per download EPK con controllo permessi e SEO."""
 from django.contrib.auth.decorators import login_required
-from django.http import Http404
+from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404, redirect
+from wagtail.models import Site
 
 from .models import EPKPackage
+
+
+def robots_txt(request):
+    """Genera robots.txt dinamico. Blocca /admin/ e /api/ per i crawler."""
+    try:
+        site = Site.objects.get(is_default_site=True)
+        base_url = site.root_url.rstrip("/")
+    except Site.DoesNotExist:
+        base_url = "https://www.magixpromotion.com"
+
+    lines = [
+        "User-agent: *",
+        "Allow: /",
+        "",
+        "# Aree riservate",
+        "Disallow: /admin/",
+        "Disallow: /django-admin/",
+        "Disallow: /api/",
+        "",
+        f"Sitemap: {base_url}/sitemap.xml",
+    ]
+    return HttpResponse("\n".join(lines), content_type="text/plain")
 
 
 @login_required

@@ -1,6 +1,25 @@
 {% extends "base.html" %}
-{% block title %}MagixPromotion — Booking & Management{% endblock %}
+{% block title %}MagixPromotion — Booking & Management Musicale{% endblock %}
+
+{% block meta_description %}
+<meta name="description" content="Magix Promotion — Agenzia di booking e management musicale per eventi, concerti e feste private in Italia e nel mondo.">
+{% endblock %}
+
+{% block og_tags %}
+{{ block.super }}
+<meta property="og:title" content="Magix Promotion">
+<meta property="og:description" content="Agenzia di booking e management musicale per eventi in Italia e nel mondo.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="{{ page.full_url }}">
+{% endblock %}
+
+{% block canonical %}<link rel="canonical" href="{{ page.full_url }}">{% endblock %}
+
 {% block content %}
+{# Contenuto SEO minimo visibile ai crawler #}
+<h1>Magix Promotion — Booking & Management Musicale</h1>
+<p>Agenzia di band e artisti musicali per eventi, concerti e feste private in Italia e nel mondo.</p>
+
 <script>window.location.replace("/");</script>
 <noscript>
   <meta http-equiv="refresh" content="0;url=/">

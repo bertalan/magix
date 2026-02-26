@@ -16,6 +16,7 @@ from artists.api import ArtistAPIViewSet
 from booking.views import booking_submit_api
 from core.band_finder import band_finder_api
 from core.search import autocomplete_api, search_api
+from core.views import robots_txt
 from events.api import EventAPIViewSet
 from navigation.api import menu_api
 
@@ -44,6 +45,7 @@ urlpatterns = [
     path("api/v2/band-finder/", band_finder_api, name="band_finder_api"),
     # SEO
     path("sitemap.xml", wagtail_sitemap),
+    path("robots.txt", robots_txt, name="robots_txt"),
     # EPK download protetto
     path("press/", include("core.epk_urls")),
 ]

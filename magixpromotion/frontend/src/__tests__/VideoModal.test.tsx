@@ -5,10 +5,9 @@
  * chiusura (Escape/backdrop/X), a11y attributes, gestione URL non supportati, body scroll lock.
  */
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, fireEvent, within } from "@testing-library/react";
+import { render, screen, fireEvent } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import VideoModal, { getEmbedUrl, parseVideoUrl } from "../components/VideoModal";
-import type { VideoInfo } from "../components/VideoModal";
 
 // --- Unit test per getEmbedUrl ---
 

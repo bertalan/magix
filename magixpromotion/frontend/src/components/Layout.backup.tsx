@@ -3,7 +3,6 @@ import { ViewState } from "@/types";
 import Header from "./Header";
 import Footer from "./Footer";
 import SkipLink from "./SkipLink";
-import AnimatedLogoBackground from "./AnimatedLogoBackground";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -21,10 +20,7 @@ const Layout: React.FC<LayoutProps> = ({
   toggleTheme,
 }) => {
   return (
-    <div className="min-h-screen flex flex-col bg-[var(--bg-color)] relative">
-      {/* Animated "m" background — z-0, behind everything */}
-      <AnimatedLogoBackground />
-
+    <div className="min-h-screen flex flex-col bg-[var(--bg-color)]">
       <SkipLink />
       <Header
         activeView={activeView}
@@ -32,7 +28,7 @@ const Layout: React.FC<LayoutProps> = ({
         currentTheme={currentTheme}
         toggleTheme={toggleTheme}
       />
-      <main id="main-content" className="flex-grow pt-20 relative z-10" role="main">
+      <main id="main-content" className="flex-grow pt-20" role="main">
         {children}
       </main>
       <Footer setView={setView} />

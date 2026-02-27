@@ -2,6 +2,7 @@
 from django import forms
 from django.db import models
 from django.utils.text import slugify
+from django.utils.translation import gettext_lazy as _
 from django_countries.fields import CountryField
 from modelcluster.fields import ParentalKey, ParentalManyToManyField
 from modelcluster.models import ClusterableModel
@@ -27,17 +28,17 @@ class Genre(models.Model):
     name = models.CharField(
         max_length=100,
         unique=True,
-        verbose_name="Nome genere",
+        verbose_name=_("Nome genere"),
     )
     slug = models.SlugField(
         max_length=100,
         unique=True,
-        help_text="Generato automaticamente dal nome.",
+        help_text=_("Generato automaticamente dal nome."),
     )
     description = models.TextField(
         blank=True,
-        verbose_name="Descrizione",
-        help_text="Breve descrizione del genere (opzionale).",
+        verbose_name=_("Descrizione"),
+        help_text=_("Breve descrizione del genere (opzionale)."),
     )
 
     panels = [
@@ -52,8 +53,8 @@ class Genre(models.Model):
     ]
 
     class Meta:
-        verbose_name = "Genere musicale"
-        verbose_name_plural = "Generi musicali"
+        verbose_name = _("Genere musicale")
+        verbose_name_plural = _("Generi musicali")
         ordering = ["name"]
 
     def __str__(self) -> str:
@@ -74,7 +75,7 @@ class TargetEvent(models.Model):
     icon = models.CharField(
         max_length=50,
         blank=True,
-        help_text="Nome icona Lucide (es: 'party-popper', 'building-2').",
+        help_text=_("Nome icona Lucide (es: 'party-popper', 'building-2')."),
     )
 
     panels = [
@@ -84,8 +85,8 @@ class TargetEvent(models.Model):
     ]
 
     class Meta:
-        verbose_name = "Tipologia evento"
-        verbose_name_plural = "Tipologie evento"
+        verbose_name = _("Tipologia evento")
+        verbose_name_plural = _("Tipologie evento")
         ordering = ["name"]
 
     def __str__(self) -> str:
@@ -98,11 +99,11 @@ class TargetEvent(models.Model):
 
 
 ARTIST_TYPE_CHOICES = [
-    ("show_band", "Show Band / Party Band"),
-    ("tribute", "Tribute Band"),
-    ("original", "Band Originale"),
-    ("dj", "DJ / Solista"),
-    ("cover", "Cover Band"),
+    ("show_band", _("Show Band / Party Band")),
+    ("tribute", _("Tribute Band")),
+    ("original", _("Band Originale")),
+    ("dj", _("DJ / Solista")),
+    ("cover", _("Cover Band")),
 ]
 
 
@@ -111,8 +112,8 @@ class ArtistListingPage(Page):
 
     intro = RichTextField(
         blank=True,
-        verbose_name="Testo introduttivo",
-        help_text="Breve intro SEO per la pagina roster.",
+        verbose_name=_("Testo introduttivo"),
+        help_text=_("Breve intro SEO per la pagina roster."),
     )
 
     content_panels = Page.content_panels + [
@@ -125,7 +126,7 @@ class ArtistListingPage(Page):
     max_count = 1  # Solo un indice artisti
 
     class Meta:
-        verbose_name = "Pagina Roster Artisti"
+        verbose_name = _("Pagina Roster Artisti")
 
     def get_context(self, request, *args, **kwargs):
         """Aggiunge la lista artisti live al contesto template."""
@@ -164,12 +165,12 @@ class ArtistGalleryImage(Orderable):
         get_image_model_string(),
         on_delete=models.CASCADE,
         related_name="+",
-        verbose_name="Immagine",
+        verbose_name=_("Immagine"),
     )
     caption = models.CharField(
         max_length=250,
         blank=True,
-        verbose_name="Didascalia (opzionale)",
+        verbose_name=_("Didascalia (opzionale)"),
     )
 
     panels = [
@@ -178,8 +179,8 @@ class ArtistGalleryImage(Orderable):
     ]
 
     class Meta(Orderable.Meta):
-        verbose_name = "Immagine gallery"
-        verbose_name_plural = "Immagini gallery"
+        verbose_name = _("Immagine gallery")
+        verbose_name_plural = _("Immagini gallery")
 
     def __str__(self) -> str:
         return f"Gallery image {self.sort_order} for {self.page}"
@@ -193,12 +194,12 @@ class ArtistPage(Page):
         max_length=20,
         choices=ARTIST_TYPE_CHOICES,
         default="show_band",
-        verbose_name="Tipologia artista",
+        verbose_name=_("Tipologia artista"),
     )
     short_bio = models.TextField(
         max_length=500,
-        verbose_name="Bio breve",
-        help_text="Max 500 caratteri. Usata nelle card e snippet SEO.",
+        verbose_name=_("Bio breve"),
+        help_text=_("Max 500 caratteri. Usata nelle card e snippet SEO."),
     )
 
     # === Media Primari ===
@@ -208,58 +209,58 @@ class ArtistPage(Page):
         blank=True,
         on_delete=models.SET_NULL,
         related_name="+",
-        verbose_name="Immagine principale",
+        verbose_name=_("Immagine principale"),
     )
     hero_video_url = models.URLField(
         blank=True,
-        verbose_name="URL Video Hero (YouTube)",
-        help_text="Se presente, l'header e' video-first (loop/preview).",
+        verbose_name=_("URL Video Hero (YouTube)"),
+        help_text=_("Se presente, l'header e' video-first (loop/preview)."),
     )
 
     # === Tribute-specific ===
     tribute_to = models.CharField(
         max_length=200,
         blank=True,
-        verbose_name="Tributo a",
-        help_text="Nome artista/band tributato. Es: 'Queen', 'Vasco Rossi'. Migliora SEO.",
+        verbose_name=_("Tributo a"),
+        help_text=_("Nome artista/band tributato. Es: 'Queen', 'Vasco Rossi'. Migliora SEO."),
     )
 
     # === Localizzazione (internazionale) ===
     base_country = CountryField(
         default="IT",
-        verbose_name="Paese base",
-        help_text="Paese operativo principale della band.",
+        verbose_name=_("Paese base"),
+        help_text=_("Paese operativo principale della band."),
     )
     base_region = models.CharField(
         max_length=100,
         blank=True,
-        verbose_name="Regione base",
-        help_text="Testo libero. Es: Piemonte, Lombardia, Bavaria.",
+        verbose_name=_("Regione base"),
+        help_text=_("Testo libero. Es: Piemonte, Lombardia, Bavaria."),
     )
     base_city = models.CharField(
         max_length=100,
         blank=True,
-        verbose_name="Citta base",
+        verbose_name=_("Citta base"),
     )
 
     # === Relazioni ===
     genres = ParentalManyToManyField(
         "artists.Genre",
         blank=True,
-        verbose_name="Generi musicali",
+        verbose_name=_("Generi musicali"),
     )
     target_events = ParentalManyToManyField(
         "artists.TargetEvent",
         blank=True,
-        verbose_name="Tipologie evento target",
-        help_text="Per quali tipi di evento e' adatta questa band?",
+        verbose_name=_("Tipologie evento target"),
+        help_text=_("Per quali tipi di evento e' adatta questa band?"),
     )
 
     # === Social & Link ===
-    spotify_url = models.URLField(blank=True, verbose_name="Spotify")
-    instagram_url = models.URLField(blank=True, verbose_name="Instagram")
-    facebook_url = models.URLField(blank=True, verbose_name="Facebook")
-    website_url = models.URLField(blank=True, verbose_name="Sito web")
+    spotify_url = models.URLField(blank=True, verbose_name=_("Spotify"))
+    instagram_url = models.URLField(blank=True, verbose_name=_("Instagram"))
+    facebook_url = models.URLField(blank=True, verbose_name=_("Facebook"))
+    website_url = models.URLField(blank=True, verbose_name=_("Sito web"))
 
     # === Permessi Per-Band (Task 27) ===
     managing_group = models.ForeignKey(
@@ -267,8 +268,8 @@ class ArtistPage(Page):
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
-        verbose_name="Gruppo editor autorizzati",
-        help_text=(
+        verbose_name=_("Gruppo editor autorizzati"),
+        help_text=_(
             "Gruppo Wagtail i cui membri possono modificare questa band "
             "e i relativi eventi. Lasciare vuoto per accesso solo staff."
         ),
@@ -279,7 +280,7 @@ class ArtistPage(Page):
         ARTIST_BODY_BLOCKS,
         blank=True,
         use_json_field=True,
-        verbose_name="Contenuto pagina",
+        verbose_name=_("Contenuto pagina"),
     )
 
     # === Pannelli Admin ===
@@ -289,7 +290,7 @@ class ArtistPage(Page):
                 FieldPanel("artist_type"),
                 FieldPanel("tribute_to"),
             ],
-            heading="Classificazione",
+            heading=_("Classificazione"),
         ),
         FieldPanel("short_bio"),
         MultiFieldPanel(
@@ -297,14 +298,14 @@ class ArtistPage(Page):
                 FieldPanel("main_image"),
                 FieldPanel("hero_video_url"),
             ],
-            heading="Media principali",
+            heading=_("Media principali"),
         ),
         InlinePanel(
             "gallery_images",
-            label="Immagini gallery",
+            label=_("Immagini gallery"),
             min_num=0,
             max_num=10,
-            heading="Gallery immagini (rotazione automatica)",
+            heading=_("Gallery immagini (rotazione automatica)"),
         ),
         FieldPanel("genres", widget=forms.CheckboxSelectMultiple),
         FieldPanel("target_events", widget=forms.CheckboxSelectMultiple),
@@ -314,7 +315,7 @@ class ArtistPage(Page):
                 FieldPanel("base_region"),
                 FieldPanel("base_city"),
             ],
-            heading="Localizzazione",
+            heading=_("Localizzazione"),
         ),
         FieldPanel("body"),
     ]
@@ -327,7 +328,7 @@ class ArtistPage(Page):
                 FieldPanel("facebook_url"),
                 FieldPanel("website_url"),
             ],
-            heading="Social & Link esterni",
+            heading=_("Social & Link esterni"),
         ),
     ]
 
@@ -373,8 +374,8 @@ class ArtistPage(Page):
     ]
 
     class Meta:
-        verbose_name = "Pagina Artista"
-        verbose_name_plural = "Pagine Artista"
+        verbose_name = _("Pagina Artista")
+        verbose_name_plural = _("Pagine Artista")
 
     def __str__(self) -> str:
         return self.title

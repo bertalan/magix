@@ -3,6 +3,7 @@ import json
 import logging
 
 from django.http import JsonResponse
+from django.utils.translation import gettext as _
 from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.http import require_POST
 
@@ -20,7 +21,7 @@ def booking_submit_api(request):
         data = json.loads(request.body)
     except json.JSONDecodeError:
         return JsonResponse(
-            {"detail": "Formato JSON non valido."},
+            {"detail": _("Formato JSON non valido.")},
             status=400,
         )
 
@@ -51,6 +52,6 @@ def booking_submit_api(request):
         logger.exception(f"Errore invio email booking: {exc}")
 
     return JsonResponse(
-        {"success": True, "message": "Richiesta inviata con successo"},
+        {"success": True, "message": _("Richiesta inviata con successo")},
         status=200,
     )

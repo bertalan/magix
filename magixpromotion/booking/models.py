@@ -1,6 +1,7 @@
 """Modelli app Booking — form contatto/booking context-aware."""
 from django.db import models
 from django.core.mail import send_mail
+from django.utils.translation import gettext_lazy as _
 from modelcluster.fields import ParentalKey
 from wagtail.admin.panels import FieldPanel, FieldRowPanel, InlinePanel, MultiFieldPanel
 from wagtail.contrib.forms.models import AbstractEmailForm, AbstractFormField
@@ -25,16 +26,16 @@ class BookingFormPage(AbstractEmailForm):
 
     intro = RichTextField(
         blank=True,
-        verbose_name="Testo introduttivo",
+        verbose_name=_("Testo introduttivo"),
     )
     thank_you_text = RichTextField(
         blank=True,
-        verbose_name="Testo di ringraziamento",
+        verbose_name=_("Testo di ringraziamento"),
     )
 
     content_panels = AbstractEmailForm.content_panels + [
         FieldPanel("intro"),
-        InlinePanel("form_fields", label="Campi aggiuntivi"),
+        InlinePanel("form_fields", label=_("Campi aggiuntivi")),
         FieldPanel("thank_you_text"),
         MultiFieldPanel(
             [
@@ -46,7 +47,7 @@ class BookingFormPage(AbstractEmailForm):
                 ),
                 FieldPanel("subject"),
             ],
-            heading="Configurazione Email",
+            heading=_("Configurazione Email"),
         ),
     ]
 
@@ -55,7 +56,7 @@ class BookingFormPage(AbstractEmailForm):
     max_count = 1
 
     class Meta:
-        verbose_name = "Pagina Form Booking"
+        verbose_name = _("Pagina Form Booking")
 
     def get_context(self, request, *args, **kwargs):
         """Inietta il contesto artista nel form."""

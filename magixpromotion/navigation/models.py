@@ -1,5 +1,6 @@
 """Sistema navigazione dinamico sganciato dall'albero pagine."""
 from django.db import models
+from django.utils.translation import gettext_lazy as _
 from modelcluster.fields import ParentalKey
 from modelcluster.models import ClusterableModel
 from wagtail.admin.panels import (
@@ -14,11 +15,11 @@ from core.widgets import IconPickerWidget
 
 
 MENU_LOCATION_CHOICES = [
-    ("header", "Header (Navigazione principale)"),
-    ("footer_main", "Footer — Colonna principale"),
-    ("footer_legal", "Footer — Link legali"),
-    ("footer_social", "Footer — Social"),
-    ("mobile", "Mobile menu"),
+    ("header", _("Header (Navigazione principale)")),
+    ("footer_main", _("Footer — Colonna principale")),
+    ("footer_legal", _("Footer — Link legali")),
+    ("footer_social", _("Footer — Social")),
+    ("mobile", _("Mobile menu")),
 ]
 
 
@@ -28,31 +29,31 @@ class NavigationMenu(ClusterableModel):
 
     title = models.CharField(
         max_length=100,
-        verbose_name="Nome menu",
-        help_text="Nome interno, non visibile al pubblico. Es: 'Header Menu IT'",
+        verbose_name=_("Nome menu"),
+        help_text=_("Nome interno, non visibile al pubblico. Es: 'Header Menu IT'"),
     )
     location = models.CharField(
         max_length=30,
         choices=MENU_LOCATION_CHOICES,
-        verbose_name="Posizione",
+        verbose_name=_("Posizione"),
     )
     language = models.CharField(
         max_length=5,
-        choices=[("it", "Italiano"), ("en", "English")],
+        choices=[("it", _("Italiano")), ("en", _("English"))],
         default="it",
-        verbose_name="Lingua",
+        verbose_name=_("Lingua"),
     )
 
     panels = [
         FieldPanel("title"),
         FieldPanel("location"),
         FieldPanel("language"),
-        InlinePanel("items", label="Voci di menu"),
+        InlinePanel("items", label=_("Voci di menu")),
     ]
 
     class Meta:
-        verbose_name = "Menu navigazione"
-        verbose_name_plural = "Menu navigazione"
+        verbose_name = _("Menu navigazione")
+        verbose_name_plural = _("Menu navigazione")
         unique_together = [("location", "language")]
 
     def __str__(self) -> str:
@@ -70,8 +71,8 @@ class MenuItem(Orderable):
     title_override = models.CharField(
         max_length=100,
         blank=True,
-        verbose_name="Titolo custom",
-        help_text="Se vuoto, usa il titolo della pagina linkata.",
+        verbose_name=_("Titolo custom"),
+        help_text=_("Se vuoto, usa il titolo della pagina linkata."),
     )
     page_link = models.ForeignKey(
         "wagtailcore.Page",
@@ -79,22 +80,22 @@ class MenuItem(Orderable):
         blank=True,
         on_delete=models.SET_NULL,
         related_name="+",
-        verbose_name="Pagina interna",
+        verbose_name=_("Pagina interna"),
     )
     external_url = models.URLField(
         blank=True,
-        verbose_name="URL esterno",
-        help_text="Usato solo se 'Pagina interna' e' vuoto.",
+        verbose_name=_("URL esterno"),
+        help_text=_("Usato solo se 'Pagina interna' e' vuoto."),
     )
     open_in_new_tab = models.BooleanField(
         default=False,
-        verbose_name="Apri in nuova scheda",
+        verbose_name=_("Apri in nuova scheda"),
     )
     icon = models.CharField(
         max_length=50,
         blank=True,
-        verbose_name="Icona",
-        help_text="Nome icona Lucide React (es: 'music', 'calendar', 'mail').",
+        verbose_name=_("Icona"),
+        help_text=_("Nome icona Lucide React (es: 'music', 'calendar', 'mail')."),
     )
 
     panels = [

@@ -1,6 +1,7 @@
 """Modelli app Events: Venue, Promoter snippets, EventListingPage, EventPage."""
 from django.db import models
 from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
 from django_countries.fields import CountryField
 from wagtail.admin.panels import FieldPanel, MultiFieldPanel
 from wagtail.fields import RichTextField
@@ -15,54 +16,54 @@ from wagtail_localize.fields import SynchronizedField, TranslatableField
 class Venue(models.Model):
     """Locale, teatro, piazza o venue per eventi. Supporta indirizzi internazionali."""
 
-    name = models.CharField(max_length=200, verbose_name="Nome venue")
-    city = models.CharField(max_length=100, verbose_name="Citta")
+    name = models.CharField(max_length=200, verbose_name=_("Nome venue"))
+    city = models.CharField(max_length=100, verbose_name=_("Citta"))
     province = models.CharField(
         max_length=10,
         blank=True,
-        verbose_name="Provincia / Stato",
-        help_text="Es: AL, MI, TO oppure Bayern, Ile-de-France",
+        verbose_name=_("Provincia / Stato"),
+        help_text=_("Es: AL, MI, TO oppure Bayern, Ile-de-France"),
     )
     region = models.CharField(
         max_length=100,
         blank=True,
-        verbose_name="Regione",
-        help_text="Testo libero. Es: Piemonte, Lombardia, Bavaria, Catalonia",
+        verbose_name=_("Regione"),
+        help_text=_("Testo libero. Es: Piemonte, Lombardia, Bavaria, Catalonia"),
     )
     country = CountryField(
         default="IT",
-        verbose_name="Paese",
-        help_text="Codice ISO 3166-1 alpha-2",
+        verbose_name=_("Paese"),
+        help_text=_("Codice ISO 3166-1 alpha-2"),
     )
     address = models.CharField(
         max_length=300,
         blank=True,
-        verbose_name="Indirizzo completo",
+        verbose_name=_("Indirizzo completo"),
     )
     zip_code = models.CharField(
         max_length=20,
         blank=True,
-        verbose_name="CAP / Codice postale",
+        verbose_name=_("CAP / Codice postale"),
     )
     capacity = models.PositiveIntegerField(
         null=True,
         blank=True,
-        verbose_name="Capienza",
+        verbose_name=_("Capienza"),
     )
-    website = models.URLField(blank=True, verbose_name="Sito web")
+    website = models.URLField(blank=True, verbose_name=_("Sito web"))
     latitude = models.DecimalField(
         max_digits=9,
         decimal_places=6,
         null=True,
         blank=True,
-        verbose_name="Latitudine",
+        verbose_name=_("Latitudine"),
     )
     longitude = models.DecimalField(
         max_digits=9,
         decimal_places=6,
         null=True,
         blank=True,
-        verbose_name="Longitudine",
+        verbose_name=_("Longitudine"),
     )
 
     panels = [
@@ -76,7 +77,7 @@ class Venue(models.Model):
                 FieldPanel("zip_code"),
                 FieldPanel("country"),
             ],
-            heading="Localizzazione",
+            heading=_("Localizzazione"),
         ),
         FieldPanel("capacity"),
         FieldPanel("website"),
@@ -85,7 +86,7 @@ class Venue(models.Model):
                 FieldPanel("latitude"),
                 FieldPanel("longitude"),
             ],
-            heading="Coordinate GPS (auto-compilabili via Nominatim)",
+            heading=_("Coordinate GPS (auto-compilabili via Nominatim)"),
         ),
     ]
 
@@ -126,18 +127,18 @@ class Venue(models.Model):
 class Promoter(models.Model):
     """Promoter o organizzatore eventi. Dati riservati (non pubblici)."""
 
-    company_name = models.CharField(max_length=200, verbose_name="Ragione sociale")
+    company_name = models.CharField(max_length=200, verbose_name=_("Ragione sociale"))
     contact_name = models.CharField(
         max_length=150,
         blank=True,
-        verbose_name="Referente",
+        verbose_name=_("Referente"),
     )
-    email = models.EmailField(blank=True, verbose_name="Email")
-    phone = models.CharField(max_length=30, blank=True, verbose_name="Telefono")
+    email = models.EmailField(blank=True, verbose_name=_("Email"))
+    phone = models.CharField(max_length=30, blank=True, verbose_name=_("Telefono"))
     notes = models.TextField(
         blank=True,
-        verbose_name="Note interne",
-        help_text="Visibili solo agli admin.",
+        verbose_name=_("Note interne"),
+        help_text=_("Visibili solo agli admin."),
     )
 
     panels = [
@@ -158,16 +159,16 @@ class Promoter(models.Model):
 
 
 EVENT_STATUS_CHOICES = [
-    ("confirmed", "Confermato"),
-    ("tentative", "Da confermare"),
-    ("cancelled", "Annullato"),
-    ("postponed", "Posticipato"),
-    ("sold_out", "Sold Out"),
+    ("confirmed", _("Confermato")),
+    ("tentative", _("Da confermare")),
+    ("cancelled", _("Annullato")),
+    ("postponed", _("Posticipato")),
+    ("sold_out", _("Sold Out")),
 ]
 
 EVENT_VISIBILITY_CHOICES = [
-    ("public", "Pubblico"),
-    ("private", "Privato (non visibile nel calendario)"),
+    ("public", _("Pubblico")),
+    ("private", _("Privato (non visibile nel calendario)")),
 ]
 
 
@@ -176,7 +177,7 @@ class EventListingPage(Page):
 
     intro = RichTextField(
         blank=True,
-        verbose_name="Testo introduttivo",
+        verbose_name=_("Testo introduttivo"),
     )
 
     content_panels = Page.content_panels + [
@@ -188,7 +189,7 @@ class EventListingPage(Page):
     max_count = 1
 
     class Meta:
-        verbose_name = "Pagina Calendario Eventi"
+        verbose_name = _("Pagina Calendario Eventi")
 
     def get_context(self, request, *args, **kwargs):
         """Filtra eventi futuri/passati con filtri opzionali."""
@@ -231,22 +232,22 @@ class EventPage(Page):
     """Singola data o evento."""
 
     # === Date ===
-    start_date = models.DateField(null=True, verbose_name="Data inizio")
+    start_date = models.DateField(null=True, verbose_name=_("Data inizio"))
     end_date = models.DateField(
         null=True,
         blank=True,
-        verbose_name="Data fine",
-        help_text="Compilare solo per eventi multi-giorno.",
+        verbose_name=_("Data fine"),
+        help_text=_("Compilare solo per eventi multi-giorno."),
     )
     doors_time = models.TimeField(
         null=True,
         blank=True,
-        verbose_name="Apertura porte",
+        verbose_name=_("Apertura porte"),
     )
     start_time = models.TimeField(
         null=True,
         blank=True,
-        verbose_name="Inizio show",
+        verbose_name=_("Inizio show"),
     )
 
     # === Stato ===
@@ -254,18 +255,18 @@ class EventPage(Page):
         max_length=20,
         choices=EVENT_STATUS_CHOICES,
         default="confirmed",
-        verbose_name="Stato evento",
+        verbose_name=_("Stato evento"),
     )
     visibility = models.CharField(
         max_length=20,
         choices=EVENT_VISIBILITY_CHOICES,
         default="public",
-        verbose_name="Visibilita",
+        verbose_name=_("Visibilita"),
     )
     is_archived = models.BooleanField(
         default=False,
-        verbose_name="Archiviato",
-        help_text="Impostato automaticamente dal job notturno per eventi passati.",
+        verbose_name=_("Archiviato"),
+        help_text=_("Impostato automaticamente dal job notturno per eventi passati."),
     )
 
     # === Relazioni ===
@@ -275,7 +276,7 @@ class EventPage(Page):
         blank=True,
         on_delete=models.SET_NULL,
         related_name="events",
-        verbose_name="Artista",
+        verbose_name=_("Artista"),
     )
     venue = models.ForeignKey(
         "events.Venue",
@@ -283,7 +284,7 @@ class EventPage(Page):
         blank=True,
         on_delete=models.SET_NULL,
         related_name="events",
-        verbose_name="Venue",
+        verbose_name=_("Venue"),
     )
     promoter = models.ForeignKey(
         "events.Promoter",
@@ -291,7 +292,7 @@ class EventPage(Page):
         blank=True,
         on_delete=models.SET_NULL,
         related_name="events",
-        verbose_name="Promoter",
+        verbose_name=_("Promoter"),
     )
 
     # === Media ===
@@ -301,23 +302,23 @@ class EventPage(Page):
         blank=True,
         on_delete=models.SET_NULL,
         related_name="+",
-        verbose_name="Immagine evento",
+        verbose_name=_("Immagine evento"),
     )
 
     # === Contenuto ===
     description = RichTextField(
         blank=True,
-        verbose_name="Descrizione evento",
+        verbose_name=_("Descrizione evento"),
     )
     ticket_url = models.URLField(
         blank=True,
-        verbose_name="Link biglietti",
+        verbose_name=_("Link biglietti"),
     )
     ticket_price = models.CharField(
         max_length=100,
         blank=True,
-        verbose_name="Prezzo biglietti",
-        help_text="Es: '15 + d.p.' oppure 'Ingresso libero'",
+        verbose_name=_("Prezzo biglietti"),
+        help_text=_("Es: '15 + d.p.' oppure 'Ingresso libero'"),
     )
 
     # === Admin Panels ===
@@ -329,14 +330,14 @@ class EventPage(Page):
                 FieldPanel("doors_time"),
                 FieldPanel("start_time"),
             ],
-            heading="Date e Orari",
+            heading=_("Date e Orari"),
         ),
         MultiFieldPanel(
             [
                 FieldPanel("status"),
                 FieldPanel("visibility"),
             ],
-            heading="Stato",
+            heading=_("Stato"),
         ),
         FieldPanel("related_artist"),
         FieldPanel("venue"),
@@ -348,7 +349,7 @@ class EventPage(Page):
                 FieldPanel("ticket_url"),
                 FieldPanel("ticket_price"),
             ],
-            heading="Biglietti",
+            heading=_("Biglietti"),
         ),
     ]
 
@@ -391,8 +392,8 @@ class EventPage(Page):
     ]
 
     class Meta:
-        verbose_name = "Pagina Evento"
-        verbose_name_plural = "Pagine Evento"
+        verbose_name = _("Pagina Evento")
+        verbose_name_plural = _("Pagine Evento")
         ordering = ["-start_date"]
 
     def __str__(self) -> str:

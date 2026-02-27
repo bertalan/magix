@@ -38,6 +38,9 @@ services:
       - WAGTAILADMIN_BASE_URL=http://localhost:8000
       - GEMINI_API_KEY=${GEMINI_API_KEY:-placeholder}
       - NOMINATIM_USER_AGENT=magix-promotion-dev
+      - MATOMO_URL=${MATOMO_URL:-//piwik.gpsbooking.com/}
+      - MATOMO_SITE_ID=${MATOMO_SITE_ID:-14}
+      - GOOGLE_ANALYTICS_ID=${GOOGLE_ANALYTICS_ID:-}
     ports:
       - "8000:8000"
     volumes:
@@ -68,6 +71,9 @@ services:
       - DJANGO_SECRET_KEY=dev-secret-key-not-for-production
       - GEMINI_API_KEY=${GEMINI_API_KEY:-placeholder}
       - NOMINATIM_USER_AGENT=magix-promotion-dev
+      - MATOMO_URL=${MATOMO_URL:-//piwik.gpsbooking.com/}
+      - MATOMO_SITE_ID=${MATOMO_SITE_ID:-14}
+      - GOOGLE_ANALYTICS_ID=${GOOGLE_ANALYTICS_ID:-}
     volumes:
       - ..:/app
     depends_on:

@@ -2,12 +2,14 @@ import React from "react";
 import { ViewState, Artist, EventPage } from "@/types";
 import { fetchArtistBySlug, fetchArtist, fetchEventBySlug } from "@/lib/api";
 import { useLanguage, Lang } from "@/contexts/LanguageContext";
+import { useSiteSettings } from "@/hooks/useSiteSettings";
 import Layout from "./components/Layout";
 import HomePage from "./components/HomePage";
 import ArtistGrid from "./components/ArtistGrid";
 import ArtistDetail from "./components/ArtistDetail";
 import EventDetail from "./components/EventDetail";
 import EventsPage from "./components/EventsPage";
+import Analytics from "./components/Analytics";
 import BookingPage from "./components/BookingPage";
 import BandFinder from "./components/BandFinder";
 import PrivacyPage from "./components/PrivacyPage";
@@ -95,6 +97,7 @@ function viewToPath(view: ViewState, lang: Lang, slug?: string): string {
 
 const App: React.FC = () => {
   const { lang, setLang } = useLanguage();
+  const { data: siteSettings } = useSiteSettings();
   const [activeView, setActiveView] = React.useState<ViewState>(() => parseViewFromPath());
   const [selectedArtist, setSelectedArtist] = React.useState<Artist | null>(
     null,
@@ -348,6 +351,12 @@ const App: React.FC = () => {
       currentTheme={currentTheme}
       toggleTheme={toggleTheme}
     >
+      {/* Analytics tracking — inietta Matomo / GA in base alla config del backend */}
+      <Analytics
+        analytics={siteSettings?.analytics}
+        currentPath={window.location.pathname}
+      />
+
       {renderView()}
 
       {/* EventDetail overlay */}

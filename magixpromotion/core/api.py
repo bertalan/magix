@@ -1,4 +1,5 @@
 """API endpoint per dati aziendali pubblici (MagixSiteSettings)."""
+from django.conf import settings as django_settings
 from django.http import JsonResponse
 from wagtail.models import Site
 
@@ -33,6 +34,14 @@ def site_settings_view(request):
             "instagram": settings_obj.instagram_url or None,
             "youtube": settings_obj.youtube_url or None,
             "spotify": settings_obj.spotify_url or None,
+        },
+        "analytics": {
+            "matomo_url": settings_obj.matomo_url or getattr(django_settings, "MATOMO_URL", ""),
+            "matomo_site_id": settings_obj.matomo_site_id or getattr(django_settings, "MATOMO_SITE_ID", ""),
+            "google_analytics_id": (
+                settings_obj.google_analytics_id
+                or getattr(django_settings, "GOOGLE_ANALYTICS_ID", "")
+            ),
         },
     }
     return JsonResponse(data)

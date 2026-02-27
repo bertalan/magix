@@ -170,4 +170,11 @@ WAGTAILLOCALIZE_MACHINE_TRANSLATOR = {
     "OPTIONS": {},
 }
 
+# ---------------------------------------------------------------------------
+# Analytics — Matomo & Google Analytics
+# ---------------------------------------------------------------------------
+MATOMO_URL = os.environ.get("MATOMO_URL", "//piwik.gpsbooking.com/")
+MATOMO_SITE_ID = os.environ.get("MATOMO_SITE_ID", "14")
+GOOGLE_ANALYTICS_ID = os.environ.get("GOOGLE_ANALYTICS_ID", "")
+
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"

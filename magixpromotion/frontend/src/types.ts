@@ -141,6 +141,12 @@ export interface SiteSocial {
   spotify: string | null;
 }
 
+export interface SiteAnalytics {
+  matomo_url: string;
+  matomo_site_id: string;
+  google_analytics_id: string;
+}
+
 export interface SiteSettings {
   company_name: string;
   phone: string;
@@ -148,6 +154,7 @@ export interface SiteSettings {
   vat_number: string;
   address: SiteAddress;
   social: SiteSocial;
+  analytics: SiteAnalytics;
 }
 
 // --- Booking ---

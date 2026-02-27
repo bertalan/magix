@@ -96,6 +96,26 @@ class MagixSiteSettings(BaseSiteSetting):
     youtube_url = models.URLField(blank=True, verbose_name=_("YouTube"))
     spotify_url = models.URLField(blank=True, verbose_name=_("Spotify"))
 
+    # --- Analytics ---
+    matomo_url = models.CharField(
+        max_length=300,
+        blank=True,
+        verbose_name=_("Matomo URL"),
+        help_text=_("URL base del server Matomo (es: //piwik.gpsbooking.com/). Vuoto = usa valore da settings."),
+    )
+    matomo_site_id = models.CharField(
+        max_length=20,
+        blank=True,
+        verbose_name=_("Matomo Site ID"),
+        help_text=_("ID del sito configurato su Matomo. Vuoto = usa valore da settings."),
+    )
+    google_analytics_id = models.CharField(
+        max_length=50,
+        blank=True,
+        verbose_name=_("Google Analytics ID"),
+        help_text=_("Measurement ID di Google Analytics (es: G-XXXXXXXXXX). Vuoto = disabilitato."),
+    )
+
     # --- API Keys e configurazioni tecniche ---
     gemini_api_key = models.CharField(
         max_length=200,
@@ -141,6 +161,14 @@ class MagixSiteSettings(BaseSiteSetting):
                 FieldPanel("spotify_url"),
             ],
             heading=_("Social media"),
+        ),
+        MultiFieldPanel(
+            [
+                FieldPanel("matomo_url"),
+                FieldPanel("matomo_site_id"),
+                FieldPanel("google_analytics_id"),
+            ],
+            heading=_("Analytics & Tracking"),
         ),
         MultiFieldPanel(
             [

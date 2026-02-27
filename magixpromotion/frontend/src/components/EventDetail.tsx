@@ -13,6 +13,8 @@ import type { EventPage, ViewState } from "@/types";
 import { fetchEvents } from "@/lib/api";
 import { useFocusTrap } from "@/hooks/useFocusTrap";
 import { useImageRotator, ImagePair } from "@/hooks/useImageRotator";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { localePath } from "@/lib/routes";
 import ProgressiveImage from "./ProgressiveImage";
 import SEOHead from "./SEOHead";
 import { EventJsonLd } from "./JsonLdScript";
@@ -116,6 +118,7 @@ const EventDetail: React.FC<EventDetailProps> = ({
 }) => {
   const trapRef = useFocusTrap<HTMLDivElement>();
   const [relatedEvents, setRelatedEvents] = React.useState<EventPage[]>([]);
+  const { lang } = useLanguage();
 
   // Costruisci array immagini artista per rotazione fallback (quando evento senza foto)
   const artistImages = React.useMemo<ImagePair[]>(() => {
@@ -213,10 +216,10 @@ const EventDetail: React.FC<EventDetailProps> = ({
         title={seoTitle}
         description={seoDescription}
         image={event.featured_image_url || undefined}
-        url={`/it/eventi/${event.meta.slug}/`}
+        url={localePath(lang, "events", event.meta.slug)}
         type="music.event"
       />
-      <EventJsonLd event={event} />
+      <EventJsonLd event={event} lang={lang} />
 
       {/* Close */}
       <button

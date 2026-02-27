@@ -15,28 +15,7 @@ import BandFinder from "./components/BandFinder";
 import PrivacyPage from "./components/PrivacyPage";
 import TermsPage from "./components/TermsPage";
 import ContactsPage from "./components/ContactsPage";
-
-/** Slug locali per le rotte */
-const ROUTE_SLUGS: Record<Lang, Record<string, string>> = {
-  it: {
-    artists: "artisti",
-    events: "eventi",
-    booking: "booking",
-    scout: "scout",
-    privacy: "privacy",
-    terms: "termini",
-    contacts: "contatti",
-  },
-  en: {
-    artists: "artists",
-    events: "events",
-    booking: "booking",
-    scout: "scout",
-    privacy: "privacy",
-    terms: "terms",
-    contacts: "contacts",
-  },
-};
+import { ROUTE_SLUGS } from "@/lib/routes";
 
 /** Parse the URL path to detect an artist slug (/it/artisti/:slug or /en/artists/:slug). */
 function parseArtistSlugFromPath(): string | null {

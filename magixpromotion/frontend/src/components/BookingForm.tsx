@@ -4,6 +4,7 @@ import { submitBooking } from "@/lib/api";
 import { Send, CheckCircle, AlertCircle, Loader } from "lucide-react";
 import ArtistAutocomplete from "./ArtistAutocomplete";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { localePath } from "@/lib/routes";
 
 interface BookingFormProps {
   /** Nome artista preselezionato (da navigazione) */
@@ -299,7 +300,7 @@ const BookingForm: React.FC<BookingFormProps> = ({ preselectedArtist }) => {
         <span className="text-sm text-[var(--text-muted)]">
           {t("booking.privacyConsent")}{" "}
           <a
-            href="/privacy"
+            href={localePath(lang, "privacy")}
             className="text-[var(--accent)] hover:underline"
           >
             {t("booking.privacyLink")}

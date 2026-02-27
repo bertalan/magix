@@ -1,5 +1,6 @@
 import React from "react";
 import { Artist, EventPage, SiteSettings } from "@/types";
+import { ROUTE_SLUGS } from "@/lib/routes";
 
 /**
  * Inietta un <script type="application/ld+json"> nel DOM.
@@ -29,13 +30,14 @@ function removeJsonLd() {
 // ---- Generatori JSON-LD ----
 
 /** Schema.org/MusicGroup per un artista. */
-export function artistToJsonLd(artist: Artist, siteUrl = "https://www.magixpromotion.com"): Record<string, unknown> {
+export function artistToJsonLd(artist: Artist, siteUrl = "https://www.magixpromotion.com", lang: "it" | "en" = "it"): Record<string, unknown> {
+  const slugs = ROUTE_SLUGS[lang];
   const data: Record<string, unknown> = {
     "@context": "https://schema.org",
     "@type": "MusicGroup",
     "name": artist.title,
     "description": artist.short_bio?.slice(0, 200) || "",
-    "url": `${siteUrl}/it/artisti/${artist.meta.slug}/`,
+    "url": `${siteUrl}/${lang}/${slugs.artists}/${artist.meta.slug}/`,
     "genre": artist.genre_display ? [artist.genre_display] : [],
   };
 
@@ -76,7 +78,7 @@ export function artistToJsonLd(artist: Artist, siteUrl = "https://www.magixpromo
 }
 
 /** Schema.org/MusicEvent per un evento. */
-export function eventToJsonLd(event: EventPage, siteUrl = "https://www.magixpromotion.com"): Record<string, unknown> {
+export function eventToJsonLd(event: EventPage, siteUrl = "https://www.magixpromotion.com", lang: "it" | "en" = "it"): Record<string, unknown> {
   const statusMap: Record<string, string> = {
     confirmed: "https://schema.org/EventScheduled",
     tentative: "https://schema.org/EventScheduled",
@@ -90,7 +92,7 @@ export function eventToJsonLd(event: EventPage, siteUrl = "https://www.magixprom
     "@type": "MusicEvent",
     "name": event.title,
     "startDate": event.start_date,
-    "url": `${siteUrl}/it/eventi/${event.meta.slug}/`,
+    "url": `${siteUrl}/${lang}/${ROUTE_SLUGS[lang].events}/${event.meta.slug}/`,
     "eventStatus": statusMap[event.status] || "https://schema.org/EventScheduled",
     "eventAttendanceMode": "https://schema.org/OfflineEventAttendanceMode",
   };
@@ -128,7 +130,7 @@ export function eventToJsonLd(event: EventPage, siteUrl = "https://www.magixprom
     data["performer"] = {
       "@type": "MusicGroup",
       "name": event.artist.name,
-      "url": `${siteUrl}/it/artisti/${event.artist.slug}/`,
+      "url": `${siteUrl}/${lang}/${ROUTE_SLUGS[lang].artists}/${event.artist.slug}/`,
     };
   }
 
@@ -203,20 +205,20 @@ export function homepageToJsonLd(settings?: SiteSettings | null, siteUrl = "http
 // ---- Componenti React ----
 
 /** Inietta JSON-LD per un artista. */
-export const ArtistJsonLd: React.FC<{ artist: Artist }> = ({ artist }) => {
+export const ArtistJsonLd: React.FC<{ artist: Artist; lang?: "it" | "en" }> = ({ artist, lang = "it" }) => {
   React.useEffect(() => {
-    injectJsonLd(artistToJsonLd(artist));
+    injectJsonLd(artistToJsonLd(artist, undefined, lang));
     return removeJsonLd;
-  }, [artist.id]);
+  }, [artist.id, lang]);
   return null;
 };
 
 /** Inietta JSON-LD per un evento. */
-export const EventJsonLd: React.FC<{ event: EventPage }> = ({ event }) => {
+export const EventJsonLd: React.FC<{ event: EventPage; lang?: "it" | "en" }> = ({ event, lang = "it" }) => {
   React.useEffect(() => {
-    injectJsonLd(eventToJsonLd(event));
+    injectJsonLd(eventToJsonLd(event, undefined, lang));
     return removeJsonLd;
-  }, [event.id]);
+  }, [event.id, lang]);
   return null;
 };
 

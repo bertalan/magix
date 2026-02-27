@@ -148,7 +148,9 @@ function urlToView(url: string): ViewState {
   const map: Record<string, ViewState> = {
     "/": "HOME",
     "/artisti/": "TALENT",
+    "/artists/": "TALENT",
     "/eventi/": "EVENTS",
+    "/events/": "EVENTS",
     "/scout/": "SCOUT",
     "/booking/": "BOOKING",
   };

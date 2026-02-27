@@ -6,6 +6,8 @@ import ProgressiveImage from "./ProgressiveImage";
 import VideoModal from "./VideoModal";
 import SEOHead from "./SEOHead";
 import { ArtistJsonLd } from "./JsonLdScript";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { localePath } from "@/lib/routes";
 import {
   X,
   Instagram,
@@ -39,6 +41,7 @@ const ArtistDetail: React.FC<ArtistDetailProps> = ({
   const [showVideoModal, setShowVideoModal] = React.useState(false);
   const eventsRef = React.useRef<HTMLDivElement>(null);
   const trapRef = useFocusTrap<HTMLDivElement>();
+  const { lang } = useLanguage();
 
   // SEO: aggiorna meta tag e JSON-LD per l'artista corrente
   const seoDescription = artist.short_bio?.slice(0, 160) || `${artist.title} — artista Magix Promotion`;
@@ -134,10 +137,10 @@ const ArtistDetail: React.FC<ArtistDetailProps> = ({
         title={artist.title}
         description={seoDescription}
         image={artist.image_url || undefined}
-        url={`/it/artisti/${artist.meta.slug}/`}
+        url={localePath(lang, "artists", artist.meta.slug)}
         type="music.musician"
       />
-      <ArtistJsonLd artist={artist} />
+      <ArtistJsonLd artist={artist} lang={lang} />
 
       {/* Notifica riproduzione */}
       {isPlaying && (

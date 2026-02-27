@@ -1,13 +1,14 @@
 /**
- * Test suite per il componente VideoModal.
+ * Test suite per il componente VideoModal (lite YouTube embed).
  *
- * Verifica: rendering, embed URL, chiusura (Escape/backdrop/X),
- * a11y attributes, gestione URL non supportati, body scroll lock.
+ * Verifica: rendering, embed URL, parseVideoUrl, lite embed (thumbnail + click-to-play),
+ * chiusura (Escape/backdrop/X), a11y attributes, gestione URL non supportati, body scroll lock.
  */
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import VideoModal, { getEmbedUrl } from "../components/VideoModal";
+import VideoModal, { getEmbedUrl, parseVideoUrl } from "../components/VideoModal";
+import type { VideoInfo } from "../components/VideoModal";
 
 // --- Unit test per getEmbedUrl ---
 
@@ -54,6 +55,47 @@ describe("getEmbedUrl", () => {
   });
 });
 
+// --- Unit test per parseVideoUrl ---
+
+describe("parseVideoUrl", () => {
+  it("restituisce info complete per YouTube standard", () => {
+    const info = parseVideoUrl("https://www.youtube.com/watch?v=EpIhJzo7apY");
+    expect(info).not.toBeNull();
+    expect(info!.provider).toBe("youtube");
+    expect(info!.embedUrl).toContain("youtube-nocookie.com/embed/EpIhJzo7apY");
+    expect(info!.thumbnailUrl).toBe(
+      "https://img.youtube.com/vi/EpIhJzo7apY/maxresdefault.jpg"
+    );
+  });
+
+  it("restituisce info per youtu.be short link", () => {
+    const info = parseVideoUrl("https://youtu.be/111YapUfdEo");
+    expect(info!.provider).toBe("youtube");
+    expect(info!.thumbnailUrl).toContain("111YapUfdEo");
+  });
+
+  it("restituisce info Dailymotion senza thumbnail", () => {
+    const info = parseVideoUrl("https://dai.ly/x71bykc");
+    expect(info!.provider).toBe("dailymotion");
+    expect(info!.thumbnailUrl).toBeNull();
+    expect(info!.embedUrl).toContain("dailymotion.com/embed/video/x71bykc");
+  });
+
+  it("restituisce provider generic per embed URL", () => {
+    const info = parseVideoUrl("https://player.vimeo.com/video/123");
+    expect(info!.provider).toBe("generic");
+    expect(info!.thumbnailUrl).toBeNull();
+  });
+
+  it("restituisce null per URL non riconosciuto", () => {
+    expect(parseVideoUrl("https://example.com/not-a-video")).toBeNull();
+  });
+
+  it("restituisce null per stringa vuota", () => {
+    expect(parseVideoUrl("")).toBeNull();
+  });
+});
+
 // --- Component test per VideoModal ---
 
 describe("VideoModal", () => {
@@ -84,8 +126,36 @@ describe("VideoModal", () => {
     expect(screen.getByText("VIDEO PROMO")).toBeInTheDocument();
   });
 
-  it("renderizza un iframe con URL embed YouTube nocookie", () => {
+  // --- Lite embed: thumbnail-first ---
+
+  it("mostra il thumbnail YouTube prima del click (lite embed)", () => {
     render(<VideoModal {...defaultProps} />);
+    // Non deve esserci un iframe inizialmente
+    expect(screen.queryByTitle("Video promo di RED MOON")).not.toBeInTheDocument();
+    // Deve esserci il thumbnail
+    const thumb = screen.getByAltText("Anteprima video RED MOON");
+    expect(thumb).toBeInTheDocument();
+    expect(thumb).toHaveAttribute(
+      "src",
+      "https://img.youtube.com/vi/EpIhJzo7apY/maxresdefault.jpg"
+    );
+  });
+
+  it("mostra il pulsante play sul thumbnail", () => {
+    render(<VideoModal {...defaultProps} />);
+    const playBtn = screen.getByLabelText("Avvia video promo di RED MOON");
+    expect(playBtn).toBeInTheDocument();
+  });
+
+  it("carica l'iframe solo dopo il click sul thumbnail", async () => {
+    const user = userEvent.setup();
+    render(<VideoModal {...defaultProps} />);
+    // Nessun iframe iniziale
+    expect(screen.queryByTitle("Video promo di RED MOON")).not.toBeInTheDocument();
+    // Click sul play
+    const playBtn = screen.getByLabelText("Avvia video promo di RED MOON");
+    await user.click(playBtn);
+    // Ora l'iframe deve essere presente
     const iframe = screen.getByTitle("Video promo di RED MOON");
     expect(iframe).toBeInTheDocument();
     expect(iframe).toHaveAttribute(
@@ -94,6 +164,24 @@ describe("VideoModal", () => {
     );
     expect(iframe).toHaveAttribute("allowFullScreen");
   });
+
+  it("mostra etichetta YouTube sul thumbnail", () => {
+    render(<VideoModal {...defaultProps} />);
+    expect(screen.getByText("YouTube")).toBeInTheDocument();
+  });
+
+  it("mostra etichetta Dailymotion per video Dailymotion", () => {
+    render(
+      <VideoModal
+        {...defaultProps}
+        videoUrl="https://dai.ly/x71bykc"
+        artistName="MISTER JUMP"
+      />
+    );
+    expect(screen.getByText("Dailymotion")).toBeInTheDocument();
+  });
+
+  // --- Fallback per URL sconosciuto ---
 
   it("mostra fallback con link esterno per URL non supportati", () => {
     render(
@@ -108,6 +196,8 @@ describe("VideoModal", () => {
       "https://example.com/not-a-video"
     );
   });
+
+  // --- Chiusura ---
 
   it("chiude il modal con Escape", async () => {
     render(<VideoModal {...defaultProps} />);
@@ -132,6 +222,8 @@ describe("VideoModal", () => {
     expect(defaultProps.onClose).toHaveBeenCalledTimes(1);
   });
 
+  // --- Scroll lock ---
+
   it("blocca lo scroll del body quando aperto", () => {
     const { unmount } = render(<VideoModal {...defaultProps} />);
     expect(document.body.style.overflow).toBe("hidden");
@@ -140,7 +232,10 @@ describe("VideoModal", () => {
     expect(document.body.style.overflow).not.toBe("hidden");
   });
 
-  it("gestisce URL Dailymotion correttamente", () => {
+  // --- Dailymotion (click-to-play) ---
+
+  it("gestisce URL Dailymotion con click-to-play", async () => {
+    const user = userEvent.setup();
     render(
       <VideoModal
         {...defaultProps}
@@ -148,10 +243,29 @@ describe("VideoModal", () => {
         artistName="MISTER JUMP"
       />
     );
+    // Click per attivare
+    const playBtn = screen.getByLabelText("Avvia video promo di MISTER JUMP");
+    await user.click(playBtn);
     const iframe = screen.getByTitle("Video promo di MISTER JUMP");
     expect(iframe).toHaveAttribute(
       "src",
       expect.stringContaining("dailymotion.com/embed/video/x71bykc")
     );
+  });
+
+  // --- Iframe attributes ---
+
+  it("l'iframe contiene gli attributi allow corretti", async () => {
+    const user = userEvent.setup();
+    render(<VideoModal {...defaultProps} />);
+    const playBtn = screen.getByLabelText("Avvia video promo di RED MOON");
+    await user.click(playBtn);
+    const iframe = screen.getByTitle("Video promo di RED MOON");
+    const allowAttr = iframe.getAttribute("allow") || "";
+    expect(allowAttr).toContain("autoplay");
+    expect(allowAttr).toContain("fullscreen");
+    expect(allowAttr).toContain("accelerometer");
+    expect(allowAttr).toContain("gyroscope");
+    expect(allowAttr).toContain("encrypted-media");
   });
 });

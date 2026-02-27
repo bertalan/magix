@@ -1,16 +1,22 @@
 /**
- * VideoModal — Modal overlay per embed video YouTube / Dailymotion.
+ * VideoModal — Modal overlay con lite YouTube embed.
+ *
+ * Approccio "thumbnail-first":
+ * 1. Mostra il thumbnail YouTube (immagine statica, nessun JS esterno)
+ * 2. Al click dell'utente carica l'iframe embed (autoplay dopo interazione)
+ * 3. Elimina crash dovuto ad autoplay senza interazione utente
  *
  * Caratteristiche:
- * - Embed iframe privacy-enhanced (youtube-nocookie.com)
+ * - Lite embed: thumbnail → iframe solo al click (performance + stabilità)
+ * - Privacy-enhanced embed (youtube-nocookie.com)
  * - Focus trap completo (useFocusTrap)
  * - Chiusura con Escape, click backdrop, pulsante X
  * - Rispetta prefers-reduced-motion
  * - Proporzioni 16:9 responsive
- * - Lazy loading iframe
+ * - Fallback per Dailymotion e URL generici
  */
 import React from "react";
-import { X } from "lucide-react";
+import { X, Play } from "lucide-react";
 import { useFocusTrap } from "@/hooks/useFocusTrap";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 
@@ -23,19 +29,43 @@ interface VideoModalProps {
   onClose: () => void;
 }
 
+/** Informazioni estratte da un URL video */
+interface VideoInfo {
+  /** URL embed per l'iframe */
+  embedUrl: string;
+  /** URL thumbnail (solo YouTube) */
+  thumbnailUrl: string | null;
+  /** Provider del video */
+  provider: "youtube" | "dailymotion" | "generic";
+}
+
 /**
  * Estrae l'URL embed da un URL YouTube, Dailymotion o generico.
  * Restituisce null se non riconosciuto.
  */
 function getEmbedUrl(url: string): string | null {
   if (!url) return null;
+  const info = parseVideoUrl(url);
+  return info?.embedUrl ?? null;
+}
 
-  // YouTube: youtube.com/watch?v=ID o youtu.be/ID
+/**
+ * Analizza un URL video e restituisce embed URL + thumbnail.
+ */
+function parseVideoUrl(url: string): VideoInfo | null {
+  if (!url) return null;
+
+  // YouTube: youtube.com/watch?v=ID o youtu.be/ID o youtube-nocookie.com/embed/ID
   const ytMatch = url.match(
     /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube-nocookie\.com\/embed\/)([a-zA-Z0-9_-]{11})/
   );
   if (ytMatch) {
-    return `https://www.youtube-nocookie.com/embed/${ytMatch[1]}?autoplay=1&rel=0&modestbranding=1`;
+    const videoId = ytMatch[1];
+    return {
+      embedUrl: `https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1`,
+      thumbnailUrl: `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`,
+      provider: "youtube",
+    };
   }
 
   // Dailymotion: dai.ly/ID o dailymotion.com/video/ID
@@ -43,12 +73,20 @@ function getEmbedUrl(url: string): string | null {
     /(?:dai\.ly\/|dailymotion\.com\/video\/)([a-zA-Z0-9]+)/
   );
   if (dmMatch) {
-    return `https://www.dailymotion.com/embed/video/${dmMatch[1]}?autoplay=1`;
+    return {
+      embedUrl: `https://www.dailymotion.com/embed/video/${dmMatch[1]}?autoplay=1`,
+      thumbnailUrl: null,
+      provider: "dailymotion",
+    };
   }
 
   // Fallback: se è già un embed URL, restituiscilo
   if (url.includes("/embed/") || url.includes("player.")) {
-    return url;
+    return {
+      embedUrl: url,
+      thumbnailUrl: null,
+      provider: "generic",
+    };
   }
 
   return null;
@@ -61,7 +99,11 @@ const VideoModal: React.FC<VideoModalProps> = ({
 }) => {
   const trapRef = useFocusTrap<HTMLDivElement>();
   const reducedMotion = useReducedMotion();
-  const embedUrl = getEmbedUrl(videoUrl);
+  const videoInfo = parseVideoUrl(videoUrl);
+  /** Stato: false = mostra thumbnail, true = carica iframe */
+  const [activated, setActivated] = React.useState(false);
+  /** Gestisce errore caricamento thumbnail */
+  const [thumbError, setThumbError] = React.useState(false);
 
   // Chiusura con Escape
   React.useEffect(() => {
@@ -86,9 +128,27 @@ const VideoModal: React.FC<VideoModalProps> = ({
     if (e.target === e.currentTarget) onClose();
   };
 
+  /** Attiva il player: carica l'iframe con autoplay */
+  const handleActivate = () => {
+    setActivated(true);
+  };
+
   const animationClass = reducedMotion
     ? ""
     : "animate-in fade-in zoom-in-95 duration-300";
+
+  /** Thumbnail YouTube con fallback (maxresdefault → hqdefault) */
+  const thumbnailSrc = React.useMemo(() => {
+    if (!videoInfo?.thumbnailUrl || thumbError) {
+      // Fallback a hqdefault (sempre disponibile)
+      const ytMatch = videoUrl.match(
+        /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube-nocookie\.com\/embed\/)([a-zA-Z0-9_-]{11})/
+      );
+      if (ytMatch) return `https://img.youtube.com/vi/${ytMatch[1]}/hqdefault.jpg`;
+      return null;
+    }
+    return videoInfo.thumbnailUrl;
+  }, [videoInfo?.thumbnailUrl, thumbError, videoUrl]);
 
   return (
     <div
@@ -129,17 +189,55 @@ const VideoModal: React.FC<VideoModalProps> = ({
         </div>
 
         {/* Container video 16:9 */}
-        {embedUrl ? (
+        {videoInfo ? (
           <div className="relative w-full aspect-video rounded-2xl overflow-hidden bg-black shadow-2xl shadow-black/50 border border-white/10">
-            <iframe
-              src={embedUrl}
-              title={`Video promo di ${artistName}`}
-              className="absolute inset-0 w-full h-full"
-              loading="lazy"
-              allow="autoplay; fullscreen; picture-in-picture; encrypted-media"
-              allowFullScreen
-              referrerPolicy="no-referrer"
-            />
+            {activated ? (
+              /* Iframe caricato dopo il click dell'utente — autoplay funziona */
+              <iframe
+                src={videoInfo.embedUrl}
+                title={`Video promo di ${artistName}`}
+                className="absolute inset-0 w-full h-full"
+                allow="autoplay; fullscreen; picture-in-picture; encrypted-media; accelerometer; gyroscope"
+                allowFullScreen
+                referrerPolicy="no-referrer"
+              />
+            ) : (
+              /* Lite embed: thumbnail cliccabile (nessun JS YouTube caricato) */
+              <button
+                onClick={handleActivate}
+                className="absolute inset-0 w-full h-full group cursor-pointer bg-black"
+                aria-label={`Avvia video promo di ${artistName}`}
+              >
+                {/* Thumbnail */}
+                {thumbnailSrc && (
+                  <img
+                    src={thumbnailSrc}
+                    alt={`Anteprima video ${artistName}`}
+                    className="absolute inset-0 w-full h-full object-cover group-hover:brightness-75 transition-all duration-300"
+                    onError={() => setThumbError(true)}
+                    loading="eager"
+                  />
+                )}
+                {/* Overlay scuro */}
+                <div className="absolute inset-0 bg-black/30 group-hover:bg-black/10 transition-colors duration-300" />
+                {/* Play button centrale */}
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-[var(--accent)] flex items-center justify-center shadow-2xl group-hover:scale-110 transition-transform duration-300">
+                    <Play
+                      fill="currentColor"
+                      size={36}
+                      className="text-[var(--bg-color)] ml-1"
+                    />
+                  </div>
+                </div>
+                {/* Label provider */}
+                <div className="absolute bottom-4 right-4 px-3 py-1.5 rounded-lg bg-black/60 text-white/80 text-xs font-medium tracking-wide backdrop-blur-sm">
+                  {videoInfo.provider === "youtube" && "YouTube"}
+                  {videoInfo.provider === "dailymotion" && "Dailymotion"}
+                  {videoInfo.provider === "generic" && "Video"}
+                </div>
+              </button>
+            )}
           </div>
         ) : (
           <div className="relative w-full aspect-video rounded-2xl overflow-hidden bg-black/50 border border-white/10 flex items-center justify-center">
@@ -163,5 +261,6 @@ const VideoModal: React.FC<VideoModalProps> = ({
 
 export default VideoModal;
 
-// Esporta la funzione helper per test
-export { getEmbedUrl };
+// Esporta le funzioni helper per test
+export { getEmbedUrl, parseVideoUrl };
+export type { VideoInfo };

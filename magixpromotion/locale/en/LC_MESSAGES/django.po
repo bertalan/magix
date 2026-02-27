@@ -1,0 +1,863 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-02-27 14:09+0100\n"
+"PO-Revision-Date: 2026-02-27 15:00+0100\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: English <en@li.org>\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+#: artists/models.py:31
+msgid "Nome genere"
+msgstr "Genre name"
+
+#: artists/models.py:36
+msgid "Generato automaticamente dal nome."
+msgstr "Automatically generated from the name."
+
+#: artists/models.py:40 core/models.py:175
+msgid "Descrizione"
+msgstr "Description"
+
+#: artists/models.py:41
+msgid "Breve descrizione del genere (opzionale)."
+msgstr "Short genre description (optional)."
+
+#: artists/models.py:56
+msgid "Genere musicale"
+msgstr "Music genre"
+
+#: artists/models.py:57 artists/models.py:250
+msgid "Generi musicali"
+msgstr "Music genres"
+
+#: artists/models.py:78
+msgid "Nome icona Lucide (es: 'party-popper', 'building-2')."
+msgstr "Lucide icon name (e.g. 'party-popper', 'building-2')."
+
+#: artists/models.py:88
+msgid "Tipologia evento"
+msgstr "Event type"
+
+#: artists/models.py:89
+msgid "Tipologie evento"
+msgstr "Event types"
+
+#: artists/models.py:102
+msgid "Show Band / Party Band"
+msgstr "Show Band / Party Band"
+
+#: artists/models.py:103
+msgid "Tribute Band"
+msgstr "Tribute Band"
+
+#: artists/models.py:104
+msgid "Band Originale"
+msgstr "Original Band"
+
+#: artists/models.py:105
+msgid "DJ / Solista"
+msgstr "DJ / Solo Artist"
+
+#: artists/models.py:106
+msgid "Cover Band"
+msgstr "Cover Band"
+
+#: artists/models.py:115 booking/models.py:29 events/models.py:180
+msgid "Testo introduttivo"
+msgstr "Introductory text"
+
+#: artists/models.py:116
+msgid "Breve intro SEO per la pagina roster."
+msgstr "Short SEO intro for the roster page."
+
+#: artists/models.py:129
+msgid "Pagina Roster Artisti"
+msgstr "Artist Roster Page"
+
+#: artists/models.py:168
+msgid "Immagine"
+msgstr "Image"
+
+#: artists/models.py:173
+msgid "Didascalia (opzionale)"
+msgstr "Caption (optional)"
+
+#: artists/models.py:182
+msgid "Immagine gallery"
+msgstr "Gallery image"
+
+#: artists/models.py:183 artists/models.py:305
+msgid "Immagini gallery"
+msgstr "Gallery images"
+
+#: artists/models.py:197
+msgid "Tipologia artista"
+msgstr "Artist type"
+
+#: artists/models.py:201
+msgid "Bio breve"
+msgstr "Short bio"
+
+#: artists/models.py:202
+msgid "Max 500 caratteri. Usata nelle card e snippet SEO."
+msgstr "Max 500 characters. Used in cards and SEO snippets."
+
+#: artists/models.py:212
+msgid "Immagine principale"
+msgstr "Main image"
+
+#: artists/models.py:216
+msgid "URL Video Hero (YouTube)"
+msgstr "Hero Video URL (YouTube)"
+
+#: artists/models.py:217
+msgid "Se presente, l'header e' video-first (loop/preview)."
+msgstr "If set, the header is video-first (loop/preview)."
+
+#: artists/models.py:224
+msgid "Tributo a"
+msgstr "Tribute to"
+
+#: artists/models.py:225
+msgid "Nome artista/band tributato. Es: 'Queen', 'Vasco Rossi'. Migliora SEO."
+msgstr "Tribute artist/band name. E.g. 'Queen', 'Vasco Rossi'. Improves SEO."
+
+#: artists/models.py:231
+msgid "Paese base"
+msgstr "Base country"
+
+#: artists/models.py:232
+msgid "Paese operativo principale della band."
+msgstr "Main operating country of the band."
+
+#: artists/models.py:237
+msgid "Regione base"
+msgstr "Base region"
+
+#: artists/models.py:238
+msgid "Testo libero. Es: Piemonte, Lombardia, Bavaria."
+msgstr "Free text. E.g. Piedmont, Lombardy, Bavaria."
+
+#: artists/models.py:243
+msgid "Citta base"
+msgstr "Base city"
+
+#: artists/models.py:255
+msgid "Tipologie evento target"
+msgstr "Target event types"
+
+#: artists/models.py:256
+msgid "Per quali tipi di evento e' adatta questa band?"
+msgstr "Which event types is this band suited for?"
+
+#: artists/models.py:260 core/models.py:97
+msgid "Spotify"
+msgstr "Spotify"
+
+#: artists/models.py:261 core/models.py:95
+msgid "Instagram"
+msgstr "Instagram"
+
+#: artists/models.py:262 core/models.py:94
+msgid "Facebook"
+msgstr "Facebook"
+
+#: artists/models.py:263 events/models.py:53
+msgid "Sito web"
+msgstr "Website"
+
+#: artists/models.py:271
+msgid "Gruppo editor autorizzati"
+msgstr "Authorized editor group"
+
+#: artists/models.py:273
+msgid ""
+"Gruppo Wagtail i cui membri possono modificare questa band e i relativi "
+"eventi. Lasciare vuoto per accesso solo staff."
+msgstr "Wagtail group whose members can edit this band and its related events. Leave blank for staff-only access."
+
+#: artists/models.py:283
+msgid "Contenuto pagina"
+msgstr "Page content"
+
+#: artists/models.py:293
+msgid "Classificazione"
+msgstr "Classification"
+
+#: artists/models.py:301
+msgid "Media principali"
+msgstr "Main media"
+
+#: artists/models.py:308
+msgid "Gallery immagini (rotazione automatica)"
+msgstr "Image gallery (auto-rotation)"
+
+#: artists/models.py:318 events/models.py:80
+msgid "Localizzazione"
+msgstr "Location"
+
+#: artists/models.py:331
+msgid "Social & Link esterni"
+msgstr "Social & External links"
+
+#: artists/models.py:377
+msgid "Pagina Artista"
+msgstr "Artist Page"
+
+#: artists/models.py:378
+msgid "Pagine Artista"
+msgstr "Artist Pages"
+
+#: booking/forms.py:7
+msgid "— Seleziona tipo evento —"
+msgstr "— Select event type —"
+
+#: booking/forms.py:8
+msgid "Matrimonio"
+msgstr "Wedding"
+
+#: booking/forms.py:9
+msgid "Festa di Piazza"
+msgstr "Town Square Festival"
+
+#: booking/forms.py:10
+msgid "Club / Locale"
+msgstr "Club / Venue"
+
+#: booking/forms.py:11
+msgid "Teatro"
+msgstr "Theatre"
+
+#: booking/forms.py:12
+msgid "Evento Aziendale"
+msgstr "Corporate Event"
+
+#: booking/forms.py:13
+msgid "Festival"
+msgstr "Festival"
+
+#: booking/forms.py:14
+msgid "Evento Privato"
+msgstr "Private Event"
+
+#: booking/forms.py:15
+msgid "Altro"
+msgstr "Other"
+
+#: booking/forms.py:24
+msgid "Nome e Cognome *"
+msgstr "Full Name *"
+
+#: booking/forms.py:25
+msgid "Mario Rossi"
+msgstr "John Smith"
+
+#: booking/forms.py:28
+msgid "Email *"
+msgstr "Email *"
+
+#: booking/forms.py:34 core/models.py:48 events/models.py:137
+msgid "Telefono"
+msgstr "Phone"
+
+#: booking/forms.py:40
+msgid "Azienda / Ente"
+msgstr "Company / Organization"
+
+#: booking/forms.py:41
+msgid "Se applicabile."
+msgstr "If applicable."
+
+#: booking/forms.py:45
+msgid "Artista / Band richiesto *"
+msgstr "Requested Artist / Band *"
+
+#: booking/forms.py:46
+msgid "Se arrivi dalla scheda artista, questo campo e' precompilato."
+msgstr "If you came from the artist page, this field is pre-filled."
+
+#: booking/forms.py:50
+msgid "Tipo di evento *"
+msgstr "Event type *"
+
+#: booking/forms.py:54
+msgid "Data evento (indicativa)"
+msgstr "Event date (approximate)"
+
+#: booking/forms.py:60
+msgid "Luogo evento"
+msgstr "Event location"
+
+#: booking/forms.py:61
+msgid "Citta, Venue..."
+msgstr "City, Venue..."
+
+#: booking/forms.py:66
+msgid "Budget indicativo"
+msgstr "Approximate budget"
+
+#: booking/forms.py:67
+msgid "Opzionale. Ci aiuta a proporti la soluzione migliore."
+msgstr "Optional. Helps us suggest the best solution for you."
+
+#: booking/forms.py:70
+msgid "Descrivi il tuo evento..."
+msgstr "Describe your event..."
+
+#: booking/forms.py:71
+msgid "Messaggio"
+msgstr "Message"
+
+#: booking/forms.py:74
+msgid "Acconsento al trattamento dei dati personali *"
+msgstr "I agree to the processing of my personal data *"
+
+#: booking/forms.py:75
+msgid "Informativa privacy disponibile al link in fondo alla pagina."
+msgstr "Privacy policy available at the link at the bottom of the page."
+
+#: booking/models.py:33
+msgid "Testo di ringraziamento"
+msgstr "Thank you text"
+
+#: booking/models.py:38
+msgid "Campi aggiuntivi"
+msgstr "Additional fields"
+
+#: booking/models.py:50
+msgid "Configurazione Email"
+msgstr "Email Configuration"
+
+#: booking/models.py:59
+msgid "Pagina Form Booking"
+msgstr "Booking Form Page"
+
+#: booking/views.py:24
+msgid "Formato JSON non valido."
+msgstr "Invalid JSON format."
+
+#: booking/views.py:55
+msgid "Richiesta inviata con successo"
+msgstr "Request sent successfully"
+
+#: core/blocks.py:28
+msgid "Mai H1 — riservato al titolo pagina."
+msgstr "Never use H1 — reserved for the page title."
+
+#: core/blocks.py:34
+msgid "Titolo sezione"
+msgstr "Section title"
+
+#: core/blocks.py:42
+msgid "Testo della biografia."
+msgstr "Biography text."
+
+#: core/blocks.py:47
+msgid "Citazione o frase di lancio dell'artista (opzionale)."
+msgstr "Quote or tagline of the artist (optional)."
+
+#: core/blocks.py:52
+msgid "Autore della citazione (opzionale)."
+msgstr "Quote author (optional)."
+
+#: core/blocks.py:58
+msgid "Biografia"
+msgstr "Biography"
+
+#: core/blocks.py:64
+msgid "Titolo album."
+msgstr "Album title."
+
+#: core/blocks.py:68
+msgid "Anno di uscita."
+msgstr "Release year."
+
+#: core/blocks.py:72
+msgid "Copertina album."
+msgstr "Album cover."
+
+#: core/blocks.py:76
+msgid "Link diretto Spotify dell'album."
+msgstr "Direct Spotify link for the album."
+
+#: core/blocks.py:81
+msgid "Album"
+msgstr "Album"
+
+#: core/blocks.py:89
+msgid "Titolo della sezione."
+msgstr "Section title."
+
+#: core/blocks.py:96
+msgid "Discografia"
+msgstr "Discography"
+
+#: core/blocks.py:103
+msgid "URL YouTube o Vimeo. Es: https://www.youtube.com/watch?v=..."
+msgstr "YouTube or Vimeo URL. E.g. https://www.youtube.com/watch?v=..."
+
+#: core/blocks.py:108
+msgid "Didascalia sotto il video."
+msgstr "Caption below the video."
+
+#: core/blocks.py:112
+msgid "Normale"
+msgstr "Normal"
+
+#: core/blocks.py:113
+msgid "In evidenza (larghezza piena)"
+msgstr "Featured (full width)"
+
+#: core/blocks.py:121
+msgid "Video"
+msgstr "Video"
+
+#: core/blocks.py:129
+msgid "Crediti fotografo."
+msgstr "Photographer credits."
+
+#: core/blocks.py:133
+msgid "Foto"
+msgstr "Photo"
+
+#: core/blocks.py:145
+msgid "Griglia (3 colonne)"
+msgstr "Grid (3 columns)"
+
+#: core/blocks.py:146
+msgid "Carosello"
+msgstr "Carousel"
+
+#: core/blocks.py:147
+msgid "Masonry"
+msgstr "Masonry"
+
+#: core/blocks.py:156
+msgid "Galleria"
+msgstr "Gallery"
+
+#: core/blocks.py:162
+msgid "Testo del bottone."
+msgstr "Button text."
+
+#: core/blocks.py:163
+msgid "Link esterno."
+msgstr "External link."
+
+#: core/blocks.py:164
+msgid "Oppure link a pagina interna."
+msgstr "Or link to an internal page."
+
+#: core/blocks.py:167
+msgid "Primario (pieno)"
+msgstr "Primary (solid)"
+
+#: core/blocks.py:168
+msgid "Secondario (outline)"
+msgstr "Secondary (outline)"
+
+#: core/blocks.py:169
+msgid "Accent (gradient)"
+msgstr "Accent (gradient)"
+
+#: core/blocks.py:177
+msgid "Call to Action"
+msgstr "Call to Action"
+
+#: core/models.py:23
+msgid "Home Page"
+msgstr "Home Page"
+
+#: core/models.py:38 events/models.py:130
+msgid "Ragione sociale"
+msgstr "Company name"
+
+#: core/models.py:43
+msgid "Partita IVA"
+msgstr "VAT number"
+
+#: core/models.py:52
+msgid "Email principale"
+msgstr "Main email"
+
+#: core/models.py:59
+msgid "Indirizzo"
+msgstr "Address"
+
+#: core/models.py:64 events/models.py:20
+msgid "Citta"
+msgstr "City"
+
+#: core/models.py:69
+msgid "Provincia"
+msgstr "Province"
+
+#: core/models.py:74
+msgid "CAP"
+msgstr "Postal code"
+
+#: core/models.py:78 events/models.py:35
+msgid "Paese"
+msgstr "Country"
+
+#: core/models.py:84
+msgid "Latitudine sede"
+msgstr "Office latitude"
+
+#: core/models.py:90
+msgid "Longitudine sede"
+msgstr "Office longitude"
+
+#: core/models.py:96
+msgid "YouTube"
+msgstr "YouTube"
+
+#: core/models.py:103
+msgid "Gemini API Key"
+msgstr "Gemini API Key"
+
+#: core/models.py:104
+msgid "Chiave API Google Gemini per traduzioni automatiche e BandFinder."
+msgstr "Google Gemini API key for automatic translations and BandFinder."
+
+#: core/models.py:109
+msgid "Nominatim User-Agent"
+msgstr "Nominatim User-Agent"
+
+#: core/models.py:110
+msgid "User agent per le richieste a Nominatim/OSM."
+msgstr "User agent for Nominatim/OSM requests."
+
+#: core/models.py:122
+msgid "Dati aziendali"
+msgstr "Company details"
+
+#: core/models.py:134
+msgid "Sede legale"
+msgstr "Registered office"
+
+#: core/models.py:143
+msgid "Social media"
+msgstr "Social media"
+
+#: core/models.py:150
+msgid "Configurazioni tecniche (non traducibili)"
+msgstr "Technical settings (non-translatable)"
+
+#: core/models.py:155
+msgid "Impostazioni Magix Promotion"
+msgstr "Magix Promotion Settings"
+
+#: core/models.py:166 events/models.py:279
+msgid "Artista"
+msgstr "Artist"
+
+#: core/models.py:170
+msgid "Titolo EPK"
+msgstr "EPK Title"
+
+#: core/models.py:171
+msgid "Es: 'Red Moon — Press Kit 2026'"
+msgstr "E.g. 'Red Moon — Press Kit 2026'"
+
+#: core/models.py:183
+msgid "Foto stampa alta risoluzione"
+msgstr "High-resolution press photo"
+
+#: core/models.py:191
+msgid "Rider tecnico (PDF)"
+msgstr "Technical rider (PDF)"
+
+#: core/models.py:199
+msgid "Biografia PDF"
+msgstr "Biography PDF"
+
+#: core/models.py:207
+msgid "Logo vettoriale (SVG/AI)"
+msgstr "Vector logo (SVG/AI)"
+
+#: core/models.py:211
+msgid "Pubblicamente accessibile"
+msgstr "Publicly accessible"
+
+#: core/models.py:212
+msgid "Se True, non richiede autenticazione per il download."
+msgstr "If True, no authentication is required for download."
+
+#: core/models.py:228 core/models.py:229
+msgid "Kit Stampa (EPK)"
+msgstr "Press Kit (EPK)"
+
+#: events/models.py:19
+msgid "Nome venue"
+msgstr "Venue name"
+
+#: events/models.py:24
+msgid "Provincia / Stato"
+msgstr "Province / State"
+
+#: events/models.py:25
+msgid "Es: AL, MI, TO oppure Bayern, Ile-de-France"
+msgstr "E.g. AL, MI, TO or Bayern, Ile-de-France"
+
+#: events/models.py:30
+msgid "Regione"
+msgstr "Region"
+
+#: events/models.py:31
+msgid "Testo libero. Es: Piemonte, Lombardia, Bavaria, Catalonia"
+msgstr "Free text. E.g. Piedmont, Lombardy, Bavaria, Catalonia"
+
+#: events/models.py:36
+msgid "Codice ISO 3166-1 alpha-2"
+msgstr "ISO 3166-1 alpha-2 code"
+
+#: events/models.py:41
+msgid "Indirizzo completo"
+msgstr "Full address"
+
+#: events/models.py:46
+msgid "CAP / Codice postale"
+msgstr "Postal / ZIP code"
+
+#: events/models.py:51
+msgid "Capienza"
+msgstr "Capacity"
+
+#: events/models.py:59
+msgid "Latitudine"
+msgstr "Latitude"
+
+#: events/models.py:66
+msgid "Longitudine"
+msgstr "Longitude"
+
+#: events/models.py:89
+msgid "Coordinate GPS (auto-compilabili via Nominatim)"
+msgstr "GPS coordinates (auto-fillable via Nominatim)"
+
+#: events/models.py:134
+msgid "Referente"
+msgstr "Contact person"
+
+#: events/models.py:136
+msgid "Email"
+msgstr "Email"
+
+#: events/models.py:140
+msgid "Note interne"
+msgstr "Internal notes"
+
+#: events/models.py:141
+msgid "Visibili solo agli admin."
+msgstr "Visible to admins only."
+
+#: events/models.py:162
+msgid "Confermato"
+msgstr "Confirmed"
+
+#: events/models.py:163
+msgid "Da confermare"
+msgstr "To be confirmed"
+
+#: events/models.py:164
+msgid "Annullato"
+msgstr "Cancelled"
+
+#: events/models.py:165
+msgid "Posticipato"
+msgstr "Postponed"
+
+#: events/models.py:166
+msgid "Sold Out"
+msgstr "Sold Out"
+
+#: events/models.py:170
+msgid "Pubblico"
+msgstr "Public"
+
+#: events/models.py:171
+msgid "Privato (non visibile nel calendario)"
+msgstr "Private (not visible in the calendar)"
+
+#: events/models.py:192
+msgid "Pagina Calendario Eventi"
+msgstr "Event Calendar Page"
+
+#: events/models.py:235
+msgid "Data inizio"
+msgstr "Start date"
+
+#: events/models.py:239
+msgid "Data fine"
+msgstr "End date"
+
+#: events/models.py:240
+msgid "Compilare solo per eventi multi-giorno."
+msgstr "Fill in only for multi-day events."
+
+#: events/models.py:245
+msgid "Apertura porte"
+msgstr "Doors open"
+
+#: events/models.py:250
+msgid "Inizio show"
+msgstr "Show starts"
+
+#: events/models.py:258
+msgid "Stato evento"
+msgstr "Event status"
+
+#: events/models.py:264
+msgid "Visibilita"
+msgstr "Visibility"
+
+#: events/models.py:268
+msgid "Archiviato"
+msgstr "Archived"
+
+#: events/models.py:269
+msgid "Impostato automaticamente dal job notturno per eventi passati."
+msgstr "Automatically set by the nightly job for past events."
+
+#: events/models.py:287
+msgid "Venue"
+msgstr "Venue"
+
+#: events/models.py:295
+msgid "Promoter"
+msgstr "Promoter"
+
+#: events/models.py:305
+msgid "Immagine evento"
+msgstr "Event image"
+
+#: events/models.py:311
+msgid "Descrizione evento"
+msgstr "Event description"
+
+#: events/models.py:315
+msgid "Link biglietti"
+msgstr "Tickets link"
+
+#: events/models.py:320
+msgid "Prezzo biglietti"
+msgstr "Ticket price"
+
+#: events/models.py:321
+msgid "Es: '15 + d.p.' oppure 'Ingresso libero'"
+msgstr "E.g. '15 + booking fee' or 'Free entry'"
+
+#: events/models.py:333
+msgid "Date e Orari"
+msgstr "Dates & Times"
+
+#: events/models.py:340
+msgid "Stato"
+msgstr "Status"
+
+#: events/models.py:352
+msgid "Biglietti"
+msgstr "Tickets"
+
+#: events/models.py:395
+msgid "Pagina Evento"
+msgstr "Event Page"
+
+#: events/models.py:396
+msgid "Pagine Evento"
+msgstr "Event Pages"
+
+#: navigation/models.py:18
+msgid "Header (Navigazione principale)"
+msgstr "Header (Main navigation)"
+
+#: navigation/models.py:19
+msgid "Footer — Colonna principale"
+msgstr "Footer — Main column"
+
+#: navigation/models.py:20
+msgid "Footer — Link legali"
+msgstr "Footer — Legal links"
+
+#: navigation/models.py:21
+msgid "Footer — Social"
+msgstr "Footer — Social"
+
+#: navigation/models.py:22
+msgid "Mobile menu"
+msgstr "Mobile menu"
+
+#: navigation/models.py:32
+msgid "Nome menu"
+msgstr "Menu name"
+
+#: navigation/models.py:33
+msgid "Nome interno, non visibile al pubblico. Es: 'Header Menu IT'"
+msgstr "Internal name, not visible to the public. E.g. 'Header Menu EN'"
+
+#: navigation/models.py:38
+msgid "Posizione"
+msgstr "Position"
+
+#: navigation/models.py:42
+msgid "Italiano"
+msgstr "Italian"
+
+#: navigation/models.py:42
+msgid "English"
+msgstr "English"
+
+#: navigation/models.py:44
+msgid "Lingua"
+msgstr "Language"
+
+#: navigation/models.py:51
+msgid "Voci di menu"
+msgstr "Menu items"
+
+#: navigation/models.py:55 navigation/models.py:56
+msgid "Menu navigazione"
+msgstr "Navigation menu"
+
+#: navigation/models.py:74
+msgid "Titolo custom"
+msgstr "Custom title"
+
+#: navigation/models.py:75
+msgid "Se vuoto, usa il titolo della pagina linkata."
+msgstr "If empty, uses the linked page's title."
+
+#: navigation/models.py:83
+msgid "Pagina interna"
+msgstr "Internal page"
+
+#: navigation/models.py:87
+msgid "URL esterno"
+msgstr "External URL"
+
+#: navigation/models.py:88
+msgid "Usato solo se 'Pagina interna' e' vuoto."
+msgstr "Used only if 'Internal page' is empty."
+
+#: navigation/models.py:92
+msgid "Apri in nuova scheda"
+msgstr "Open in new tab"
+
+#: navigation/models.py:97
+msgid "Icona"
+msgstr "Icon"
+
+#: navigation/models.py:98
+msgid "Nome icona Lucide React (es: 'music', 'calendar', 'mail')."
+msgstr "Lucide React icon name (e.g. 'music', 'calendar', 'mail')."

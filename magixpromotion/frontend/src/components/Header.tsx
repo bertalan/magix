@@ -5,6 +5,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import MobileMenu from "./MobileMenu";
 import ThemeToggle from "./ThemeToggle";
 import LanguageSwitcher from "./LanguageSwitcher";
+import MagixLogo from "./MagixLogo";
 import { Music, Users, Search, Calendar, Mail, Menu, X } from "lucide-react";
 
 /** Mappa icone Lucide per nome stringa (da API menu) */
@@ -69,15 +70,7 @@ const Header: React.FC<HeaderProps> = ({
           onKeyDown={(e) => e.key === "Enter" && setView("HOME")}
           aria-label={t("header.logoAria")}
         >
-          <div className="w-10 h-10 bg-[var(--accent-gradient)] rounded-lg flex items-center justify-center font-bold text-xl font-heading transform -rotate-6 shadow-lg shadow-[var(--accent)]/20">
-            <span
-              className={
-                currentTheme === "pastel-dream" ? "text-white" : "text-black"
-              }
-            >
-              M
-            </span>
-          </div>
+          <MagixLogo variant="neon" size={42} />
           <span className="font-heading font-extrabold text-2xl tracking-tighter text-[var(--text-main)]">
             MAGIX <span className="opacity-40">PROMOTION</span>
           </span>

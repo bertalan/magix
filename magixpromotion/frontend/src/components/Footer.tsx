@@ -16,15 +16,15 @@ const Footer: React.FC<FooterProps> = ({ setView }) => {
 
   const legalLinks = legalMenu?.items || [];
 
-  /** Genera deep link navigazione verso OpenStreetMap */
+  /** Genera deep link navigazione verso Google Maps (apre l'app su mobile) */
   const getNavigationUrl = () => {
     if (!settings) return "#";
     const addr = settings.address;
     if (addr.latitude && addr.longitude) {
-      return `https://www.openstreetmap.org/directions?engine=fossgis_osrm_car&route=;${addr.latitude},${addr.longitude}`;
+      return `https://www.google.com/maps/dir/?api=1&destination=${addr.latitude},${addr.longitude}`;
     }
     const fullAddr = `${addr.street}, ${addr.zip_code} ${addr.city}`;
-    return `https://www.openstreetmap.org/search?query=${encodeURIComponent(fullAddr)}`;
+    return `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(fullAddr)}`;
   };
 
   return (

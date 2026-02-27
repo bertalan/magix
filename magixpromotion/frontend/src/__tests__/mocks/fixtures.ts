@@ -216,6 +216,11 @@ export const mockSiteSettings: SiteSettings = {
     youtube: null,
     spotify: null,
   },
+  analytics: {
+    matomo_url: "//piwik.gpsbooking.com/",
+    matomo_site_id: "14",
+    google_analytics_id: "",
+  },
 };
 
 // --- Search ---

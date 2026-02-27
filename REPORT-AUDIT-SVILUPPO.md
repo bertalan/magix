@@ -101,11 +101,9 @@ Entrambi definiscono `CORS_ALLOWED_ORIGINS` ma `django-cors-headers` non è nei 
 
 ## 3. Issue Medie (funzionalità incompleta)
 
-### 🟡 FUNC-001 — Directory `locale/` vuota
+### ✅ FUNC-001 — Directory `locale/` popolata
 
-Nessun file `.po` / `.mo` generato. Le traduzioni gettext (stringhe UI) non sono ancora state estratte.
-
-**Fix:** Eseguire `python manage.py makemessages -l en -l it` e poi `compilemessages`.
+~~Nessun file `.po` / `.mo` generato.~~ **RISOLTO:** Tutte le stringhe UI (211 msgid) wrappate con `gettext_lazy()` in 8 file (models, forms, views, blocks). Generati `django.po` e `django.mo` per `it` e `en`. Traduzioni inglesi complete.
 
 ---
 
@@ -349,10 +347,10 @@ Per ogni risultato artista, fa `page.genres.all()` e potenzialmente `page.main_i
 
 ### Priorità 3 — Medie (funzionalità)
 
-- [ ] **FUNC-001:** Generare file `.po` con `python manage.py makemessages -l en -l it` e poi `compilemessages`
+- [x] **FUNC-001:** ~~Generare file `.po`~~ ✅ CORRETTO — 211 stringhe wrappate con `gettext_lazy()`, `.po`/`.mo` generati per it/en
 - [x] **FUNC-002:** ~~Implementare routing email per artista in `booking/email_routing.py`~~ ✅ CORRETTO — lookup dinamico da DB con cache 5 min
 - [x] **FUNC-004:** ~~Aggiungere serializer custom per `venue` e `related_artist` in `events/api.py`~~ ✅ CORRETTO — VenueField, ArtistField, FeaturedImageField
-- [ ] **FUNC-005:** Verificare allineamento colonne CSV con management command
+- [x] **FUNC-005:** ~~Verificare allineamento colonne CSV~~ ✅ NON NECESSARIO — confermato dal committente
 
 ### Priorità 4 — Basse (quality)
 

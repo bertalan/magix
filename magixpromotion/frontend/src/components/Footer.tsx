@@ -1,6 +1,7 @@
 import React from "react";
 import { ViewState } from "@/types";
 import { useMenu } from "@/hooks/useMenu";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { useSiteSettings } from "@/hooks/useSiteSettings";
 import { Phone, Mail, MapPin, ExternalLink } from "lucide-react";
 
@@ -9,7 +10,8 @@ interface FooterProps {
 }
 
 const Footer: React.FC<FooterProps> = ({ setView }) => {
-  const { data: legalMenu } = useMenu("footer_legal");
+  const { lang, t } = useLanguage();
+  const { data: legalMenu } = useMenu("footer_legal", lang);
   const { data: settings } = useSiteSettings();
 
   const legalLinks = legalMenu?.items || [];
@@ -35,12 +37,11 @@ const Footer: React.FC<FooterProps> = ({ setView }) => {
           </span>
           <span className="text-[var(--text-muted)] text-sm">
             &copy; {new Date().getFullYear()}{" "}
-            {settings?.company_name || "Magix Promotion"} — Tutti i diritti
-            riservati.
+            {settings?.company_name || "Magix Promotion"} — {t("footer.rights")}
           </span>
           {settings?.vat_number && (
             <span className="text-[var(--text-muted)] text-xs">
-              P.IVA {settings.vat_number}
+              {t("footer.vat")} {settings.vat_number}
             </span>
           )}
         </div>
@@ -69,7 +70,7 @@ const Footer: React.FC<FooterProps> = ({ setView }) => {
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-2 hover:text-[var(--text-main)] transition-colors"
-              aria-label="Naviga verso la nostra sede"
+              aria-label={t("footer.navigateTo")}
             >
               <MapPin size={14} />
               {settings.address.street}, {settings.address.zip_code}{" "}
@@ -100,19 +101,19 @@ const Footer: React.FC<FooterProps> = ({ setView }) => {
                 onClick={() => setView("PRIVACY")}
                 className="hover:text-[var(--text-main)] transition-colors text-left"
               >
-                PRIVACY
+                {t("footer.privacy")}
               </button>
               <button
                 onClick={() => setView("TERMS")}
                 className="hover:text-[var(--text-main)] transition-colors text-left"
               >
-                TERMINI
+                {t("footer.terms")}
               </button>
               <button
                 onClick={() => setView("CONTACTS")}
                 className="hover:text-[var(--text-main)] transition-colors text-left"
               >
-                CONTATTI
+                {t("footer.contacts")}
               </button>
             </>
           )}

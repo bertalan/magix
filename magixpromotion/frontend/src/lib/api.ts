@@ -38,6 +38,7 @@ export async function fetchArtists(params?: {
   limit?: number;
   offset?: number;
   daily_seed?: string;
+  locale?: string;
 }): Promise<WagtailListResponse<Artist>> {
   const searchParams = new URLSearchParams();
 
@@ -48,6 +49,7 @@ export async function fetchArtists(params?: {
   if (params?.limit) searchParams.set("limit", String(params.limit));
   if (params?.offset) searchParams.set("offset", String(params.offset));
   if (params?.daily_seed) searchParams.set("daily_seed", params.daily_seed);
+  if (params?.locale) searchParams.set("locale", params.locale);
 
   // Request extra fields in detail mode
   searchParams.set(
@@ -120,6 +122,7 @@ export async function fetchEvents(params?: {
   city?: string;
   limit?: number;
   offset?: number;
+  locale?: string;
 }): Promise<WagtailListResponse<EventPage>> {
   const searchParams = new URLSearchParams();
 
@@ -133,6 +136,7 @@ export async function fetchEvents(params?: {
   if (params?.city) searchParams.set("city", params.city);
   if (params?.limit) searchParams.set("limit", String(params.limit));
   if (params?.offset) searchParams.set("offset", String(params.offset));
+  if (params?.locale) searchParams.set("locale", params.locale);
 
   searchParams.set(
     "fields",
@@ -175,12 +179,14 @@ export async function fetchSiteSettings(): Promise<SiteSettings> {
  */
 export async function submitBooking(
   data: BookingFormData,
+  lang: string = "it",
 ): Promise<{ success: boolean; message: string }> {
   const res = await fetch(`${API_BASE}/booking/submit/`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
       "X-CSRFToken": getCsrfToken(),
+      "Accept-Language": lang,
     },
     body: JSON.stringify(data),
   });

@@ -3,30 +3,31 @@ import type { BookingFormData } from "@/types";
 import { submitBooking } from "@/lib/api";
 import { Send, CheckCircle, AlertCircle, Loader } from "lucide-react";
 import ArtistAutocomplete from "./ArtistAutocomplete";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface BookingFormProps {
   /** Nome artista preselezionato (da navigazione) */
   preselectedArtist?: string;
 }
 
-const EVENT_TYPES = [
-  { value: "", label: "Seleziona tipo evento..." },
-  { value: "matrimonio", label: "Matrimonio" },
-  { value: "corporate", label: "Evento Aziendale" },
-  { value: "festival", label: "Festival / Sagra" },
-  { value: "privato", label: "Festa Privata" },
-  { value: "locale", label: "Locale / Pub" },
-  { value: "piazza", label: "Concerto in Piazza" },
-  { value: "altro", label: "Altro" },
+const EVENT_TYPE_KEYS = [
+  { value: "", i18nKey: "booking.selectEventType" },
+  { value: "matrimonio", i18nKey: "booking.matrimonio" },
+  { value: "corporate", i18nKey: "booking.corporate" },
+  { value: "festival", i18nKey: "booking.festival" },
+  { value: "privato", i18nKey: "booking.privato" },
+  { value: "locale", i18nKey: "booking.locale" },
+  { value: "piazza", i18nKey: "booking.piazza" },
+  { value: "altro", i18nKey: "booking.altro" },
 ];
 
-const BUDGET_RANGES = [
-  { value: "", label: "Fascia di budget (opzionale)" },
-  { value: "sotto-1000", label: "Fino a \u20AC1.000" },
-  { value: "1000-2500", label: "\u20AC1.000 \u2013 \u20AC2.500" },
-  { value: "2500-5000", label: "\u20AC2.500 \u2013 \u20AC5.000" },
-  { value: "5000-10000", label: "\u20AC5.000 \u2013 \u20AC10.000" },
-  { value: "oltre-10000", label: "Oltre \u20AC10.000" },
+const BUDGET_RANGE_KEYS = [
+  { value: "", i18nKey: "booking.budgetEmpty" },
+  { value: "sotto-1000", i18nKey: "booking.budgetUnder1000" },
+  { value: "1000-2500", i18nKey: "booking.budget1000_2500" },
+  { value: "2500-5000", i18nKey: "booking.budget2500_5000" },
+  { value: "5000-10000", i18nKey: "booking.budget5000_10000" },
+  { value: "oltre-10000", i18nKey: "booking.budgetOver10000" },
 ];
 
 type FormStatus = "idle" | "submitting" | "success" | "error";
@@ -38,6 +39,7 @@ type FormStatus = "idle" | "submitting" | "success" | "error";
  * Il token CSRF viene incluso nella richiesta POST via cookie.
  */
 const BookingForm: React.FC<BookingFormProps> = ({ preselectedArtist }) => {
+  const { t, lang } = useLanguage();
   const [formData, setFormData] = React.useState<BookingFormData>({
     full_name: "",
     email: "",
@@ -95,15 +97,15 @@ const BookingForm: React.FC<BookingFormProps> = ({ preselectedArtist }) => {
     setErrorMessage("");
 
     try {
-      const result = await submitBooking(formData);
+      const result = await submitBooking(formData, lang);
       if (result.success) {
         setStatus("success");
       } else {
-        setErrorMessage(result.message || "Errore nell'invio.");
+        setErrorMessage(result.message || t("booking.errorGeneric"));
         setStatus("error");
       }
     } catch {
-      setErrorMessage("Errore di connessione. Riprova piu' tardi.");
+      setErrorMessage(t("booking.errorConnection"));
       setStatus("error");
     }
   };
@@ -121,11 +123,10 @@ const BookingForm: React.FC<BookingFormProps> = ({ preselectedArtist }) => {
       <div className="text-center py-16">
         <CheckCircle className="mx-auto text-emerald-500 mb-6" size={64} />
         <h3 className="text-3xl font-heading font-extrabold text-[var(--text-main)] mb-4">
-          Richiesta Inviata!
+          {t("booking.successTitle")}
         </h3>
         <p className="text-[var(--text-muted)] text-lg max-w-md mx-auto">
-          Ti risponderemo entro 24 ore con un preventivo personalizzato per il
-          tuo evento.
+          {t("booking.successBody")}
         </p>
         <button
           onClick={() => {
@@ -145,7 +146,7 @@ const BookingForm: React.FC<BookingFormProps> = ({ preselectedArtist }) => {
           }}
           className="mt-8 px-8 py-3 glass-panel rounded-full font-bold text-[var(--text-main)] hover:bg-[var(--glass)] transition-colors"
         >
-          NUOVA RICHIESTA
+          {t("booking.newRequest")}
         </button>
       </div>
     );
@@ -171,24 +172,24 @@ const BookingForm: React.FC<BookingFormProps> = ({ preselectedArtist }) => {
         <input
           type="text"
           name="full_name"
-          placeholder="Il tuo nome *"
+          placeholder={t("booking.namePlaceholder")}
           value={formData.full_name}
           onChange={handleChange}
           required
           aria-required="true"
-          aria-label="Il tuo nome"
+          aria-label={t("booking.nameLabel")}
           aria-describedby={status === "error" ? "booking-error" : undefined}
           className={inputClass}
         />
         <input
           type="email"
           name="email"
-          placeholder="Email *"
+          placeholder={t("booking.emailPlaceholder")}
           value={formData.email}
           onChange={handleChange}
           required
           aria-required="true"
-          aria-label="Email"
+          aria-label={t("booking.emailLabel")}
           aria-describedby={status === "error" ? "booking-error" : undefined}
           className={inputClass}
         />
@@ -199,10 +200,10 @@ const BookingForm: React.FC<BookingFormProps> = ({ preselectedArtist }) => {
         <input
           type="tel"
           name="phone"
-          placeholder="Telefono (opzionale)"
+          placeholder={t("booking.phonePlaceholder")}
           value={formData.phone}
           onChange={handleChange}
-          aria-label="Telefono"
+          aria-label={t("booking.phoneLabel")}
           className={inputClass}
         />
         <ArtistAutocomplete
@@ -223,12 +224,12 @@ const BookingForm: React.FC<BookingFormProps> = ({ preselectedArtist }) => {
           onChange={handleChange}
           required
           aria-required="true"
-          aria-label="Tipo evento"
+          aria-label={t("booking.eventTypeLabel")}
           className={inputClass}
         >
-          {EVENT_TYPES.map((t) => (
-            <option key={t.value} value={t.value}>
-              {t.label}
+          {EVENT_TYPE_KEYS.map((et) => (
+            <option key={et.value} value={et.value}>
+              {t(et.i18nKey)}
             </option>
           ))}
         </select>
@@ -239,7 +240,7 @@ const BookingForm: React.FC<BookingFormProps> = ({ preselectedArtist }) => {
           onChange={handleChange}
           required
           aria-required="true"
-          aria-label="Data evento"
+          aria-label={t("booking.eventDateLabel")}
           min={minDate}
           className={inputClass}
         />
@@ -250,24 +251,24 @@ const BookingForm: React.FC<BookingFormProps> = ({ preselectedArtist }) => {
         <input
           type="text"
           name="event_location"
-          placeholder="Citta' / Provincia *"
+          placeholder={t("booking.locationPlaceholder")}
           value={formData.event_location}
           onChange={handleChange}
           required
           aria-required="true"
-          aria-label="Citta' o provincia"
+          aria-label={t("booking.locationLabel")}
           className={inputClass}
         />
         <select
           name="estimated_budget"
           value={formData.estimated_budget}
           onChange={handleChange}
-          aria-label="Fascia di budget"
+          aria-label={t("booking.budgetLabel")}
           className={inputClass}
         >
-          {BUDGET_RANGES.map((b) => (
+          {BUDGET_RANGE_KEYS.map((b) => (
             <option key={b.value} value={b.value}>
-              {b.label}
+              {t(b.i18nKey)}
             </option>
           ))}
         </select>
@@ -276,11 +277,11 @@ const BookingForm: React.FC<BookingFormProps> = ({ preselectedArtist }) => {
       {/* Messaggio */}
       <textarea
         name="message"
-        placeholder="Note aggiuntive (orario, location, richieste speciali...)"
+        placeholder={t("booking.messagePlaceholder")}
         value={formData.message}
         onChange={handleChange}
         rows={4}
-        aria-label="Note aggiuntive"
+        aria-label={t("booking.messageLabel")}
         className={inputClass + " resize-none"}
       />
 
@@ -296,13 +297,12 @@ const BookingForm: React.FC<BookingFormProps> = ({ preselectedArtist }) => {
           aria-required="true"
         />
         <span className="text-sm text-[var(--text-muted)]">
-          Acconsento al trattamento dei dati personali ai sensi del GDPR (Reg.
-          UE 2016/679). Leggi la{" "}
+          {t("booking.privacyConsent")}{" "}
           <a
             href="/privacy"
             className="text-[var(--accent)] hover:underline"
           >
-            Privacy Policy
+            {t("booking.privacyLink")}
           </a>
           .
         </span>
@@ -317,12 +317,12 @@ const BookingForm: React.FC<BookingFormProps> = ({ preselectedArtist }) => {
         {status === "submitting" ? (
           <>
             <Loader className="animate-spin" size={20} />
-            INVIO IN CORSO...
+            {t("booking.submitting")}
           </>
         ) : (
           <>
             <Send size={20} />
-            INVIA RICHIESTA
+            {t("booking.submitButton")}
           </>
         )}
       </button>

@@ -3,9 +3,10 @@
  * =================================================================== */
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, waitFor } from "@testing-library/react";
+import { screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import BandFinder from "@/components/BandFinder";
+import { renderWithProviders } from "../test-utils";
 
 // Mock the geminiService module
 vi.mock("@/services/geminiService", () => ({
@@ -22,7 +23,7 @@ describe("BandFinder", () => {
   });
 
   it("renders the heading", async () => {
-    render(<BandFinder onArtistSelect={() => {}} />);
+    renderWithProviders(<BandFinder onArtistSelect={() => {}} />);
 
     await waitFor(() => {
       expect(screen.getByText(/TROVA LA TUA/)).toBeInTheDocument();
@@ -31,7 +32,7 @@ describe("BandFinder", () => {
   });
 
   it("renders the description text", async () => {
-    render(<BandFinder onArtistSelect={() => {}} />);
+    renderWithProviders(<BandFinder onArtistSelect={() => {}} />);
 
     expect(
       screen.getByText(/Descrivi l'evento, il mood o il genere che cerchi/),
@@ -39,14 +40,14 @@ describe("BandFinder", () => {
   });
 
   it("renders the search input", () => {
-    render(<BandFinder onArtistSelect={() => {}} />);
+    renderWithProviders(<BandFinder onArtistSelect={() => {}} />);
     expect(
       screen.getByLabelText("Descrivi la band che cerchi"),
     ).toBeInTheDocument();
   });
 
   it("renders suggestion buttons", async () => {
-    render(<BandFinder onArtistSelect={() => {}} />);
+    renderWithProviders(<BandFinder onArtistSelect={() => {}} />);
 
     expect(screen.getByText("PROVA CON:")).toBeInTheDocument();
     expect(
@@ -59,7 +60,7 @@ describe("BandFinder", () => {
 
   it("fills search input when suggestion is clicked", async () => {
     const user = userEvent.setup();
-    render(<BandFinder onArtistSelect={() => {}} />);
+    renderWithProviders(<BandFinder onArtistSelect={() => {}} />);
 
     const suggestion = screen.getByText("Band energica per un matrimonio");
     await user.click(suggestion);
@@ -73,7 +74,7 @@ describe("BandFinder", () => {
     mockedScoutTalent.mockReturnValue(new Promise(() => {}));
 
     const user = userEvent.setup();
-    render(<BandFinder onArtistSelect={() => {}} />);
+    renderWithProviders(<BandFinder onArtistSelect={() => {}} />);
 
     // Wait for artists to load (MSW handler returns the list)
     await waitFor(() => {
@@ -99,7 +100,7 @@ describe("BandFinder", () => {
     });
 
     const user = userEvent.setup();
-    render(<BandFinder onArtistSelect={() => {}} />);
+    renderWithProviders(<BandFinder onArtistSelect={() => {}} />);
 
     // Wait for artists to load from MSW
     await waitFor(() => {
@@ -130,7 +131,7 @@ describe("BandFinder", () => {
     });
 
     const user = userEvent.setup();
-    render(<BandFinder onArtistSelect={() => {}} />);
+    renderWithProviders(<BandFinder onArtistSelect={() => {}} />);
 
     await waitFor(() => {
       const submitBtn = screen.getByLabelText("Cerca con AI");
@@ -160,7 +161,7 @@ describe("BandFinder", () => {
     const user = userEvent.setup();
     const onArtistSelect = vi.fn();
 
-    render(<BandFinder onArtistSelect={onArtistSelect} />);
+    renderWithProviders(<BandFinder onArtistSelect={onArtistSelect} />);
 
     await waitFor(() => {
       const submitBtn = screen.getByLabelText("Cerca con AI");
@@ -187,7 +188,7 @@ describe("BandFinder", () => {
 
   it("does not submit with empty query", async () => {
     const user = userEvent.setup();
-    render(<BandFinder onArtistSelect={() => {}} />);
+    renderWithProviders(<BandFinder onArtistSelect={() => {}} />);
 
     await waitFor(() => {
       const submitBtn = screen.getByLabelText("Cerca con AI");

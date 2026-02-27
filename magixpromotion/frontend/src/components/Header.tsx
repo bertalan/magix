@@ -1,8 +1,10 @@
 import React from "react";
 import { ViewState } from "@/types";
 import { useMenu } from "@/hooks/useMenu";
+import { useLanguage } from "@/contexts/LanguageContext";
 import MobileMenu from "./MobileMenu";
 import ThemeToggle from "./ThemeToggle";
+import LanguageSwitcher from "./LanguageSwitcher";
 import { Music, Users, Search, Calendar, Mail, Menu, X } from "lucide-react";
 
 /** Mappa icone Lucide per nome stringa (da API menu) */
@@ -14,13 +16,13 @@ const ICON_MAP: Record<string, React.ElementType> = {
   mail: Mail,
 };
 
-/** Navigazione statica di fallback se l'API menu non e' disponibile */
-const FALLBACK_NAV: Array<{ label: string; view: ViewState; icon: string }> = [
-  { label: "HOME", view: "HOME", icon: "music" },
-  { label: "ARTISTI", view: "TALENT", icon: "users" },
-  { label: "EVENTI", view: "EVENTS", icon: "calendar" },
-  { label: "TROVA LA TUA BAND", view: "SCOUT", icon: "search" },
-  { label: "BOOKING", view: "BOOKING", icon: "mail" },
+/** Chiavi i18n per la navigazione statica di fallback */
+const FALLBACK_NAV_KEYS: Array<{ i18nKey: string; view: ViewState; icon: string }> = [
+  { i18nKey: "nav.home", view: "HOME", icon: "music" },
+  { i18nKey: "nav.artists", view: "TALENT", icon: "users" },
+  { i18nKey: "nav.events", view: "EVENTS", icon: "calendar" },
+  { i18nKey: "nav.scout", view: "SCOUT", icon: "search" },
+  { i18nKey: "nav.booking", view: "BOOKING", icon: "mail" },
 ];
 
 interface HeaderProps {
@@ -37,9 +39,10 @@ const Header: React.FC<HeaderProps> = ({
   toggleTheme,
 }) => {
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
-  const { data: menuData } = useMenu("header");
+  const { lang, t } = useLanguage();
+  const { data: menuData } = useMenu("header", lang);
 
-  // Usa il menu API se disponibile, altrimenti fallback statico
+  // Usa il menu API se disponibile, altrimenti fallback statico (tradotto)
   const apiMenuItems = menuData?.items || [];
   const navItems =
     apiMenuItems.length > 0
@@ -48,7 +51,11 @@ const Header: React.FC<HeaderProps> = ({
           view: urlToView(item.url),
           icon: item.icon || "music",
         }))
-      : FALLBACK_NAV;
+      : FALLBACK_NAV_KEYS.map((item) => ({
+          label: t(item.i18nKey),
+          view: item.view,
+          icon: item.icon,
+        }));
 
   return (
     <>
@@ -60,7 +67,7 @@ const Header: React.FC<HeaderProps> = ({
           role="button"
           tabIndex={0}
           onKeyDown={(e) => e.key === "Enter" && setView("HOME")}
-          aria-label="Magix Promotion — Torna alla home"
+          aria-label={t("header.logoAria")}
         >
           <div className="w-10 h-10 bg-[var(--accent-gradient)] rounded-lg flex items-center justify-center font-bold text-xl font-heading transform -rotate-6 shadow-lg shadow-[var(--accent)]/20">
             <span
@@ -96,16 +103,18 @@ const Header: React.FC<HeaderProps> = ({
               </button>
             );
           })}
+          <LanguageSwitcher />
           <ThemeToggle currentTheme={currentTheme} toggleTheme={toggleTheme} />
         </nav>
 
         {/* Mobile toggle */}
         <div className="flex items-center gap-4 md:hidden">
+          <LanguageSwitcher />
           <ThemeToggle currentTheme={currentTheme} toggleTheme={toggleTheme} />
           <button
             className="text-[var(--text-main)]"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
-            aria-label={isMenuOpen ? "Chiudi menu" : "Apri menu"}
+            aria-label={isMenuOpen ? t("header.closeMenu") : t("header.openMenu")}
             aria-expanded={isMenuOpen}
             aria-controls="mobile-menu"
           >

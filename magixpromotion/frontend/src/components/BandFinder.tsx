@@ -3,21 +3,14 @@ import { Sparkles, Wand2, ArrowRight } from "lucide-react";
 import { scoutTalent, ScoutResult } from "@/services/geminiService";
 import { Artist } from "@/types";
 import { useArtists } from "@/hooks/useArtists";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface BandFinderProps {
   onArtistSelect: (artist: Artist) => void;
 }
 
-const SUGGESTIONS = [
-  "Band energica per un matrimonio",
-  "Tributo ai Queen per un festival",
-  "DJ set per evento aziendale",
-  "Cover band italiana anni 80",
-  "Band acustica per aperitivo",
-  "Show band con ballerini per piazza",
-];
-
 const BandFinder: React.FC<BandFinderProps> = ({ onArtistSelect }) => {
+  const { t } = useLanguage();
   const [query, setQuery] = React.useState("");
   const [loading, setLoading] = React.useState(false);
   const [result, setResult] = React.useState<ScoutResult | null>(null);
@@ -54,6 +47,15 @@ const BandFinder: React.FC<BandFinderProps> = ({ onArtistSelect }) => {
     setLoading(false);
   };
 
+  const SUGGESTIONS = [
+    t("scout.suggestion1"),
+    t("scout.suggestion2"),
+    t("scout.suggestion3"),
+    t("scout.suggestion4"),
+    t("scout.suggestion5"),
+    t("scout.suggestion6"),
+  ];
+
   const matchedArtist = result
     ? artists.find((a) => a.id === result.artistId)
     : null;
@@ -64,32 +66,31 @@ const BandFinder: React.FC<BandFinderProps> = ({ onArtistSelect }) => {
       <div className="text-center mb-16">
         <div className="inline-flex items-center gap-2 px-4 py-2 glass-panel rounded-full text-[var(--accent)] text-sm font-bold tracking-widest mb-6">
           <Sparkles size={16} />
-          ASSISTENTE INTELLIGENTE
+          {t("scout.badge")}
         </div>
         <h2 className="text-5xl md:text-7xl font-heading font-extrabold tracking-tighter mb-6 text-[var(--text-main)]">
-          TROVA LA TUA <span className="gradient-text">BAND</span>
+          {t("scout.title")} <span className="gradient-text">{t("scout.titleAccent")}</span>
         </h2>
         <p className="text-[var(--text-muted)] text-xl font-light">
-          Descrivi l'evento, il mood o il genere che cerchi. Il nostro
-          assistente trovera' la band perfetta per te.
+          {t("scout.subtitle")}
         </p>
       </div>
 
       {/* Search */}
-      <form onSubmit={handleSearch} className="mb-12 relative group" role="search" aria-label="Cerca band con intelligenza artificiale">
+      <form onSubmit={handleSearch} className="mb-12 relative group" role="search" aria-label={t("scout.searchAria")}>
         <input
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder='es: "Cerco una band energica per un matrimonio a Como..."'
+          placeholder={t("scout.placeholder")}
           className="w-full bg-[var(--glass)] border border-[var(--glass-border)] px-8 py-6 rounded-3xl text-xl text-[var(--text-main)] placeholder:text-[var(--text-muted)]/40 focus:outline-none focus:border-[var(--accent)]/50 transition-all pr-20"
-          aria-label="Descrivi la band che cerchi"
+          aria-label={t("scout.inputAria")}
         />
         <button
           type="submit"
           disabled={loading || artists.length === 0}
           className="absolute right-4 top-4 bottom-4 w-12 rounded-2xl bg-[var(--accent)] text-[var(--bg-color)] flex items-center justify-center hover:scale-105 transition-transform disabled:opacity-50 shadow-lg shadow-[var(--accent)]/20"
-          aria-label="Cerca con AI"
+          aria-label={t("scout.searchButtonAria")}
         >
           {loading ? (
             <div className="animate-spin h-5 w-5 border-2 border-[var(--bg-color)] border-t-transparent rounded-full" />
@@ -102,10 +103,10 @@ const BandFinder: React.FC<BandFinderProps> = ({ onArtistSelect }) => {
       {/* Loading skeleton */}
       <div aria-live="polite" aria-atomic="true">
       {loading && (
-        <div className="animate-pulse flex flex-col gap-6" role="status" aria-label="Ricerca in corso">
+        <div className="animate-pulse flex flex-col gap-6" role="status" aria-label={t("scout.searching")}>
           <div className="h-4 bg-[var(--glass)] rounded w-1/2" />
           <div className="h-64 bg-[var(--glass)] rounded-3xl w-full" />
-          <span className="sr-only">Ricerca in corso...</span>
+          <span className="sr-only">{t("scout.searching")}</span>
         </div>
       )}
 
@@ -140,7 +141,7 @@ const BandFinder: React.FC<BandFinderProps> = ({ onArtistSelect }) => {
                   </div>
                   <div className="flex flex-col items-center glass-panel p-4 rounded-2xl border-[var(--accent)]/20">
                     <span className="text-xs text-[var(--text-muted)] font-bold">
-                      MATCH
+                      {t("scout.match")}
                     </span>
                     <span className="text-3xl font-heading font-black text-[var(--accent)]">
                       {result.vibeScore}/10
@@ -156,7 +157,7 @@ const BandFinder: React.FC<BandFinderProps> = ({ onArtistSelect }) => {
                   onClick={() => onArtistSelect(matchedArtist)}
                   className="flex items-center gap-3 text-[var(--text-main)] font-bold group hover:text-[var(--accent)] transition-colors"
                 >
-                  VEDI PROFILO{" "}
+                  {t("scout.viewProfile")}{" "}
                   <ArrowRight className="group-hover:translate-x-2 transition-transform" />
                 </button>
               </div>
@@ -169,7 +170,7 @@ const BandFinder: React.FC<BandFinderProps> = ({ onArtistSelect }) => {
       {result && !matchedArtist && (
         <div className="text-center py-12 text-[var(--text-muted)]">
           <p className="text-xl">
-            Nessun artista trovato. Prova a descrivere meglio il tuo evento.
+            {t("scout.noMatch")}
           </p>
         </div>
       )}
@@ -178,7 +179,7 @@ const BandFinder: React.FC<BandFinderProps> = ({ onArtistSelect }) => {
       {/* Suggerimenti */}
       <div className="mt-16 flex flex-wrap justify-center gap-4">
         <span className="text-[var(--text-muted)] text-sm font-bold w-full text-center mb-2">
-          PROVA CON:
+          {t("scout.tryWith")}
         </span>
         {SUGGESTIONS.map((s) => (
           <button

@@ -24,6 +24,25 @@ Object.defineProperty(window, "matchMedia", {
   }),
 });
 
+/**
+ * Polyfill localStorage for Node 22+ environments where the native
+ * localStorage exists but its methods are not callable without
+ * --localstorage-file flag. This provides a proper in-memory Storage.
+ */
+if (typeof globalThis.localStorage === "undefined" || typeof globalThis.localStorage.getItem !== "function") {
+  const store = new Map<string, string>();
+  const storage: Storage = {
+    getItem: (key: string) => store.get(key) ?? null,
+    setItem: (key: string, value: string) => { store.set(key, String(value)); },
+    removeItem: (key: string) => { store.delete(key); },
+    clear: () => { store.clear(); },
+    key: (index: number) => [...store.keys()][index] ?? null,
+    get length() { return store.size; },
+  };
+  Object.defineProperty(globalThis, "localStorage", { value: storage, writable: true, configurable: true });
+  Object.defineProperty(window, "localStorage", { value: storage, writable: true, configurable: true });
+}
+
 // Start MSW server before all tests
 beforeAll(() => {
   server.listen({ onUnhandledRequest: "warn" });

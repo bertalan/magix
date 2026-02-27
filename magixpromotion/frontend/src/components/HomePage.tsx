@@ -1,6 +1,7 @@
 import React from "react";
 import { Artist, ViewState } from "@/types";
 import { useSiteSettings } from "@/hooks/useSiteSettings";
+import { useLanguage } from "@/contexts/LanguageContext";
 import Hero from "./Hero";
 import FeaturedArtists from "./FeaturedArtists";
 import SEOHead from "./SEOHead";
@@ -13,12 +14,13 @@ interface HomePageProps {
 
 const HomePage: React.FC<HomePageProps> = ({ setView, onArtistClick }) => {
   const { data: settings } = useSiteSettings();
+  const { t } = useLanguage();
 
   return (
     <>
       <SEOHead
-        title="Magix Promotion — Booking & Management Musicale"
-        description="Agenzia di band e artisti musicali per eventi, concerti e feste private in Italia e nel mondo."
+        title={t("home.title")}
+        description={t("home.description")}
         type="website"
       />
       <HomepageJsonLd settings={settings} />
@@ -28,16 +30,10 @@ const HomePage: React.FC<HomePageProps> = ({ setView, onArtistClick }) => {
       {/* Chi Siamo — presentazione agenzia */}
       <section className="max-w-4xl mx-auto px-6 py-20 text-center">
         <h2 className="text-2xl md:text-4xl font-heading font-extrabold tracking-tight text-[var(--text-main)] mb-6 uppercase">
-          Chi <span className="gradient-text">Siamo</span>
+          {t("home.whoWeAre")} <span className="gradient-text">{t("home.whoWeAreAccent")}</span>
         </h2>
         <p className="text-base md:text-lg text-[var(--text-muted)] leading-relaxed font-light">
-          Magix Promotion International Agency è un'agenzia che opera nel campo
-          della musica dal vivo per l'organizzazione di eventi, festival e altre
-          iniziative. Collaborazioni con i più importanti live club italiani ed
-          esteri ci permette di essere in grado di garantire la produzione di
-          eventi musicali curandone ogni aspetto: artistico, tecnico, logistico e
-          promozionale con grande professionalità grazie anche alla nostra
-          passione per la musica.
+          {t("home.whoWeAreBody")}
         </p>
       </section>
 
@@ -47,10 +43,10 @@ const HomePage: React.FC<HomePageProps> = ({ setView, onArtistClick }) => {
       <section className="max-w-7xl mx-auto px-6 py-16">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {[
-            { label: "Dance Show Band", emoji: "\uD83C\uDFA4" },
-            { label: "Tributo Italiano", emoji: "\uD83C\uDDEE\uD83C\uDDF9" },
-            { label: "Tributo Internazionale", emoji: "\uD83C\uDF0D" },
-            { label: "Dee-Jay", emoji: "\uD83C\uDFA7" },
+            { label: t("home.danceShowBand"), emoji: "\uD83C\uDFA4" },
+            { label: t("home.tributoItaliano"), emoji: "\uD83C\uDDEE\uD83C\uDDF9" },
+            { label: t("home.tributoInternazionale"), emoji: "\uD83C\uDF0D" },
+            { label: t("home.deeJay"), emoji: "\uD83C\uDFA7" },
           ].map((cat) => (
             <button
               key={cat.label}

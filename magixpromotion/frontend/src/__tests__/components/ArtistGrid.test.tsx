@@ -3,22 +3,23 @@
  * =================================================================== */
 
 import { describe, it, expect, vi } from "vitest";
-import { render, screen, waitFor } from "@testing-library/react";
+import { screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { http, HttpResponse } from "msw";
 import { server } from "../mocks/server";
 import ArtistGrid from "@/components/ArtistGrid";
+import { renderWithProviders } from "../test-utils";
 
 describe("ArtistGrid", () => {
   it("shows loading skeleton initially", () => {
-    render(<ArtistGrid onArtistClick={() => {}} />);
+    renderWithProviders(<ArtistGrid onArtistClick={() => {}} />);
     // Skeleton placeholders have animate-pulse class
     const container = document.querySelector(".animate-pulse");
     expect(container).not.toBeNull();
   });
 
   it("renders artist cards after loading", async () => {
-    render(<ArtistGrid onArtistClick={() => {}} />);
+    renderWithProviders(<ArtistGrid onArtistClick={() => {}} />);
 
     await waitFor(() => {
       expect(screen.getByText("The Groove Machine")).toBeInTheDocument();
@@ -28,7 +29,7 @@ describe("ArtistGrid", () => {
   });
 
   it("renders the heading", async () => {
-    render(<ArtistGrid onArtistClick={() => {}} />);
+    renderWithProviders(<ArtistGrid onArtistClick={() => {}} />);
 
     await waitFor(() => {
       expect(screen.getByText("Il Nostro Roster")).toBeInTheDocument();
@@ -42,7 +43,7 @@ describe("ArtistGrid", () => {
       }),
     );
 
-    render(<ArtistGrid onArtistClick={() => {}} />);
+    renderWithProviders(<ArtistGrid onArtistClick={() => {}} />);
 
     await waitFor(() => {
       expect(screen.getByText(/Errore nel caricamento/)).toBeInTheDocument();
@@ -51,7 +52,7 @@ describe("ArtistGrid", () => {
 
   it("filters artists by search text", async () => {
     const user = userEvent.setup();
-    render(<ArtistGrid onArtistClick={() => {}} />);
+    renderWithProviders(<ArtistGrid onArtistClick={() => {}} />);
 
     await waitFor(() => {
       expect(screen.getByText("The Groove Machine")).toBeInTheDocument();
@@ -67,7 +68,7 @@ describe("ArtistGrid", () => {
 
   it("shows empty message when no artists match search", async () => {
     const user = userEvent.setup();
-    render(<ArtistGrid onArtistClick={() => {}} />);
+    renderWithProviders(<ArtistGrid onArtistClick={() => {}} />);
 
     await waitFor(() => {
       expect(screen.getByText("The Groove Machine")).toBeInTheDocument();
@@ -85,7 +86,7 @@ describe("ArtistGrid", () => {
     const user = userEvent.setup();
     const onArtistClick = vi.fn();
 
-    render(<ArtistGrid onArtistClick={onArtistClick} />);
+    renderWithProviders(<ArtistGrid onArtistClick={onArtistClick} />);
 
     await waitFor(() => {
       expect(screen.getByText("The Groove Machine")).toBeInTheDocument();
@@ -103,7 +104,7 @@ describe("ArtistGrid", () => {
   });
 
   it("has accessible search input", () => {
-    render(<ArtistGrid onArtistClick={() => {}} />);
+    renderWithProviders(<ArtistGrid onArtistClick={() => {}} />);
     const searchInput = screen.getByLabelText("Cerca artista per nome o genere");
     expect(searchInput).toBeInTheDocument();
   });

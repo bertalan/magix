@@ -2,6 +2,7 @@ import React from "react";
 import type { EventPage, ViewState } from "@/types";
 import { useEvents } from "@/hooks/useEvents";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
+import { useLanguage } from "@/contexts/LanguageContext";
 import EventCard from "./EventCard";
 import EventFilters from "./EventFilters";
 import { Calendar } from "lucide-react";
@@ -18,6 +19,7 @@ interface EventsPageProps {
  * filtro per città, raggruppamento per mese e infinite scroll.
  */
 const EventsPage: React.FC<EventsPageProps> = ({ setView: _setView, onArtistClick, onEventClick, highlightedEventSlug }) => {
+  const { t, lang } = useLanguage();
   const [tab, setTab] = React.useState<"upcoming" | "past">("upcoming");
   const [cityFilter, setCityFilter] = React.useState("ALL");
 
@@ -45,10 +47,11 @@ const EventsPage: React.FC<EventsPageProps> = ({ setView: _setView, onArtistClic
 
   // Raggruppa eventi per data singola (es. "Venerdì 20 febbraio 2026")
   const groupedEvents = React.useMemo(() => {
+    const dateLocale = lang === "en" ? "en-GB" : "it-IT";
     const groups: Record<string, EventPage[]> = {};
     events.forEach((ev) => {
       const date = new Date(ev.start_date);
-      const key = date.toLocaleDateString("it-IT", {
+      const key = date.toLocaleDateString(dateLocale, {
         weekday: "long",
         day: "numeric",
         month: "long",
@@ -58,7 +61,7 @@ const EventsPage: React.FC<EventsPageProps> = ({ setView: _setView, onArtistClic
       groups[key].push(ev);
     });
     return groups;
-  }, [events]);
+  }, [events, lang]);
 
   // Extract unique cities for filter chips
   const cities = React.useMemo(() => {
@@ -75,16 +78,16 @@ const EventsPage: React.FC<EventsPageProps> = ({ setView: _setView, onArtistClic
         <div className="flex items-center gap-3 mb-4">
           <Calendar className="text-[var(--accent)]" size={28} />
           <h2 className="text-4xl md:text-6xl font-heading font-extrabold tracking-tight text-[var(--text-main)] uppercase">
-            Eventi
+            {t("events.title")}
           </h2>
         </div>
         <p className="text-[var(--text-muted)] text-lg max-w-xl">
-          Tutte le date live delle nostre band e artisti in Italia e nel mondo.
+          {t("events.subtitle")}
         </p>
       </div>
 
       {/* Tabs: Prossimi / Archivio */}
-      <div className="flex gap-4 mb-8" role="tablist" aria-label="Filtro eventi">
+      <div className="flex gap-4 mb-8" role="tablist" aria-label={t("events.filterAria")}>
         <button
           onClick={() => {
             setTab("upcoming");
@@ -100,7 +103,7 @@ const EventsPage: React.FC<EventsPageProps> = ({ setView: _setView, onArtistClic
               : "bg-[var(--glass)] text-[var(--text-muted)]"
           }`}
         >
-          PROSSIMI
+          {t("events.upcoming")}
         </button>
         <button
           onClick={() => {
@@ -117,7 +120,7 @@ const EventsPage: React.FC<EventsPageProps> = ({ setView: _setView, onArtistClic
               : "bg-[var(--glass)] text-[var(--text-muted)]"
           }`}
         >
-          ARCHIVIO
+          {t("events.past")}
         </button>
       </div>
 
@@ -131,7 +134,7 @@ const EventsPage: React.FC<EventsPageProps> = ({ setView: _setView, onArtistClic
       {/* Conteggio eventi */}
       {!loading && totalCount > 0 && (
         <p className="text-sm text-[var(--text-muted)] mt-4">
-          {events.length} di {totalCount} eventi
+          {t("events.countOf", { loaded: events.length, total: totalCount })}
         </p>
       )}
 
@@ -150,7 +153,7 @@ const EventsPage: React.FC<EventsPageProps> = ({ setView: _setView, onArtistClic
       {/* Error state */}
       {error && (
         <div className="text-center py-16 text-rose-500">
-          Errore nel caricamento degli eventi: {error.message}
+          {t("events.loadError")}: {error.message}
         </div>
       )}
 
@@ -194,15 +197,15 @@ const EventsPage: React.FC<EventsPageProps> = ({ setView: _setView, onArtistClic
                 ref={sentinelRef}
                 className="h-4"
                 role="status"
-                aria-label={hasMore ? "Caricamento altri eventi" : ""}
+                aria-label={hasMore ? t("events.loadingMore") : ""}
               />
             </>
           ) : (
             <div className="text-center py-24 text-[var(--text-muted)]">
               <p className="text-xl">
                 {tab === "upcoming"
-                  ? "Nessun evento in programma. Torna presto!"
-                  : "Nessun evento nell'archivio."}
+                  ? t("events.noUpcoming")
+                  : t("events.noPast")}
               </p>
             </div>
           )}

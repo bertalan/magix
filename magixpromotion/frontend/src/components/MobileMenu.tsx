@@ -1,6 +1,7 @@
 import React from "react";
 import { ViewState } from "@/types";
 import { useFocusTrap } from "@/hooks/useFocusTrap";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface MobileMenuProps {
   navItems: Array<{ label: string; view: ViewState; icon: string }>;
@@ -11,6 +12,7 @@ interface MobileMenuProps {
 
 const MobileMenu: React.FC<MobileMenuProps> = ({ navItems, activeView, setView, onClose }) => {
   const trapRef = useFocusTrap<HTMLDivElement>();
+  const { t } = useLanguage();
 
   // Close on Escape key
   React.useEffect(() => {
@@ -28,9 +30,9 @@ const MobileMenu: React.FC<MobileMenuProps> = ({ navItems, activeView, setView, 
       className="fixed inset-0 z-40 bg-[var(--bg-color)] flex flex-col items-center justify-center gap-8 text-3xl font-heading font-bold"
       role="dialog"
       aria-modal="true"
-      aria-label="Menu navigazione"
+      aria-label={t("header.mobileMenuLabel")}
     >
-      <nav aria-label="Navigazione mobile">
+      <nav aria-label={t("header.mobileMenuLabel")}>
         <ul className="flex flex-col items-center gap-8 list-none p-0 m-0">
           {navItems.map((item) => (
             <li key={item.label}>

@@ -113,7 +113,7 @@ Entrambi definiscono `CORS_ALLOWED_ORIGINS` ma `django-cors-headers` non è nei 
 
 `ARTIST_MANAGER_MAP` è un dizionario vuoto `{}`. Tutte le email di booking vanno sempre all'indirizzo default `booking@magixpromotion.it`, ignorando il manager specifico dell'artista.
 
-**Fix consigliato:** Popolare la mappa dal database, leggendo il campo `managing_group` degli artisti o creando un modello `ArtistManager` con email per artista.
+**Fix consigliato:** Popolare la mappa dal database, leggendo il campo `managing_group` degli artisti o creando un modello `ArtistManager` con email per artista. Fallback sull'email default, da specificare in un campo dedicato in SiteSettings
 
 ---
 

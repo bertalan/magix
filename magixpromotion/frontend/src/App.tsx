@@ -1,6 +1,7 @@
 import React from "react";
 import { ViewState, Artist, EventPage } from "@/types";
 import { fetchArtistBySlug, fetchArtist, fetchEventBySlug } from "@/lib/api";
+import { useLanguage, Lang } from "@/contexts/LanguageContext";
 import Layout from "./components/Layout";
 import HomePage from "./components/HomePage";
 import ArtistGrid from "./components/ArtistGrid";
@@ -13,57 +14,87 @@ import PrivacyPage from "./components/PrivacyPage";
 import TermsPage from "./components/TermsPage";
 import ContactsPage from "./components/ContactsPage";
 
-/** Parse the URL path to detect an artist slug (/artisti/:slug or /it/artisti/:slug). */
+/** Slug locali per le rotte */
+const ROUTE_SLUGS: Record<Lang, Record<string, string>> = {
+  it: {
+    artists: "artisti",
+    events: "eventi",
+    booking: "booking",
+    scout: "scout",
+    privacy: "privacy",
+    terms: "termini",
+    contacts: "contatti",
+  },
+  en: {
+    artists: "artists",
+    events: "events",
+    booking: "booking",
+    scout: "scout",
+    privacy: "privacy",
+    terms: "terms",
+    contacts: "contacts",
+  },
+};
+
+/** Parse the URL path to detect an artist slug (/it/artisti/:slug or /en/artists/:slug). */
 function parseArtistSlugFromPath(): string | null {
-  const match = window.location.pathname.match(/\/(?:it\/)?artisti\/([^/]+)/);
+  const match = window.location.pathname.match(/\/(?:it\/artisti|en\/artists)\/([^/]+)/);
   return match ? match[1] : null;
 }
 
-/** Parse the URL path to detect an event slug (/eventi/:slug or /it/eventi/:slug). */
+/** Parse the URL path to detect an event slug (/it/eventi/:slug or /en/events/:slug). */
 function parseEventSlugFromPath(): string | null {
-  const match = window.location.pathname.match(/\/(?:it\/)?eventi\/([^/]+)/);
+  const match = window.location.pathname.match(/\/(?:it\/eventi|en\/events)\/([^/]+)/);
   return match ? match[1] : null;
+}
+
+/** Detect language from URL path prefix. */
+function parseLangFromPath(): Lang {
+  const match = window.location.pathname.match(/^\/(it|en)\//);
+  return match && match[1] === "en" ? "en" : "it";
 }
 
 /** Detect the initial ViewState from the current URL path. */
 function parseViewFromPath(): ViewState {
   const path = window.location.pathname;
-  if (/\/(?:it\/)?artisti\/[^/]+/.test(path)) return "DETAIL";
-  if (/\/(?:it\/)?artisti\/?$/.test(path)) return "TALENT";
-  if (/\/(?:it\/)?eventi(?:\/|$)/.test(path)) return "EVENTS";
-  if (/\/(?:it\/)?booking\/?$/.test(path)) return "BOOKING";
-  if (/\/(?:it\/)?scout\/?$/.test(path)) return "SCOUT";
-  if (/\/(?:it\/)?privacy\/?$/.test(path)) return "PRIVACY";
-  if (/\/(?:it\/)?termini\/?$/.test(path)) return "TERMS";
-  if (/\/(?:it\/)?contatti\/?$/.test(path)) return "CONTACTS";
+  if (/\/(?:it\/artisti|en\/artists)\/[^/]+/.test(path)) return "DETAIL";
+  if (/\/(?:it\/artisti|en\/artists)\/?$/.test(path)) return "TALENT";
+  if (/\/(?:it\/eventi|en\/events)(?:\/|$)/.test(path)) return "EVENTS";
+  if (/\/(?:it|en)\/booking\/?$/.test(path)) return "BOOKING";
+  if (/\/(?:it|en)\/scout\/?$/.test(path)) return "SCOUT";
+  if (/\/(?:it\/privacy|en\/privacy)\/?$/.test(path)) return "PRIVACY";
+  if (/\/(?:it\/termini|en\/terms)\/?$/.test(path)) return "TERMS";
+  if (/\/(?:it\/contatti|en\/contacts)\/?$/.test(path)) return "CONTACTS";
   return "HOME";
 }
 
 /** Map ViewState to a URL path for pushState. */
-function viewToPath(view: ViewState, slug?: string): string {
+function viewToPath(view: ViewState, lang: Lang, slug?: string): string {
+  const s = ROUTE_SLUGS[lang];
   switch (view) {
     case "DETAIL":
-      return slug ? `/it/artisti/${slug}/` : "/";
+      return slug ? `/${lang}/${s.artists}/${slug}/` : "/";
     case "TALENT":
-      return "/it/artisti/";
+      return `/${lang}/${s.artists}/`;
     case "EVENTS":
-      return slug ? `/it/eventi/${slug}/` : "/it/eventi/";
+      return slug ? `/${lang}/${s.events}/${slug}/` : `/${lang}/${s.events}/`;
     case "BOOKING":
-      return "/it/booking/";
+      return `/${lang}/${s.booking}/`;
     case "SCOUT":
-      return "/it/scout/";
+      return `/${lang}/${s.scout}/`;
     case "PRIVACY":
-      return "/it/privacy/";
+      return `/${lang}/${s.privacy}/`;
     case "TERMS":
-      return "/it/termini/";
+      return `/${lang}/${s.terms}/`;
     case "CONTACTS":
-      return "/it/contatti/";
+      return `/${lang}/${s.contacts}/`;
     default:
       return "/";
   }
 }
 
 const App: React.FC = () => {
+  const { lang, setLang } = useLanguage();
   const [activeView, setActiveView] = React.useState<ViewState>(() => parseViewFromPath());
   const [selectedArtist, setSelectedArtist] = React.useState<Artist | null>(
     null,
@@ -91,6 +122,10 @@ const App: React.FC = () => {
 
   // --- URL-based routing on mount ---
   React.useEffect(() => {
+    // Sincronizza lingua da URL se presente
+    const urlLang = parseLangFromPath();
+    if (urlLang !== lang) setLang(urlLang);
+
     const artistSlug = parseArtistSlugFromPath();
     if (artistSlug) {
       setLoadingArtist(true);
@@ -122,16 +157,20 @@ const App: React.FC = () => {
 
   // --- Sync URL with view changes ---
   const pushUrl = React.useCallback((view: ViewState, slug?: string) => {
-    const newPath = viewToPath(view, slug);
+    const newPath = viewToPath(view, lang, slug);
     if (window.location.pathname !== newPath) {
-      window.history.pushState({ view, slug }, "", newPath);
+      window.history.pushState({ view, slug, lang }, "", newPath);
     }
-  }, []);
+  }, [lang]);
 
   // --- Handle browser back/forward ---
   React.useEffect(() => {
     const handlePopState = (e: PopStateEvent) => {
-      const state = e.state as { view?: ViewState; slug?: string } | null;
+      const state = e.state as { view?: ViewState; slug?: string; lang?: Lang } | null;
+      // Sincronizza lingua dallo stato o dall'URL
+      const stateLang = state?.lang || parseLangFromPath();
+      if (stateLang !== lang) setLang(stateLang);
+
       if (state?.view === "DETAIL" && state.slug) {
         fetchArtistBySlug(state.slug).then((artist) => {
           if (artist) {
@@ -168,6 +207,17 @@ const App: React.FC = () => {
     document.documentElement.setAttribute("data-theme", currentTheme);
     localStorage.setItem("magix-theme", currentTheme);
   }, [currentTheme]);
+
+  // Aggiorna l'URL quando cambia la lingua
+  React.useEffect(() => {
+    document.documentElement.setAttribute("lang", lang);
+    // Ricostruisce il path con la nuova lingua
+    const currentSlug = selectedArtist?.meta?.slug || selectedEvent?.meta?.slug;
+    const newPath = viewToPath(activeView, lang, currentSlug);
+    if (window.location.pathname !== newPath && activeView !== "HOME") {
+      window.history.replaceState({ view: activeView, slug: currentSlug, lang }, "", newPath);
+    }
+  }, [lang]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const toggleTheme = () => {
     setCurrentTheme((prev) =>

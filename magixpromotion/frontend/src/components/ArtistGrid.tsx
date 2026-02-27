@@ -2,6 +2,7 @@ import React from "react";
 import { Artist } from "@/types";
 import { useArtists } from "@/hooks/useArtists";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
+import { useLanguage } from "@/contexts/LanguageContext";
 import ArtistCard from "./ArtistCard";
 import ArtistFilters from "./ArtistFilters";
 
@@ -10,6 +11,7 @@ interface ArtistGridProps {
 }
 
 const ArtistGrid: React.FC<ArtistGridProps> = ({ onArtistClick }) => {
+  const { t } = useLanguage();
   const [search, setSearch] = React.useState("");
   const [typeFilter, setTypeFilter] = React.useState("ALL");
 
@@ -49,7 +51,7 @@ const ArtistGrid: React.FC<ArtistGridProps> = ({ onArtistClick }) => {
       <div className="flex flex-col md:flex-row justify-between items-end gap-8 mb-16">
         <div>
           <h2 className="text-4xl md:text-6xl font-heading font-extrabold mb-4 tracking-tight text-[var(--text-main)] uppercase">
-            Il Nostro Roster
+            {t("artists.rosterTitle")}
           </h2>
           <ArtistFilters
             artistTypes={artistTypes}
@@ -62,11 +64,11 @@ const ArtistGrid: React.FC<ArtistGridProps> = ({ onArtistClick }) => {
         <div className="w-full md:w-80">
           <input
             type="text"
-            placeholder="Cerca artista..."
+            placeholder={t("artists.searchPlaceholder")}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="w-full bg-[var(--glass)] border border-[var(--glass-border)] px-6 py-3 rounded-full text-[var(--text-main)] placeholder:text-[var(--text-muted)]/40 focus:outline-none focus:border-[var(--accent)]/50 transition-all"
-            aria-label="Cerca artista per nome o genere"
+            aria-label={t("artists.searchAria")}
           />
         </div>
       </div>
@@ -75,8 +77,8 @@ const ArtistGrid: React.FC<ArtistGridProps> = ({ onArtistClick }) => {
       {!loading && totalCount > 0 && (
         <p className="text-sm text-[var(--text-muted)] mb-6">
           {search.trim()
-            ? `${artists.length} risultati`
-            : `${allArtists.length} di ${totalCount} artisti`}
+            ? t("artists.results", { count: artists.length })
+            : t("artists.countOf", { loaded: allArtists.length, total: totalCount })}
         </p>
       )}
 
@@ -94,7 +96,7 @@ const ArtistGrid: React.FC<ArtistGridProps> = ({ onArtistClick }) => {
 
       {error && (
         <div className="text-center py-24 text-rose-500">
-          <p>Errore nel caricamento: {error.message}</p>
+          <p>{t("artists.loadError")}: {error.message}</p>
         </div>
       )}
 
@@ -113,7 +115,7 @@ const ArtistGrid: React.FC<ArtistGridProps> = ({ onArtistClick }) => {
             ) : (
               <div className="col-span-full py-24 text-center text-[var(--text-muted)]">
                 <p className="text-xl">
-                  Nessun artista trovato con questi filtri.
+                  {t("artists.noResults")}
                 </p>
               </div>
             )}
@@ -136,7 +138,7 @@ const ArtistGrid: React.FC<ArtistGridProps> = ({ onArtistClick }) => {
             ref={sentinelRef}
             className="h-4"
             role="status"
-            aria-label={hasMore ? "Caricamento altri artisti" : ""}
+            aria-label={hasMore ? t("artists.loadingMore") : ""}
           />
         </>
       )}

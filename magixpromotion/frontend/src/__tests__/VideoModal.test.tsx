@@ -12,17 +12,17 @@ import VideoModal, { getEmbedUrl, parseVideoUrl } from "../components/VideoModal
 // --- Unit test per getEmbedUrl ---
 
 describe("getEmbedUrl", () => {
-  it("converte URL YouTube standard in embed nocookie", () => {
+  it("converte URL YouTube standard in embed", () => {
     const url = "https://www.youtube.com/watch?v=EpIhJzo7apY";
     expect(getEmbedUrl(url)).toBe(
-      "https://www.youtube-nocookie.com/embed/EpIhJzo7apY?autoplay=1&rel=0&modestbranding=1"
+      "https://www.youtube.com/embed/EpIhJzo7apY?autoplay=1&rel=0"
     );
   });
 
   it("converte URL youtu.be short link", () => {
     const url = "https://youtu.be/111YapUfdEo";
     expect(getEmbedUrl(url)).toBe(
-      "https://www.youtube-nocookie.com/embed/111YapUfdEo?autoplay=1&rel=0&modestbranding=1"
+      "https://www.youtube.com/embed/111YapUfdEo?autoplay=1&rel=0"
     );
   });
 
@@ -49,8 +49,15 @@ describe("getEmbedUrl", () => {
   });
 
   it("restituisce l'URL se contiene /embed/", () => {
-    const url = "https://www.youtube-nocookie.com/embed/abc123?autoplay=1";
+    const url = "https://www.youtube.com/embed/abc123?autoplay=1";
     expect(getEmbedUrl(url)).toBe(url);
+  });
+
+  it("converte anche URL youtube-nocookie.com", () => {
+    const url = "https://www.youtube-nocookie.com/embed/EpIhJzo7apY";
+    expect(getEmbedUrl(url)).toBe(
+      "https://www.youtube.com/embed/EpIhJzo7apY?autoplay=1&rel=0"
+    );
   });
 });
 
@@ -61,7 +68,7 @@ describe("parseVideoUrl", () => {
     const info = parseVideoUrl("https://www.youtube.com/watch?v=EpIhJzo7apY");
     expect(info).not.toBeNull();
     expect(info!.provider).toBe("youtube");
-    expect(info!.embedUrl).toContain("youtube-nocookie.com/embed/EpIhJzo7apY");
+    expect(info!.embedUrl).toContain("youtube.com/embed/EpIhJzo7apY");
     expect(info!.thumbnailUrl).toBe(
       "https://img.youtube.com/vi/EpIhJzo7apY/maxresdefault.jpg"
     );
@@ -159,7 +166,7 @@ describe("VideoModal", () => {
     expect(iframe).toBeInTheDocument();
     expect(iframe).toHaveAttribute(
       "src",
-      expect.stringContaining("youtube-nocookie.com/embed/EpIhJzo7apY")
+      expect.stringContaining("youtube.com/embed/EpIhJzo7apY")
     );
     expect(iframe).toHaveAttribute("allowFullScreen");
   });
@@ -262,9 +269,19 @@ describe("VideoModal", () => {
     const iframe = screen.getByTitle("Video promo di RED MOON");
     const allowAttr = iframe.getAttribute("allow") || "";
     expect(allowAttr).toContain("autoplay");
-    expect(allowAttr).toContain("fullscreen");
     expect(allowAttr).toContain("accelerometer");
     expect(allowAttr).toContain("gyroscope");
     expect(allowAttr).toContain("encrypted-media");
+    expect(allowAttr).toContain("clipboard-write");
+    expect(allowAttr).toContain("web-share");
+  });
+
+  it("l'iframe ha referrerPolicy strict-origin-when-cross-origin", async () => {
+    const user = userEvent.setup();
+    render(<VideoModal {...defaultProps} />);
+    const playBtn = screen.getByLabelText("Avvia video promo di RED MOON");
+    await user.click(playBtn);
+    const iframe = screen.getByTitle("Video promo di RED MOON");
+    expect(iframe).toHaveAttribute("referrerpolicy", "strict-origin-when-cross-origin");
   });
 });

@@ -8,7 +8,7 @@
  *
  * Caratteristiche:
  * - Lite embed: thumbnail → iframe solo al click (performance + stabilità)
- * - Privacy-enhanced embed (youtube-nocookie.com)
+ * - Embed conforme a YouTube oEmbed spec (youtube.com + strict-origin-when-cross-origin)
  * - Focus trap completo (useFocusTrap)
  * - Chiusura con Escape, click backdrop, pulsante X
  * - Rispetta prefers-reduced-motion
@@ -55,14 +55,14 @@ function getEmbedUrl(url: string): string | null {
 function parseVideoUrl(url: string): VideoInfo | null {
   if (!url) return null;
 
-  // YouTube: youtube.com/watch?v=ID o youtu.be/ID o youtube-nocookie.com/embed/ID
+  // YouTube: youtube.com/watch?v=ID o youtu.be/ID o youtube(-nocookie)?.com/embed/ID
   const ytMatch = url.match(
-    /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube-nocookie\.com\/embed\/)([a-zA-Z0-9_-]{11})/
+    /(?:youtube(?:-nocookie)?\.com\/watch\?v=|youtu\.be\/|youtube(?:-nocookie)?\.com\/embed\/)([a-zA-Z0-9_-]{11})/
   );
   if (ytMatch) {
     const videoId = ytMatch[1];
     return {
-      embedUrl: `https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1`,
+      embedUrl: `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0`,
       thumbnailUrl: `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`,
       provider: "youtube",
     };
@@ -197,9 +197,9 @@ const VideoModal: React.FC<VideoModalProps> = ({
                 src={videoInfo.embedUrl}
                 title={`Video promo di ${artistName}`}
                 className="absolute inset-0 w-full h-full"
-                allow="autoplay; fullscreen; picture-in-picture; encrypted-media; accelerometer; gyroscope"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                 allowFullScreen
-                referrerPolicy="no-referrer"
+                referrerPolicy="strict-origin-when-cross-origin"
               />
             ) : (
               /* Lite embed: thumbnail cliccabile (nessun JS YouTube caricato) */

@@ -1,12 +1,15 @@
 /**
- * ContactsPage — Pagina contatti con informazioni aziendali,
- * mappa OpenStreetMap embed e link social.
+ * ContactsPage — Contacts page with company info,
+ * OpenStreetMap embed and social links.
+ * All text is i18n-aware via useLanguage / t().
  */
 import React from "react";
 import { useSiteSettings } from "@/hooks/useSiteSettings";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { MapPin, Phone, Mail, Globe, Facebook, Youtube } from "lucide-react";
 
 const ContactsPage: React.FC = () => {
+  const { t } = useLanguage();
   const { data: settings } = useSiteSettings();
 
   const companyName = settings?.company_name || "Magix Promotion";
@@ -30,21 +33,21 @@ const ContactsPage: React.FC = () => {
       <div className="text-center mb-16">
         <div className="inline-flex items-center gap-2 px-4 py-2 glass-panel rounded-full text-[var(--accent)] text-sm font-bold tracking-widest mb-6">
           <MapPin size={16} />
-          CONTATTI
+          {t("contacts.badge")}
         </div>
         <h1 className="text-4xl md:text-6xl font-heading font-extrabold tracking-tighter mb-6 text-[var(--text-main)]">
-          PARLIAMO <span className="gradient-text">INSIEME</span>
+          {t("contacts.title")} <span className="gradient-text">{t("contacts.titleAccent")}</span>
         </h1>
         <p className="text-[var(--text-muted)] text-lg max-w-xl mx-auto">
-          Hai un evento da organizzare? Vuoi ingaggiare una band?
+          {t("contacts.subtitle")}
           <br />
-          Contattaci, saremo felici di aiutarti.
+          {t("contacts.subtitleLine2")}
         </p>
       </div>
 
       {/* Info cards */}
       <div className="grid sm:grid-cols-3 gap-6 mb-12">
-        {/* Telefono */}
+        {/* Phone */}
         <a
           href={`tel:${phone.replace(/\s/g, "")}`}
           className="glass-panel rounded-2xl p-6 border border-[var(--glass-border)] flex flex-col items-center gap-3 hover:border-[var(--accent)] transition-colors group"
@@ -52,7 +55,7 @@ const ContactsPage: React.FC = () => {
           <div className="w-12 h-12 rounded-full bg-[var(--accent)]/15 flex items-center justify-center text-[var(--accent)] group-hover:scale-110 transition-transform">
             <Phone size={22} />
           </div>
-          <span className="text-sm text-[var(--text-muted)]">Telefono</span>
+          <span className="text-sm text-[var(--text-muted)]">{t("contacts.phone")}</span>
           <span className="text-[var(--text-main)] font-bold text-sm">{phone}</span>
         </a>
 
@@ -64,11 +67,11 @@ const ContactsPage: React.FC = () => {
           <div className="w-12 h-12 rounded-full bg-[var(--accent)]/15 flex items-center justify-center text-[var(--accent)] group-hover:scale-110 transition-transform">
             <Mail size={22} />
           </div>
-          <span className="text-sm text-[var(--text-muted)]">Email</span>
+          <span className="text-sm text-[var(--text-muted)]">{t("contacts.email")}</span>
           <span className="text-[var(--text-main)] font-bold text-sm">{email}</span>
         </a>
 
-        {/* Indirizzo */}
+        {/* Address */}
         <a
           href={mapLinkUrl}
           target="_blank"
@@ -78,15 +81,15 @@ const ContactsPage: React.FC = () => {
           <div className="w-12 h-12 rounded-full bg-[var(--accent)]/15 flex items-center justify-center text-[var(--accent)] group-hover:scale-110 transition-transform">
             <Globe size={22} />
           </div>
-          <span className="text-sm text-[var(--text-muted)]">Sede</span>
+          <span className="text-sm text-[var(--text-muted)]">{t("contacts.office")}</span>
           <span className="text-[var(--text-main)] font-bold text-sm text-center leading-snug">{addressStr}</span>
         </a>
       </div>
 
-      {/* Mappa OpenStreetMap */}
+      {/* OpenStreetMap */}
       <div className="glass-panel rounded-[2rem] overflow-hidden border border-[var(--glass-border)] mb-12">
         <iframe
-          title={`Mappa sede ${companyName}`}
+          title={t("contacts.mapTitle", { companyName })}
           width="100%"
           height="350"
           src={mapUrl}
@@ -96,7 +99,7 @@ const ContactsPage: React.FC = () => {
         <div className="px-6 py-4 flex items-center gap-2 text-sm text-[var(--text-muted)]">
           <MapPin size={14} className="text-[var(--accent)]" />
           <a href={mapLinkUrl} target="_blank" rel="noopener noreferrer" className="hover:text-[var(--accent)] transition-colors">
-            Apri mappa completa su OpenStreetMap
+            {t("contacts.openMap")}
           </a>
         </div>
       </div>
@@ -104,7 +107,7 @@ const ContactsPage: React.FC = () => {
       {/* Social */}
       {(facebook || youtube) && (
         <div className="glass-panel rounded-2xl p-8 border border-[var(--glass-border)] text-center">
-          <h2 className="text-lg font-bold text-[var(--text-main)] mb-5 tracking-wide">SEGUICI</h2>
+          <h2 className="text-lg font-bold text-[var(--text-main)] mb-5 tracking-wide">{t("contacts.followUs")}</h2>
           <div className="flex items-center justify-center gap-6">
             {facebook && (
               <a

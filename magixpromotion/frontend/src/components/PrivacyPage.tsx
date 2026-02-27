@@ -1,12 +1,14 @@
 /**
- * PrivacyPage — Informativa privacy conforme GDPR.
- * Contenuto statico con dati aziendali dal CMS (SiteSettings).
+ * PrivacyPage — Privacy policy page, GDPR compliant.
+ * All text is i18n-aware via useLanguage / t().
  */
 import React from "react";
 import { useSiteSettings } from "@/hooks/useSiteSettings";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { Shield } from "lucide-react";
 
 const PrivacyPage: React.FC = () => {
+  const { t } = useLanguage();
   const { data: settings } = useSiteSettings();
   const companyName = settings?.company_name || "Magix Promotion";
   const email = settings?.email || "info@magixpromotion.it";
@@ -21,23 +23,23 @@ const PrivacyPage: React.FC = () => {
       <div className="text-center mb-16">
         <div className="inline-flex items-center gap-2 px-4 py-2 glass-panel rounded-full text-[var(--accent)] text-sm font-bold tracking-widest mb-6">
           <Shield size={16} />
-          INFORMATIVA
+          {t("privacy.badge")}
         </div>
         <h1 className="text-4xl md:text-6xl font-heading font-extrabold tracking-tighter mb-6 text-[var(--text-main)]">
-          PRIVACY <span className="gradient-text">POLICY</span>
+          {t("privacy.title")} <span className="gradient-text">{t("privacy.titleAccent")}</span>
         </h1>
         <p className="text-[var(--text-muted)] text-lg max-w-xl mx-auto">
-          Informativa sul trattamento dei dati personali ai sensi del Regolamento UE 2016/679 (GDPR).
+          {t("privacy.subtitle")}
         </p>
       </div>
 
-      {/* Contenuto */}
+      {/* Content */}
       <div className="glass-panel rounded-[2rem] p-8 md:p-12 border border-[var(--glass-border)]">
         <div className="prose-custom flex flex-col gap-10 text-[var(--text-muted)] leading-relaxed">
           <section>
             <h2 className="text-xl font-bold text-[var(--text-main)] mb-3 flex items-center gap-2">
               <div className="w-8 h-[2px] bg-[var(--accent)]" />
-              TITOLARE DEL TRATTAMENTO
+              {t("privacy.controller")}
             </h2>
             <p>
               <strong className="text-[var(--text-main)]">{companyName}</strong>
@@ -49,73 +51,58 @@ const PrivacyPage: React.FC = () => {
           <section>
             <h2 className="text-xl font-bold text-[var(--text-main)] mb-3 flex items-center gap-2">
               <div className="w-8 h-[2px] bg-[var(--accent)]" />
-              DATI RACCOLTI
+              {t("privacy.dataCollected")}
             </h2>
-            <p>
-              Il sito raccoglie i seguenti dati personali esclusivamente attraverso il form di richiesta preventivo:
-            </p>
+            <p>{t("privacy.dataCollectedIntro")}</p>
             <ul className="list-disc list-inside mt-3 flex flex-col gap-1.5">
-              <li>Nome e cognome</li>
-              <li>Indirizzo email</li>
-              <li>Numero di telefono (facoltativo)</li>
-              <li>Informazioni sull'evento (tipologia, data, luogo)</li>
-              <li>Messaggio libero (facoltativo)</li>
+              <li>{t("privacy.dataName")}</li>
+              <li>{t("privacy.dataEmail")}</li>
+              <li>{t("privacy.dataPhone")}</li>
+              <li>{t("privacy.dataEvent")}</li>
+              <li>{t("privacy.dataMessage")}</li>
             </ul>
           </section>
 
           <section>
             <h2 className="text-xl font-bold text-[var(--text-main)] mb-3 flex items-center gap-2">
               <div className="w-8 h-[2px] bg-[var(--accent)]" />
-              FINALITÀ DEL TRATTAMENTO
+              {t("privacy.purpose")}
             </h2>
-            <p>
-              I dati sono trattati esclusivamente per rispondere alle richieste di preventivo,
-              gestire le comunicazioni relative ai servizi di booking e management artistico,
-              e adempiere agli obblighi di legge.
-            </p>
+            <p>{t("privacy.purposeText")}</p>
           </section>
 
           <section>
             <h2 className="text-xl font-bold text-[var(--text-main)] mb-3 flex items-center gap-2">
               <div className="w-8 h-[2px] bg-[var(--accent)]" />
-              BASE GIURIDICA
+              {t("privacy.legalBasis")}
             </h2>
-            <p>
-              Il trattamento è basato sul consenso dell'interessato (art. 6.1.a GDPR),
-              espresso tramite l'accettazione dell'informativa nel form di contatto,
-              e sull'esecuzione di misure precontrattuali (art. 6.1.b GDPR).
-            </p>
+            <p>{t("privacy.legalBasisText")}</p>
           </section>
 
           <section>
             <h2 className="text-xl font-bold text-[var(--text-main)] mb-3 flex items-center gap-2">
               <div className="w-8 h-[2px] bg-[var(--accent)]" />
-              CONSERVAZIONE DEI DATI
+              {t("privacy.retention")}
             </h2>
-            <p>
-              I dati personali sono conservati per il tempo necessario all'evasione della richiesta
-              e comunque non oltre 24 mesi dalla raccolta, salvo obblighi di legge.
-            </p>
+            <p>{t("privacy.retentionText")}</p>
           </section>
 
           <section>
             <h2 className="text-xl font-bold text-[var(--text-main)] mb-3 flex items-center gap-2">
               <div className="w-8 h-[2px] bg-[var(--accent)]" />
-              DIRITTI DELL'INTERESSATO
+              {t("privacy.rights")}
             </h2>
-            <p>
-              In qualsiasi momento puoi esercitare i diritti previsti dagli artt. 15-22 del GDPR:
-            </p>
+            <p>{t("privacy.rightsIntro")}</p>
             <ul className="list-disc list-inside mt-3 flex flex-col gap-1.5">
-              <li>Accesso ai propri dati personali</li>
-              <li>Rettifica o cancellazione</li>
-              <li>Limitazione del trattamento</li>
-              <li>Portabilità dei dati</li>
-              <li>Opposizione al trattamento</li>
-              <li>Revoca del consenso</li>
+              <li>{t("privacy.rightAccess")}</li>
+              <li>{t("privacy.rightRectification")}</li>
+              <li>{t("privacy.rightRestriction")}</li>
+              <li>{t("privacy.rightPortability")}</li>
+              <li>{t("privacy.rightObjection")}</li>
+              <li>{t("privacy.rightWithdraw")}</li>
             </ul>
             <p className="mt-3">
-              Per esercitare i tuoi diritti, scrivi a{" "}
+              {t("privacy.rightsContact")}{" "}
               <a href={`mailto:${email}`} className="text-[var(--accent)] hover:underline">{email}</a>.
             </p>
           </section>
@@ -123,13 +110,9 @@ const PrivacyPage: React.FC = () => {
           <section>
             <h2 className="text-xl font-bold text-[var(--text-main)] mb-3 flex items-center gap-2">
               <div className="w-8 h-[2px] bg-[var(--accent)]" />
-              COOKIE
+              {t("privacy.cookies")}
             </h2>
-            <p>
-              Questo sito utilizza esclusivamente cookie tecnici necessari al funzionamento
-              (preferenza tema, nessun cookie di profilazione o di terze parti).
-              Non è richiesto il consenso ai sensi dell'art. 122 del Codice Privacy.
-            </p>
+            <p>{t("privacy.cookiesText")}</p>
           </section>
         </div>
       </div>

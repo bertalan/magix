@@ -1,5 +1,6 @@
 import React from "react";
 import { fetchArtists } from "@/lib/api";
+import { useLanguage } from "@/contexts/LanguageContext";
 import type { Artist } from "@/types";
 import { Search, Lock, ChevronDown } from "lucide-react";
 
@@ -28,6 +29,7 @@ const ArtistAutocomplete: React.FC<ArtistAutocompleteProps> = ({
   locked = false,
   className = "",
 }) => {
+  const { lang } = useLanguage();
   const [artists, setArtists] = React.useState<Artist[]>([]);
   const [isOpen, setIsOpen] = React.useState(false);
   const [highlightIndex, setHighlightIndex] = React.useState(-1);
@@ -37,7 +39,7 @@ const ArtistAutocomplete: React.FC<ArtistAutocompleteProps> = ({
   // Carica la lista artisti al mount
   React.useEffect(() => {
     let cancelled = false;
-    fetchArtists({ limit: 50 })
+    fetchArtists({ limit: 50, locale: lang })
       .then((res) => {
         if (!cancelled) {
           setArtists(res.items);

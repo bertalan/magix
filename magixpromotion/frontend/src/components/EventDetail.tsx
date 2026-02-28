@@ -162,6 +162,7 @@ const EventDetail: React.FC<EventDetailProps> = ({
       artist: event.artist.slug,
       date_from: today,
       limit: 6,
+      locale: lang,
     }).then((res) => {
       // Escludi l'evento corrente
       setRelatedEvents(res.items.filter((e) => e.id !== event.id));

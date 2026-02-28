@@ -111,7 +111,7 @@ const App: React.FC = () => {
     const artistSlug = parseArtistSlugFromPath();
     if (artistSlug) {
       setLoadingArtist(true);
-      fetchArtistBySlug(artistSlug)
+      fetchArtistBySlug(artistSlug, lang)
         .then((artist) => {
           if (artist) {
             setSelectedArtist(artist);
@@ -126,7 +126,7 @@ const App: React.FC = () => {
     if (eventSlug) {
       // Fetch the event and open the detail page
       setLoadingEvent(true);
-      fetchEventBySlug(eventSlug)
+      fetchEventBySlug(eventSlug, lang)
         .then((event) => {
           if (event) {
             setSelectedEvent(event);
@@ -154,7 +154,7 @@ const App: React.FC = () => {
       if (stateLang !== lang) setLang(stateLang);
 
       if (state?.view === "DETAIL" && state.slug) {
-        fetchArtistBySlug(state.slug).then((artist) => {
+        fetchArtistBySlug(state.slug, lang).then((artist) => {
           if (artist) {
             setSelectedArtist(artist);
             setActiveView("DETAIL");
@@ -162,7 +162,7 @@ const App: React.FC = () => {
         });
       } else if (state?.view === "EVENTS" && state.slug) {
         setSelectedArtist(null);
-        fetchEventBySlug(state.slug).then((event) => {
+        fetchEventBySlug(state.slug, lang).then((event) => {
           if (event) {
             setSelectedEvent(event);
             setActiveView("EVENTS");
@@ -257,7 +257,7 @@ const App: React.FC = () => {
   /** Apri dettaglio evento da slug (es. da ArtistDetail). Fetcha l'evento completo. */
   const handleEventClickBySlug = (slug: string) => {
     setLoadingEvent(true);
-    fetchEventBySlug(slug)
+    fetchEventBySlug(slug, lang)
       .then((ev) => {
         if (ev) {
           setSelectedEvent(ev);

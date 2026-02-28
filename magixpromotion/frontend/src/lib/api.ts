@@ -75,9 +75,10 @@ export async function fetchArtist(id: number): Promise<Artist> {
  * Uses the Wagtail ?slug= filter on the list endpoint.
  * Returns null if not found.
  */
-export async function fetchArtistBySlug(slug: string): Promise<Artist | null> {
+export async function fetchArtistBySlug(slug: string, locale?: string): Promise<Artist | null> {
   const params = new URLSearchParams();
   params.set("slug", slug);
+  if (locale) params.set("locale", locale);
   params.set(
     "fields",
     "short_bio,artist_type,image_url,image_thumb,gallery_images,gallery_thumbs,genre_display,tags,socials,events,tribute_to,hero_video_url,base_country,base_region,base_city",
@@ -93,9 +94,10 @@ export async function fetchArtistBySlug(slug: string): Promise<Artist | null> {
  * Uses the Wagtail ?slug= filter on the list endpoint.
  * Returns null if not found.
  */
-export async function fetchEventBySlug(slug: string): Promise<EventPage | null> {
+export async function fetchEventBySlug(slug: string, locale?: string): Promise<EventPage | null> {
   const params = new URLSearchParams();
   params.set("slug", slug);
+  if (locale) params.set("locale", locale);
   params.set(
     "fields",
     "start_date,end_date,doors_time,start_time,status,ticket_url,ticket_price,description,venue,artist,featured_image_url",

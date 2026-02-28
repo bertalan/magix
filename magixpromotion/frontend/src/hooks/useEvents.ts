@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback, useRef } from "react";
 import { fetchEvents } from "@/lib/api";
+import { useLanguage } from "@/contexts/LanguageContext";
 import type { EventPage, WagtailListResponse } from "@/types";
 
 /** Parametri filtro eventi (senza offset/limit, gestiti internamente) */
@@ -30,6 +31,7 @@ const PAGE_SIZE = 6;
  * - `error`: eventuale errore
  */
 export function useEvents(filters?: EventFilterParams) {
+  const { lang } = useLanguage();
   const [items, setItems] = useState<EventPage[]>([]);
   const [totalCount, setTotalCount] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -47,7 +49,7 @@ export function useEvents(filters?: EventFilterParams) {
     setLoading(true);
     setError(null);
 
-    fetchEvents({ ...filters, limit: PAGE_SIZE, offset: 0 })
+    fetchEvents({ ...filters, limit: PAGE_SIZE, offset: 0, locale: lang })
       .then((res) => {
         if (!cancelled) {
           setItems(res.items);
@@ -66,7 +68,7 @@ export function useEvents(filters?: EventFilterParams) {
       cancelled = true;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filterKey]);
+  }, [filterKey, lang]);
 
   const hasMore = items.length < totalCount;
 
@@ -75,7 +77,7 @@ export function useEvents(filters?: EventFilterParams) {
     if (loadingMore || !hasMore) return;
     setLoadingMore(true);
 
-    fetchEvents({ ...filters, limit: PAGE_SIZE, offset: offsetRef.current })
+    fetchEvents({ ...filters, limit: PAGE_SIZE, offset: offsetRef.current, locale: lang })
       .then((res) => {
         setItems((prev) => [...prev, ...res.items]);
         setTotalCount(res.meta.total_count);
@@ -88,7 +90,7 @@ export function useEvents(filters?: EventFilterParams) {
         setLoadingMore(false);
       });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [loadingMore, hasMore, filterKey]);
+  }, [loadingMore, hasMore, filterKey, lang]);
 
   // Retrocompatibilità: esponi anche `data` nella forma WagtailListResponse
   const data: WagtailListResponse<EventPage> | null =

@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback, useRef, useMemo } from "react";
 import { fetchArtists, fetchArtist } from "@/lib/api";
+import { useLanguage } from "@/contexts/LanguageContext";
 import type { Artist, WagtailListResponse } from "@/types";
 
 /** Parametri filtro (senza offset/limit, gestiti internamente) */
@@ -31,6 +32,7 @@ function todaySeed(): string {
  * - `error`: eventuale errore
  */
 export function useArtists(filters?: ArtistFilterParams) {
+  const { lang } = useLanguage();
   const [items, setItems] = useState<Artist[]>([]);
   const [totalCount, setTotalCount] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -52,7 +54,7 @@ export function useArtists(filters?: ArtistFilterParams) {
     setLoading(true);
     setError(null);
 
-    fetchArtists({ ...filters, limit: PAGE_SIZE, offset: 0, daily_seed: seed })
+    fetchArtists({ ...filters, limit: PAGE_SIZE, offset: 0, daily_seed: seed, locale: lang })
       .then((res) => {
         if (!cancelled) {
           setItems(res.items);
@@ -71,7 +73,7 @@ export function useArtists(filters?: ArtistFilterParams) {
       cancelled = true;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filterKey]);
+  }, [filterKey, lang]);
 
   const hasMore = items.length < totalCount;
 
@@ -80,7 +82,7 @@ export function useArtists(filters?: ArtistFilterParams) {
     if (loadingMore || !hasMore) return;
     setLoadingMore(true);
 
-    fetchArtists({ ...filters, limit: PAGE_SIZE, offset: offsetRef.current, daily_seed: seed })
+    fetchArtists({ ...filters, limit: PAGE_SIZE, offset: offsetRef.current, daily_seed: seed, locale: lang })
       .then((res) => {
         setItems((prev) => [...prev, ...res.items]);
         setTotalCount(res.meta.total_count);
@@ -93,7 +95,7 @@ export function useArtists(filters?: ArtistFilterParams) {
         setLoadingMore(false);
       });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [loadingMore, hasMore, filterKey]);
+  }, [loadingMore, hasMore, filterKey, lang]);
 
   // Retrocompatibilità: esponi anche `data` nella forma WagtailListResponse
   const data: WagtailListResponse<Artist> | null =

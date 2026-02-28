@@ -1,6 +1,8 @@
 import React from "react";
-import { Artist, EventPage, SiteSettings } from "@/types";
+import { Artist, EventPage, SiteSettings, WagtailListResponse } from "@/types";
 import { ROUTE_SLUGS } from "@/lib/routes";
+
+const API_BASE = "/api/v2";
 
 /**
  * Inietta un <script type="application/ld+json"> nel DOM.
@@ -334,22 +336,53 @@ export const HomepageJsonLd: React.FC<{ settings?: SiteSettings | null }> = ({ s
   return null;
 };
 
-/** Inietta JSON-LD ItemList per la pagina roster artisti. */
-export const RosterJsonLd: React.FC<{ artists: Artist[]; totalCount: number; lang?: "it" | "en" }> = ({ artists, totalCount, lang = "it" }) => {
+/**
+ * Inietta JSON-LD ItemList per la pagina roster artisti.
+ * Esegue un fetch autonomo con limit=50 per avere tutti gli artisti nel JSON-LD,
+ * indipendentemente da quanti ne ha caricati l'infinite scroll.
+ */
+export const RosterJsonLd: React.FC<{ lang?: "it" | "en" }> = ({ lang = "it" }) => {
   React.useEffect(() => {
-    if (artists.length === 0) return;
-    injectJsonLd(rosterToJsonLd(artists, totalCount, undefined, lang));
+    const params = new URLSearchParams();
+    params.set("limit", "50");
+    params.set("locale", lang);
+    params.set("fields", "short_bio,image_url,genre_display");
+
+    fetch(`${API_BASE}/artists/?${params.toString()}`)
+      .then((r) => r.ok ? r.json() as Promise<WagtailListResponse<Artist>> : null)
+      .then((res) => {
+        if (res && res.items.length > 0) {
+          injectJsonLd(rosterToJsonLd(res.items, res.meta.total_count, undefined, lang));
+        }
+      })
+      .catch(() => { /* non-blocking — SEO opzionale */ });
+
     return removeJsonLd;
-  }, [artists.length, totalCount, lang]);
+  }, [lang]);
   return null;
 };
 
-/** Inietta JSON-LD ItemList per la pagina lista eventi. */
-export const EventsListJsonLd: React.FC<{ events: EventPage[]; totalCount: number; lang?: "it" | "en" }> = ({ events, totalCount, lang = "it" }) => {
+/**
+ * Inietta JSON-LD ItemList per la pagina lista eventi.
+ * Esegue un fetch autonomo con limit=50 per avere tutti gli eventi nel JSON-LD.
+ */
+export const EventsListJsonLd: React.FC<{ lang?: "it" | "en" }> = ({ lang = "it" }) => {
   React.useEffect(() => {
-    if (events.length === 0) return;
-    injectJsonLd(eventsListToJsonLd(events, totalCount, undefined, lang));
+    const params = new URLSearchParams();
+    params.set("limit", "50");
+    params.set("locale", lang);
+    params.set("fields", "start_date,venue,artist,featured_image_url,status");
+
+    fetch(`${API_BASE}/events/?${params.toString()}`)
+      .then((r) => r.ok ? r.json() as Promise<WagtailListResponse<EventPage>> : null)
+      .then((res) => {
+        if (res && res.items.length > 0) {
+          injectJsonLd(eventsListToJsonLd(res.items, res.meta.total_count, undefined, lang));
+        }
+      })
+      .catch(() => { /* non-blocking — SEO opzionale */ });
+
     return removeJsonLd;
-  }, [events.length, totalCount, lang]);
+  }, [lang]);
   return null;
 };

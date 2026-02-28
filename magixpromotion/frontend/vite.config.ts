@@ -34,7 +34,18 @@ export default defineConfig(({ mode }) => {
     },
     build: {
       outDir: "dist",
-      sourcemap: true,
+      sourcemap: false, // no sourcemaps in production (saves 1.4 MB)
+      cssCodeSplit: false, // single CSS file (already small at ~7 KB gzip)
+      rollupOptions: {
+        output: {
+          manualChunks: {
+            // Vendor chunk — cached independently from app code
+            vendor: ["react", "react-dom", "scheduler"],
+            // i18n chunk — translations change rarely
+            i18n: ["i18next", "react-i18next"],
+          },
+        },
+      },
     },
     test: {
       globals: true,

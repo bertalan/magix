@@ -13,6 +13,8 @@ interface ProgressiveImageProps {
   transitionMs?: number;
   /** Attributo loading nativo */
   loading?: "lazy" | "eager";
+  /** fetchpriority for LCP images */
+  fetchPriority?: "high" | "low" | "auto";
   /** Disabilita l'effetto progressivo (utile per reduced-motion) */
   disableProgressive?: boolean;
   ariaHidden?: boolean;
@@ -37,6 +39,7 @@ const ProgressiveImage: React.FC<ProgressiveImageProps> = ({
   blurClassName = "",
   transitionMs = 700,
   loading = "lazy",
+  fetchPriority,
   disableProgressive = false,
   ariaHidden,
 }) => {
@@ -76,6 +79,7 @@ const ProgressiveImage: React.FC<ProgressiveImageProps> = ({
         alt={alt}
         loading={loading}
         decoding="async"
+        fetchPriority={fetchPriority}
         onLoad={handleLoad}
         className={`${className} transition-opacity duration-500 ${loaded ? "opacity-100" : "opacity-0"}`}
         aria-hidden={ariaHidden}
@@ -118,6 +122,7 @@ const ProgressiveImage: React.FC<ProgressiveImageProps> = ({
         alt={alt}
         loading={loading}
         decoding="async"
+        fetchPriority={fetchPriority}
         onLoad={handleLoad}
         className={`absolute inset-0 w-full h-full object-cover ${className}`}
         style={{

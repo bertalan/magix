@@ -8,9 +8,11 @@ import VideoModal from "./VideoModal";
 interface ArtistCardProps {
   artist: Artist;
   onClick: () => void;
+  /** Above-the-fold priority for LCP */
+  priority?: boolean;
 }
 
-const ArtistCard: React.FC<ArtistCardProps> = ({ artist, onClick }) => {
+const ArtistCard: React.FC<ArtistCardProps> = ({ artist, onClick, priority }) => {
   const [showVideo, setShowVideo] = React.useState(false);
 
   // Costruisci array immagini paired: full-res + LQIP thumb
@@ -73,7 +75,8 @@ const ArtistCard: React.FC<ArtistCardProps> = ({ artist, onClick }) => {
             className={`transition-all duration-700 group-hover:scale-110 grayscale group-hover:grayscale-0 opacity-60 group-hover:opacity-100 ${
               transitioning ? "animate-fade-in" : ""
             }`}
-            loading="lazy"
+            loading={priority ? "eager" : "lazy"}
+            fetchPriority={priority ? "high" : undefined}
           />
         </>
       ) : (

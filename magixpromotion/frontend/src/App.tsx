@@ -6,16 +6,18 @@ import { useSiteSettings } from "@/hooks/useSiteSettings";
 import Layout from "./components/Layout";
 import HomePage from "./components/HomePage";
 import ArtistGrid from "./components/ArtistGrid";
-import ArtistDetail from "./components/ArtistDetail";
-import EventDetail from "./components/EventDetail";
-import EventsPage from "./components/EventsPage";
 import Analytics from "./components/Analytics";
-import BookingPage from "./components/BookingPage";
-import BandFinder from "./components/BandFinder";
-import PrivacyPage from "./components/PrivacyPage";
-import TermsPage from "./components/TermsPage";
-import ContactsPage from "./components/ContactsPage";
 import { ROUTE_SLUGS } from "@/lib/routes";
+
+/* ── Lazy-loaded routes (code-split into separate chunks) ── */
+const ArtistDetail = React.lazy(() => import("./components/ArtistDetail"));
+const EventDetail = React.lazy(() => import("./components/EventDetail"));
+const EventsPage = React.lazy(() => import("./components/EventsPage"));
+const BookingPage = React.lazy(() => import("./components/BookingPage"));
+const BandFinder = React.lazy(() => import("./components/BandFinder"));
+const PrivacyPage = React.lazy(() => import("./components/PrivacyPage"));
+const TermsPage = React.lazy(() => import("./components/TermsPage"));
+const ContactsPage = React.lazy(() => import("./components/ContactsPage"));
 
 /** Parse the URL path to detect an artist slug (/it/artisti/:slug or /en/artists/:slug). */
 function parseArtistSlugFromPath(): string | null {
@@ -336,36 +338,45 @@ const App: React.FC = () => {
         currentPath={window.location.pathname}
       />
 
-      {renderView()}
+      {/* Suspense boundary for lazy-loaded route chunks */}
+      <React.Suspense
+        fallback={
+          <div className="flex items-center justify-center py-32">
+            <div className="w-10 h-10 border-4 border-[var(--accent)] border-t-transparent rounded-full animate-spin" />
+          </div>
+        }
+      >
+        {renderView()}
 
-      {/* EventDetail overlay */}
-      {selectedEvent && (
-        <EventDetail
-          event={selectedEvent}
-          onClose={handleCloseEventDetail}
-          onArtistClick={handleArtistClickById}
-          onEventClick={handleEventClick}
-          onBookArtist={handleBookArtist}
-          setView={setView}
-        />
-      )}
+        {/* EventDetail overlay */}
+        {selectedEvent && (
+          <EventDetail
+            event={selectedEvent}
+            onClose={handleCloseEventDetail}
+            onArtistClick={handleArtistClickById}
+            onEventClick={handleEventClick}
+            onBookArtist={handleBookArtist}
+            setView={setView}
+          />
+        )}
+
+        {/* ArtistDetail overlay (renders on top when DETAIL view is active) */}
+        {activeView === "DETAIL" && selectedArtist && (
+          <ArtistDetail
+            artist={selectedArtist}
+            onClose={handleCloseDetail}
+            setView={setView}
+            onBookArtist={handleBookArtist}
+            onEventClick={handleEventClickBySlug}
+          />
+        )}
+      </React.Suspense>
 
       {/* Loading overlay when fetching artist or event from URL */}
       {(loadingArtist || loadingEvent) && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center bg-[var(--bg-color)]">
           <div className="w-12 h-12 border-4 border-[var(--accent)] border-t-transparent rounded-full animate-spin" />
         </div>
-      )}
-
-      {/* ArtistDetail overlay (renders on top when DETAIL view is active) */}
-      {activeView === "DETAIL" && selectedArtist && (
-        <ArtistDetail
-          artist={selectedArtist}
-          onClose={handleCloseDetail}
-          setView={setView}
-          onBookArtist={handleBookArtist}
-          onEventClick={handleEventClickBySlug}
-        />
       )}
     </Layout>
   );

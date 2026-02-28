@@ -109,11 +109,12 @@ const ArtistGrid: React.FC<ArtistGridProps> = ({ onArtistClick }) => {
         <>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-12">
             {artists.length > 0 ? (
-              artists.map((artist) => (
+              artists.map((artist, idx) => (
                 <ArtistCard
                   key={artist.id}
                   artist={artist}
                   onClick={() => onArtistClick(artist)}
+                  priority={idx < 3}
                 />
               ))
             ) : (

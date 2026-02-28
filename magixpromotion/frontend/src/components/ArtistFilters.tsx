@@ -1,4 +1,5 @@
 import React from "react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface ArtistFiltersProps {
   artistTypes: string[];
@@ -6,13 +7,14 @@ interface ArtistFiltersProps {
   onTypeChange: (type: string) => void;
 }
 
-const TYPE_LABELS: Record<string, string> = {
-  ALL: "TUTTI",
-  show_band: "SHOW BAND",
-  tribute: "TRIBUTO",
-  original: "ORIGINALE",
-  dj: "DJ",
-  cover: "COVER",
+/** Map artist_type API values to i18n keys under artists.* */
+const TYPE_I18N_KEYS: Record<string, string> = {
+  ALL: "artists.allTypes",
+  show_band: "artists.typeShowBand",
+  tribute: "artists.typeTribute",
+  original: "artists.typeOriginal",
+  dj: "artists.typeDj",
+  cover: "artists.typeCover",
 };
 
 const ArtistFilters: React.FC<ArtistFiltersProps> = ({
@@ -20,19 +22,21 @@ const ArtistFilters: React.FC<ArtistFiltersProps> = ({
   activeType,
   onTypeChange,
 }) => {
+  const { t } = useLanguage();
+
   return (
     <div className="flex flex-wrap gap-2">
-      {artistTypes.map((t) => (
+      {artistTypes.map((type) => (
         <button
-          key={t}
-          onClick={() => onTypeChange(t)}
+          key={type}
+          onClick={() => onTypeChange(type)}
           className={`px-4 py-2 rounded-full text-xs font-bold tracking-widest transition-all ${
-            activeType === t
+            activeType === type
               ? "bg-[var(--accent)] text-[var(--bg-color)] shadow-lg shadow-[var(--accent)]/20"
               : "bg-[var(--glass)] text-[var(--text-muted)] hover:bg-[var(--glass-border)]"
           }`}
         >
-          {TYPE_LABELS[t] || t.toUpperCase()}
+          {TYPE_I18N_KEYS[type] ? t(TYPE_I18N_KEYS[type]) : type.toUpperCase()}
         </button>
       ))}
     </div>

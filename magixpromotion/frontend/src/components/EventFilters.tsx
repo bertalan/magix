@@ -1,4 +1,5 @@
 import React from "react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface EventFiltersProps {
   cities: string[];
@@ -16,6 +17,8 @@ const EventFilters: React.FC<EventFiltersProps> = ({
   activeCity,
   onCityChange,
 }) => {
+  const { t } = useLanguage();
+
   if (cities.length <= 1) return null;
 
   return (
@@ -30,7 +33,7 @@ const EventFilters: React.FC<EventFiltersProps> = ({
               : "border-[var(--glass-border)] text-[var(--text-muted)] hover:border-[var(--text-muted)]"
           }`}
         >
-          {city === "ALL" ? "TUTTE LE CITTA'" : city.toUpperCase()}
+          {city === "ALL" ? t("events.allCities") : city.toUpperCase()}
         </button>
       ))}
     </div>

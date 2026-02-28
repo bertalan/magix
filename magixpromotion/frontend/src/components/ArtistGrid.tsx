@@ -5,13 +5,14 @@ import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import { useLanguage } from "@/contexts/LanguageContext";
 import ArtistCard from "./ArtistCard";
 import ArtistFilters from "./ArtistFilters";
+import { RosterJsonLd } from "./JsonLdScript";
 
 interface ArtistGridProps {
   onArtistClick: (artist: Artist) => void;
 }
 
 const ArtistGrid: React.FC<ArtistGridProps> = ({ onArtistClick }) => {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
   const [search, setSearch] = React.useState("");
   const [typeFilter, setTypeFilter] = React.useState("ALL");
 
@@ -47,6 +48,9 @@ const ArtistGrid: React.FC<ArtistGridProps> = ({ onArtistClick }) => {
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-24">
+      {/* SEO: JSON-LD ItemList per il roster */}
+      <RosterJsonLd artists={allArtists} totalCount={totalCount} lang={lang} />
+
       {/* Header con titolo e filtri */}
       <div className="flex flex-col md:flex-row justify-between items-end gap-8 mb-16">
         <div>

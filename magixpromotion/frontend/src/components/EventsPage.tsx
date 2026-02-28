@@ -5,6 +5,7 @@ import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import { useLanguage } from "@/contexts/LanguageContext";
 import EventCard from "./EventCard";
 import EventFilters from "./EventFilters";
+import { EventsListJsonLd } from "./JsonLdScript";
 import { Calendar } from "lucide-react";
 
 interface EventsPageProps {
@@ -73,6 +74,9 @@ const EventsPage: React.FC<EventsPageProps> = ({ setView: _setView, onArtistClic
 
   return (
     <div className="max-w-5xl mx-auto px-6 py-24">
+      {/* SEO: JSON-LD ItemList per gli eventi */}
+      <EventsListJsonLd events={events} totalCount={totalCount} lang={lang} />
+
       {/* Page header */}
       <div className="mb-16">
         <div className="flex items-center gap-3 mb-4">

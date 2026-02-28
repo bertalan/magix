@@ -162,6 +162,109 @@ export function eventToJsonLd(event: EventPage, siteUrl = "https://www.magixprom
   return data;
 }
 
+/**
+ * Schema.org/ItemList di MusicGroup per la pagina roster artisti.
+ * Google può generare rich results carousel da una ItemList.
+ * Include al massimo 50 elementi (limite ragionevole per structured data).
+ */
+export function rosterToJsonLd(
+  artists: Artist[],
+  totalCount: number,
+  siteUrl = "https://www.magixpromotion.com",
+  lang: "it" | "en" = "it",
+): Record<string, unknown> {
+  const slugs = ROUTE_SLUGS[lang];
+  const listName = lang === "it"
+    ? "Roster Artisti — Magix Promotion"
+    : "Artist Roster — Magix Promotion";
+
+  return {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    "name": listName,
+    "description": lang === "it"
+      ? "Band e artisti musicali per eventi, concerti e feste private."
+      : "Bands and music artists for events, concerts and private parties.",
+    "url": `${siteUrl}/${lang}/${slugs.artists}/`,
+    "numberOfItems": totalCount,
+    "itemListElement": artists.slice(0, 50).map((artist, index) => {
+      const item: Record<string, unknown> = {
+        "@type": "MusicGroup",
+        "name": artist.title,
+        "url": `${siteUrl}/${lang}/${slugs.artists}/${artist.meta.slug}/`,
+      };
+      if (artist.image_url) item["image"] = artist.image_url;
+      if (artist.genre_display) item["genre"] = [artist.genre_display];
+      if (artist.short_bio) item["description"] = artist.short_bio.slice(0, 160);
+      return {
+        "@type": "ListItem",
+        "position": index + 1,
+        "item": item,
+      };
+    }),
+  };
+}
+
+/**
+ * Schema.org/ItemList di MusicEvent per la pagina lista eventi.
+ * Include al massimo 50 elementi.
+ */
+export function eventsListToJsonLd(
+  events: EventPage[],
+  totalCount: number,
+  siteUrl = "https://www.magixpromotion.com",
+  lang: "it" | "en" = "it",
+): Record<string, unknown> {
+  const slugs = ROUTE_SLUGS[lang];
+  const listName = lang === "it"
+    ? "Eventi — Magix Promotion"
+    : "Events — Magix Promotion";
+
+  return {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    "name": listName,
+    "description": lang === "it"
+      ? "Tutte le date live delle nostre band e artisti."
+      : "All live dates of our bands and artists.",
+    "url": `${siteUrl}/${lang}/${slugs.events}/`,
+    "numberOfItems": totalCount,
+    "itemListElement": events.slice(0, 50).map((event, index) => {
+      const item: Record<string, unknown> = {
+        "@type": "MusicEvent",
+        "name": event.title,
+        "startDate": event.start_date,
+        "url": `${siteUrl}/${lang}/${slugs.events}/${event.meta.slug}/`,
+      };
+      if (event.venue) {
+        item["location"] = {
+          "@type": "Place",
+          "name": event.venue.name,
+          ...(event.venue.city ? {
+            "address": {
+              "@type": "PostalAddress",
+              "addressLocality": event.venue.city,
+              "addressCountry": event.venue.country || "IT",
+            },
+          } : {}),
+        };
+      }
+      if (event.artist) {
+        item["performer"] = {
+          "@type": "MusicGroup",
+          "name": event.artist.name,
+        };
+      }
+      if (event.featured_image_url) item["image"] = event.featured_image_url;
+      return {
+        "@type": "ListItem",
+        "position": index + 1,
+        "item": item,
+      };
+    }),
+  };
+}
+
 /** Schema.org/EntertainmentBusiness per la homepage. */
 export function homepageToJsonLd(settings?: SiteSettings | null, siteUrl = "https://www.magixpromotion.com"): Record<string, unknown> {
   const data: Record<string, unknown> = {
@@ -228,5 +331,25 @@ export const HomepageJsonLd: React.FC<{ settings?: SiteSettings | null }> = ({ s
     injectJsonLd(homepageToJsonLd(settings));
     return removeJsonLd;
   }, [settings?.company_name]);
+  return null;
+};
+
+/** Inietta JSON-LD ItemList per la pagina roster artisti. */
+export const RosterJsonLd: React.FC<{ artists: Artist[]; totalCount: number; lang?: "it" | "en" }> = ({ artists, totalCount, lang = "it" }) => {
+  React.useEffect(() => {
+    if (artists.length === 0) return;
+    injectJsonLd(rosterToJsonLd(artists, totalCount, undefined, lang));
+    return removeJsonLd;
+  }, [artists.length, totalCount, lang]);
+  return null;
+};
+
+/** Inietta JSON-LD ItemList per la pagina lista eventi. */
+export const EventsListJsonLd: React.FC<{ events: EventPage[]; totalCount: number; lang?: "it" | "en" }> = ({ events, totalCount, lang = "it" }) => {
+  React.useEffect(() => {
+    if (events.length === 0) return;
+    injectJsonLd(eventsListToJsonLd(events, totalCount, undefined, lang));
+    return removeJsonLd;
+  }, [events.length, totalCount, lang]);
   return null;
 };

@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     "modelcluster",
     "taggit",
     "corsheaders",
+    "dj_celery_panel",
     # Django
     "django.contrib.admin",
     "django.contrib.auth",

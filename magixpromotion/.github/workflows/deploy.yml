@@ -20,19 +20,26 @@ jobs:
           key: ${{ secrets.SERVER_SSH_KEY }}
           port: 100
           script: |
-            cd /opt/magix-promotion
+            SITE_DIR="/www/wwwroot/magixpromotion.com"
+            APP_DIR="${SITE_DIR}/magixpromotion"
+            VENV_DIR="${SITE_DIR}/venv"
+
+            cd "${SITE_DIR}"
             git pull origin main
 
             # Backend
-            source venv/bin/activate
-            pip install -r requirements/production.txt
-            python manage.py migrate --noinput
-            python manage.py collectstatic --noinput
+            source "${VENV_DIR}/bin/activate"
+            pip install -q -r "${APP_DIR}/requirements/production.txt"
+            cd "${APP_DIR}"
+            DJANGO_SETTINGS_MODULE=config.settings.production \
+              python manage.py migrate --noinput
+            DJANGO_SETTINGS_MODULE=config.settings.production \
+              python manage.py collectstatic --noinput 2>/dev/null
 
             # Frontend
-            cd frontend && npm ci && npm run build && cd ..
+            cd "${APP_DIR}/frontend" && npm ci --production=false --silent && npm run build
 
             # Restart services
-            sudo systemctl restart gunicorn.socket
-            sudo systemctl reload nginx
+            systemctl restart gunicorn-magix celery-magix
+            /www/server/nginx/sbin/nginx -s reload
             echo "Deploy LIVE completato: ${{ github.sha }}"

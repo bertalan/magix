@@ -7,10 +7,11 @@ import { renderHook, waitFor } from "@testing-library/react";
 import { http, HttpResponse } from "msw";
 import { server } from "../mocks/server";
 import { useArtists, useArtist } from "@/hooks/useArtists";
+import { AllProviders } from "../test-utils";
 
 describe("useArtists", () => {
   it("fetches artists and returns data", async () => {
-    const { result } = renderHook(() => useArtists());
+    const { result } = renderHook(() => useArtists(), { wrapper: AllProviders });
 
     // Initially loading
     expect(result.current.loading).toBe(true);
@@ -28,8 +29,9 @@ describe("useArtists", () => {
   });
 
   it("passes filter params to the API", async () => {
-    const { result } = renderHook(() =>
-      useArtists({ artist_type: "tribute" }),
+    const { result } = renderHook(
+      () => useArtists({ artist_type: "tribute" }),
+      { wrapper: AllProviders },
     );
 
     await waitFor(() => {
@@ -46,7 +48,7 @@ describe("useArtists", () => {
       }),
     );
 
-    const { result } = renderHook(() => useArtists());
+    const { result } = renderHook(() => useArtists(), { wrapper: AllProviders });
 
     await waitFor(() => {
       expect(result.current.loading).toBe(false);
@@ -60,7 +62,7 @@ describe("useArtists", () => {
 
 describe("useArtist", () => {
   it("fetches a single artist by ID", async () => {
-    const { result } = renderHook(() => useArtist(1));
+    const { result } = renderHook(() => useArtist(1), { wrapper: AllProviders });
 
     await waitFor(() => {
       expect(result.current.loading).toBe(false);
@@ -72,7 +74,7 @@ describe("useArtist", () => {
   });
 
   it("does nothing when id is null", async () => {
-    const { result } = renderHook(() => useArtist(null));
+    const { result } = renderHook(() => useArtist(null), { wrapper: AllProviders });
 
     // Should not be loading since id is null
     expect(result.current.loading).toBe(false);
@@ -80,7 +82,7 @@ describe("useArtist", () => {
   });
 
   it("sets error when artist not found", async () => {
-    const { result } = renderHook(() => useArtist(999));
+    const { result } = renderHook(() => useArtist(999), { wrapper: AllProviders });
 
     await waitFor(() => {
       expect(result.current.loading).toBe(false);

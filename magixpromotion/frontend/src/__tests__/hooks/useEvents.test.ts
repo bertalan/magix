@@ -7,10 +7,11 @@ import { renderHook, waitFor } from "@testing-library/react";
 import { http, HttpResponse } from "msw";
 import { server } from "../mocks/server";
 import { useEvents } from "@/hooks/useEvents";
+import { AllProviders } from "../test-utils";
 
 describe("useEvents", () => {
   it("fetches events and returns data", async () => {
-    const { result } = renderHook(() => useEvents());
+    const { result } = renderHook(() => useEvents(), { wrapper: AllProviders });
 
     expect(result.current.loading).toBe(true);
     expect(result.current.data).toBeNull();
@@ -26,8 +27,9 @@ describe("useEvents", () => {
   });
 
   it("passes filter params to the API", async () => {
-    const { result } = renderHook(() =>
-      useEvents({ city: "Milano", future_only: true }),
+    const { result } = renderHook(
+      () => useEvents({ city: "Milano", future_only: true }),
+      { wrapper: AllProviders },
     );
 
     await waitFor(() => {
@@ -44,7 +46,7 @@ describe("useEvents", () => {
       }),
     );
 
-    const { result } = renderHook(() => useEvents());
+    const { result } = renderHook(() => useEvents(), { wrapper: AllProviders });
 
     await waitFor(() => {
       expect(result.current.loading).toBe(false);

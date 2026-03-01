@@ -1,28 +1,34 @@
-# /etc/systemd/system/gunicorn.service
+# /etc/systemd/system/gunicorn-magix.service
+# ─── Produzione: BT Panel su /www/wwwroot/magixpromotion.com ───
+# NOTA: copia esatta del service installato sul server.
+# NON usa socket activation (no gunicorn.socket).
+# NON usa gunicorn.conf.py — gli args sono inline.
 [Unit]
-Description=Gunicorn daemon for Magix Promotion
-Requires=gunicorn.socket
+Description=Gunicorn MagixPromotion
 After=network.target postgresql.service redis.service
+Requires=postgresql.service
 
 [Service]
-User=magix
-Group=www-data
-WorkingDirectory=/opt/magix-promotion
-EnvironmentFile=/opt/magix-promotion/.env.prod
-ExecStart=/opt/magix-promotion/venv/bin/gunicorn config.wsgi:application \
-    --bind unix:/run/gunicorn/magix.sock \
+User=www
+Group=www
+WorkingDirectory=/www/wwwroot/magixpromotion.com/magixpromotion
+Environment="PATH=/www/wwwroot/magixpromotion.com/venv/bin"
+Environment="DJANGO_SETTINGS_MODULE=config.settings.production"
+EnvironmentFile=/www/wwwroot/magixpromotion.com/magixpromotion/.env
+ExecStart=/www/wwwroot/magixpromotion.com/venv/bin/gunicorn \
     --workers 3 \
+    --worker-class gthread \
+    --threads 2 \
     --timeout 120 \
-    --access-logfile /var/log/gunicorn/access.log \
-    --error-logfile /var/log/gunicorn/error.log
-ExecReload=/bin/kill -s HUP $MAINPID
+    --max-requests 1000 \
+    --max-requests-jitter 50 \
+    --bind unix:/www/wwwroot/magixpromotion.com/magixpromotion/magix.sock \
+    --access-logfile /var/log/magix/gunicorn-access.log \
+    --error-logfile /var/log/magix/gunicorn-error.log \
+    --capture-output \
+    config.wsgi:application
 Restart=on-failure
 RestartSec=5
-
-# Hardening
-PrivateTmp=true
-ProtectSystem=strict
-ReadWritePaths=/opt/magix-promotion/media /opt/magix-promotion/staticfiles /var/log/gunicorn
 
 [Install]
 WantedBy=multi-user.target

@@ -13,3 +13,4 @@ django-modelcluster>=6.0
 django-taggit>=5.0
 requests>=2.31
 django-cors-headers>=4.3
+dj-celery-panel>=0.3.4

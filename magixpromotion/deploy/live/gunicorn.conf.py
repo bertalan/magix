@@ -1,15 +1,18 @@
 # =============================================================================
 # Gunicorn — Configurazione produzione MagixPromotion
 # =============================================================================
-# Usato da: systemd magix-gunicorn.service
-# Alternativa: gunicorn -c deploy/live/gunicorn.conf.py config.wsgi:application
+# NOTA: il server di produzione (BT Panel) NON usa questo file.
+# Il service systemd gunicorn-magix usa args inline nel ExecStart.
+# Questo file è un riferimento e può essere usato per avvio manuale:
+#   gunicorn -c deploy/live/gunicorn.conf.py config.wsgi:application
 # =============================================================================
 
 import multiprocessing
 import os
 
 # ─── Server socket ───────────────────────────────────────────────────────────
-bind = "unix:/run/magix-gunicorn.sock"
+# Produzione BT Panel: socket nella directory dell'app
+bind = "unix:/www/wwwroot/magixpromotion.com/magixpromotion/magix.sock"
 
 # ─── Workers ─────────────────────────────────────────────────────────────────
 # Formula: 2 * CPU + 1 (per CPU-bound). Per I/O-bound Django, 3 è un buon default.

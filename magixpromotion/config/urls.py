@@ -30,6 +30,7 @@ api_router.register_endpoint("events", EventAPIViewSet)
 
 urlpatterns = [
     path("django-admin/", admin.site.urls),
+    path("django-admin/celery-panel/", include("dj_celery_panel.urls")),
     path("admin/", include(wagtailadmin_urls)),
     path("documents/", include(wagtaildocs_urls)),
     # API

@@ -1,4 +1,5 @@
-version: "3.9"
+# docker-compose.prod.yml — Produzione Docker MagixPromotion
+# Uso: docker compose -f deploy/docker-compose.prod.yml up -d
 
 services:
   db:
@@ -6,10 +7,15 @@ services:
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-magix_prod}
       POSTGRES_USER: ${POSTGRES_USER:-magix}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD obbligatoria}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-magix} -d ${POSTGRES_DB:-magix_prod}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   redis:
     image: redis:7-alpine
@@ -25,9 +31,17 @@ services:
       - static_files:/app/staticfiles
       - media_files:/app/media
     depends_on:
-      - db
-      - redis
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v2/pages/?limit=1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
 
   celery:
     build:
@@ -36,8 +50,10 @@ services:
     command: celery -A config worker -l warning -B --scheduler django_celery_beat.schedulers:DatabaseScheduler
     env_file: ../.env.prod
     depends_on:
-      - db
-      - redis
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
     restart: unless-stopped
 
   nginx:

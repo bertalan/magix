@@ -1,4 +1,22 @@
-version: "3.9"
+# docker-compose.yml — Sviluppo locale MagixPromotion
+# Uso: cd deploy && docker compose up -d
+
+x-common-env: &common-env
+  DJANGO_SETTINGS_MODULE: config.settings.docker_dev
+  DB_NAME: magix
+  DB_USER: magix
+  DB_PASSWORD: magix_dev
+  DB_HOST: db
+  DB_PORT: "5432"
+  REDIS_URL: redis://redis:6379/0
+  DJANGO_SECRET_KEY: dev-secret-key-not-for-production
+  CELERY_BROKER_URL: redis://redis:6379/1
+  WAGTAILADMIN_BASE_URL: http://localhost:8000
+  GEMINI_API_KEY: ${GEMINI_API_KEY:-placeholder}
+  NOMINATIM_USER_AGENT: magix-promotion-dev
+  MATOMO_URL: ${MATOMO_URL:-//piwik.gpsbooking.com/}
+  MATOMO_SITE_ID: ${MATOMO_SITE_ID:-14}
+  GOOGLE_ANALYTICS_ID: ${GOOGLE_ANALYTICS_ID:-}
 
 services:
   db:
@@ -11,6 +29,11 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U magix"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
 
   redis:
     image: redis:7-alpine
@@ -26,21 +49,7 @@ services:
     command: >
       sh -c "python manage.py migrate --noinput && python manage.py runserver 0.0.0.0:8000"
     environment:
-      - DJANGO_SETTINGS_MODULE=config.settings.docker_dev
-      - DB_NAME=magix
-      - DB_USER=magix
-      - DB_PASSWORD=magix_dev
-      - DB_HOST=db
-      - DB_PORT=5432
-      - REDIS_URL=redis://redis:6379/0
-      - DJANGO_SECRET_KEY=dev-secret-key-not-for-production
-      - CELERY_BROKER_URL=redis://redis:6379/1
-      - WAGTAILADMIN_BASE_URL=http://localhost:8000
-      - GEMINI_API_KEY=${GEMINI_API_KEY:-placeholder}
-      - NOMINATIM_USER_AGENT=magix-promotion-dev
-      - MATOMO_URL=${MATOMO_URL:-//piwik.gpsbooking.com/}
-      - MATOMO_SITE_ID=${MATOMO_SITE_ID:-14}
-      - GOOGLE_ANALYTICS_ID=${GOOGLE_ANALYTICS_ID:-}
+      <<: *common-env
     ports:
       - "8000:8000"
     volumes:
@@ -48,8 +57,10 @@ services:
       - static_files:/app/staticfiles
       - media_files:/app/media
     depends_on:
-      - db
-      - redis
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
 
   celery:
     build:
@@ -60,25 +71,14 @@ services:
     command: >
       celery -A config worker -l info -B
     environment:
-      - DJANGO_SETTINGS_MODULE=config.settings.docker_dev
-      - DB_NAME=magix
-      - DB_USER=magix
-      - DB_PASSWORD=magix_dev
-      - DB_HOST=db
-      - DB_PORT=5432
-      - REDIS_URL=redis://redis:6379/0
-      - CELERY_BROKER_URL=redis://redis:6379/1
-      - DJANGO_SECRET_KEY=dev-secret-key-not-for-production
-      - GEMINI_API_KEY=${GEMINI_API_KEY:-placeholder}
-      - NOMINATIM_USER_AGENT=magix-promotion-dev
-      - MATOMO_URL=${MATOMO_URL:-//piwik.gpsbooking.com/}
-      - MATOMO_SITE_ID=${MATOMO_SITE_ID:-14}
-      - GOOGLE_ANALYTICS_ID=${GOOGLE_ANALYTICS_ID:-}
+      <<: *common-env
     volumes:
       - ..:/app
     depends_on:
-      - db
-      - redis
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
 
   frontend:
     image: node:22-alpine

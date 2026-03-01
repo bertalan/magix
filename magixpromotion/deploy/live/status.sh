@@ -33,12 +33,17 @@ echo -e "${GREEN}━━━ MagixPromotion — Stato servizi ━━━${NC}"
 echo ""
 
 echo "Servizi applicazione:"
-check_service "magix-gunicorn" "Gunicorn"
-check_service "magix-celery"   "Celery Worker+Beat"
+check_service "gunicorn-magix" "Gunicorn"
+check_service "celery-magix"   "Celery Worker+Beat"
 
 echo ""
-echo "Infrastruttura:"
-check_service "nginx"          "Nginx"
+echo "Infrastruttura (BT Panel):"
+# BT Panel usa nginx custom, non il servizio systemd standard
+if pgrep -x nginx > /dev/null 2>&1; then
+    echo -e "  ${GREEN}●${NC} Nginx: in esecuzione (BT Panel)"
+else
+    echo -e "  ${RED}●${NC} Nginx: NON in esecuzione"
+fi
 check_service "postgresql"     "PostgreSQL"
 check_service "redis-server"   "Redis"
 check_port 80   "HTTP"
@@ -47,11 +52,12 @@ check_port 5432 "PostgreSQL"
 check_port 6379 "Redis"
 
 echo ""
+SOCK_PATH="/www/wwwroot/magixpromotion.com/magixpromotion/magix.sock"
 echo "Socket Gunicorn:"
-if [[ -S /run/magix-gunicorn.sock ]]; then
-    echo -e "  ${GREEN}●${NC} /run/magix-gunicorn.sock presente"
+if [[ -S "$SOCK_PATH" ]]; then
+    echo -e "  ${GREEN}●${NC} ${SOCK_PATH} presente"
 else
-    echo -e "  ${RED}●${NC} /run/magix-gunicorn.sock NON trovato"
+    echo -e "  ${RED}●${NC} ${SOCK_PATH} NON trovato"
 fi
 
 echo ""
@@ -64,5 +70,5 @@ tail -3 /var/log/magix/gunicorn-error.log 2>/dev/null || echo "  (nessun log dis
 
 echo ""
 echo "Ultimi errori Celery:"
-tail -3 /var/log/magix/celery-worker1.log 2>/dev/null || echo "  (nessun log disponibile)"
+tail -3 /var/log/magix/celery-worker.log 2>/dev/null || echo "  (nessun log disponibile)"
 echo ""

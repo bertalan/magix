@@ -1,10 +1,17 @@
-# /etc/systemd/system/gunicorn.socket
+# /etc/systemd/system/gunicorn-magix.socket
+# ─────────────────────────────────────────────────────────────────
+# NOTA: il server BT Panel NON usa socket activation.
+# Gunicorn crea il socket direttamente (--bind unix:...magix.sock).
+# Questo file è un RIFERIMENTO per setup alternativi con socket activation.
+# ─────────────────────────────────────────────────────────────────
 [Unit]
 Description=Gunicorn socket for Magix Promotion
 
 [Socket]
-ListenStream=/run/gunicorn/magix.sock
-SocketUser=www-data
+ListenStream=/www/wwwroot/magixpromotion.com/magixpromotion/magix.sock
+SocketUser=www
+SocketGroup=www
+SocketMode=0660
 
 [Install]
 WantedBy=sockets.target

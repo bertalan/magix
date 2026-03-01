@@ -1,45 +1,68 @@
+# =============================================================================
+# .dockerignore — MagixPromotion
+# =============================================================================
+# Esclude file inutili/sensibili dal context Docker per build veloci e sicuri.
+# =============================================================================
+
 # Python
 __pycache__
 *.pyc
 *.pyo
+*.egg-info
 .pytest_cache
 .mypy_cache
+.ruff_cache
+htmlcov
+.coverage
 .venv
 venv
 
-# Node
+# Node (ricostruito nello stage frontend-build)
 frontend/node_modules
 frontend/.vite
+node_modules
 
 # IDE
 .vscode
 .idea
 *.swp
+*.swo
+*~
 
 # Git
 .git
 .gitignore
 
-# Docker
-deploy/
-!deploy/scripts/
-docker-compose*.yml
-Dockerfile*
+# Database / schedule locali
+db.sqlite3
+celerybeat-schedule
+celerybeat-schedule.db
 
-# Docs
+# Docker compose (non servono dentro il container)
+deploy/docker-compose*.yml
+deploy/live/
+
+# Docs & materiali
 *.md
+!README.md
 docs/
-idea/
 tasks/
 materiale/
+scripts/
+REPORT-*.md
 
-# Media (in produzione monta un volume)
+# Media (montato come volume in prod)
 media/
 
-# Tests
+# Tests (non servono in produzione)
 tests/
-frontend/src/test/
+frontend/src/__tests__/
 
-# Env
-.env*
+# Environment (segreti — mai nel container!)
+.env
+.env.*
 !.env.example
+
+# OS
+.DS_Store
+Thumbs.db

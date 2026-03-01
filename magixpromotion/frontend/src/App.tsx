@@ -124,6 +124,8 @@ const App: React.FC = () => {
           if (artist) {
             setSelectedArtist(artist);
             setActiveView("DETAIL");
+          } else {
+            setActiveView("NOT_FOUND");
           }
         })
         .finally(() => setLoadingArtist(false));
@@ -139,6 +141,8 @@ const App: React.FC = () => {
           if (event) {
             setSelectedEvent(event);
             setActiveView("EVENTS");
+          } else {
+            setActiveView("NOT_FOUND");
           }
         })
         .finally(() => setLoadingEvent(false));
@@ -166,6 +170,8 @@ const App: React.FC = () => {
           if (artist) {
             setSelectedArtist(artist);
             setActiveView("DETAIL");
+          } else {
+            setActiveView("NOT_FOUND");
           }
         });
       } else if (state?.view === "EVENTS" && state.slug) {
@@ -174,6 +180,8 @@ const App: React.FC = () => {
           if (event) {
             setSelectedEvent(event);
             setActiveView("EVENTS");
+          } else {
+            setActiveView("NOT_FOUND");
           }
         });
       } else if (state?.view) {

@@ -39,6 +39,7 @@ export async function fetchArtists(params?: {
   offset?: number;
   daily_seed?: string;
   locale?: string;
+  search?: string;
 }): Promise<WagtailListResponse<Artist>> {
   const searchParams = new URLSearchParams();
 
@@ -50,6 +51,7 @@ export async function fetchArtists(params?: {
   if (params?.offset) searchParams.set("offset", String(params.offset));
   if (params?.daily_seed) searchParams.set("daily_seed", params.daily_seed);
   if (params?.locale) searchParams.set("locale", params.locale);
+  if (params?.search) searchParams.set("search", params.search);
 
   // Request extra fields in detail mode
   searchParams.set(

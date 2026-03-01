@@ -26,31 +26,28 @@ const ArtistGrid: React.FC<ArtistGridProps> = ({ onArtistClick }) => {
   });
   const [typeFilter, setTypeFilter] = React.useState("ALL");
 
+  // Debounce della search per non bombardare l'API ad ogni keystroke
+  const [debouncedSearch, setDebouncedSearch] = React.useState(search);
+  React.useEffect(() => {
+    const timer = setTimeout(() => setDebouncedSearch(search.trim()), 300);
+    return () => clearTimeout(timer);
+  }, [search]);
+
   // Costruisci parametri filtro per API (senza limit/offset — gestiti dal hook)
   const apiFilters = React.useMemo(() => {
     const p: Record<string, string> = {};
     if (typeFilter !== "ALL") p["artist_type"] = typeFilter;
+    if (debouncedSearch) p["search"] = debouncedSearch;
     return p;
-  }, [typeFilter]);
+  }, [typeFilter, debouncedSearch]);
 
   const { items: allArtists, loading, loadingMore, error, hasMore, loadMore, totalCount } =
     useArtists(apiFilters);
 
-  // Filtra lato client per search testuale
-  const artists = React.useMemo(() => {
-    if (!search.trim()) return allArtists;
-    const q = search.toLowerCase();
-    return allArtists.filter(
-      (a) =>
-        a.title.toLowerCase().includes(q) ||
-        a.genre_display.toLowerCase().includes(q) ||
-        (a.tags || []).some((t) => t.toLowerCase().includes(q)),
-    );
-  }, [allArtists, search]);
+  // Con la ricerca server-side non serve più filtrare lato client
+  const artists = allArtists;
 
-  // Disabilita infinite scroll quando c'è una ricerca testuale attiva
-  // (la search filtra lato client, quindi non serve caricare nuove pagine)
-  const scrollDisabled = loading || loadingMore || !hasMore || search.trim().length > 0;
+  const scrollDisabled = loading || loadingMore || !hasMore;
   const sentinelRef = useInfiniteScroll(loadMore, scrollDisabled);
 
   // Estrai generi unici per filtri (da tutti gli artisti caricati)
@@ -90,9 +87,9 @@ const ArtistGrid: React.FC<ArtistGridProps> = ({ onArtistClick }) => {
       {/* Conteggio risultati */}
       {!loading && totalCount > 0 && (
         <p className="text-sm text-[var(--text-muted)] mb-6">
-          {search.trim()
+          {debouncedSearch
             ? t("artists.results", { count: artists.length })
-            : t("artists.countOf", { loaded: allArtists.length, total: totalCount })}
+            : t("artists.countOf", { loaded: artists.length, total: totalCount })}
         </p>
       )}
 

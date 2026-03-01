@@ -9,6 +9,7 @@ export interface ArtistFilterParams {
   genre?: string;
   region?: string;
   country?: string;
+  search?: string;
 }
 
 /** Dimensione pagina per il caricamento incrementale */

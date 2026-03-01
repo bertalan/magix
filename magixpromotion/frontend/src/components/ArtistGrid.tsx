@@ -13,7 +13,17 @@ interface ArtistGridProps {
 
 const ArtistGrid: React.FC<ArtistGridProps> = ({ onArtistClick }) => {
   const { t, lang } = useLanguage();
-  const [search, setSearch] = React.useState("");
+  const [search, setSearch] = React.useState(() => {
+    const params = new URLSearchParams(window.location.search);
+    const q = params.get("search") || "";
+    // Pulisci il parametro dall'URL per evitare che persista nei link futuri
+    if (q) {
+      const url = new URL(window.location.href);
+      url.searchParams.delete("search");
+      window.history.replaceState(null, "", url.pathname);
+    }
+    return q;
+  });
   const [typeFilter, setTypeFilter] = React.useState("ALL");
 
   // Costruisci parametri filtro per API (senza limit/offset — gestiti dal hook)

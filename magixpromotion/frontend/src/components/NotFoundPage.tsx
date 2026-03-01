@@ -1,6 +1,7 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { ROUTE_SLUGS } from "@/lib/routes";
 import { Search, Home, Mail } from "lucide-react";
 
 interface NotFoundPageProps {
@@ -16,7 +17,7 @@ const NotFoundPage: React.FC<NotFoundPageProps> = ({ setView }) => {
     e.preventDefault();
     const q = query.trim();
     if (q) {
-      window.location.href = `/${lang}/?search=${encodeURIComponent(q)}`;
+      window.location.href = `/${lang}/${ROUTE_SLUGS[lang].artists}/?search=${encodeURIComponent(q)}`;
     }
   };
 

@@ -205,6 +205,17 @@
     "openMap": "Open full map on OpenStreetMap",
     "followUs": "FOLLOW US"
   },
+  "notFound": {
+    "title": "Page Not Found",
+    "description": "The page you're looking for doesn't exist, has been moved, or the link is incorrect. Try searching or go back to the homepage.",
+    "searchPlaceholder": "Search artists, events...",
+    "backHome": "Back to Home",
+    "report": "Report this issue",
+    "emailSubject": "Error 404 on MagixPromotion",
+    "emailErrorLabel": "Code",
+    "emailPrompt": "[Describe what you were looking for]",
+    "direct": "(direct)"
+  },
   "footer": {
     "rights": "All rights reserved.",
     "vat": "VAT",

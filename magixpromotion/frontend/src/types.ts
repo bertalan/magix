@@ -174,4 +174,4 @@ export interface BookingFormData {
 
 // --- View State ---
 
-export type ViewState = "HOME" | "TALENT" | "DETAIL" | "EVENTS" | "SCOUT" | "BOOKING" | "PRIVACY" | "TERMS" | "CONTACTS";
+export type ViewState = "HOME" | "TALENT" | "DETAIL" | "EVENTS" | "SCOUT" | "BOOKING" | "PRIVACY" | "TERMS" | "CONTACTS" | "NOT_FOUND";

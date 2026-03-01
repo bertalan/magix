@@ -205,6 +205,17 @@
     "openMap": "Apri mappa completa su OpenStreetMap",
     "followUs": "SEGUICI"
   },
+  "notFound": {
+    "title": "Pagina non trovata",
+    "description": "La pagina che stai cercando non esiste, è stata spostata o il link non è corretto. Prova a cercare oppure torna alla home.",
+    "searchPlaceholder": "Cerca artisti, eventi...",
+    "backHome": "Torna alla Home",
+    "report": "Segnala il problema",
+    "emailSubject": "Errore 404 su MagixPromotion",
+    "emailErrorLabel": "Codice",
+    "emailPrompt": "[Scrivi qui cosa stavi cercando]",
+    "direct": "(diretto)"
+  },
   "footer": {
     "rights": "Tutti i diritti riservati.",
     "vat": "P.IVA",

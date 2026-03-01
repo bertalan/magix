@@ -18,6 +18,7 @@ const BandFinder = React.lazy(() => import("./components/BandFinder"));
 const PrivacyPage = React.lazy(() => import("./components/PrivacyPage"));
 const TermsPage = React.lazy(() => import("./components/TermsPage"));
 const ContactsPage = React.lazy(() => import("./components/ContactsPage"));
+const NotFoundPage = React.lazy(() => import("./components/NotFoundPage"));
 
 /** Parse the URL path to detect an artist slug (/it/artisti/:slug or /en/artists/:slug). */
 function parseArtistSlugFromPath(): string | null {
@@ -48,7 +49,10 @@ function parseViewFromPath(): ViewState {
   if (/\/(?:it\/privacy|en\/privacy)\/?$/.test(path)) return "PRIVACY";
   if (/\/(?:it\/termini|en\/terms)\/?$/.test(path)) return "TERMS";
   if (/\/(?:it\/contatti|en\/contacts)\/?$/.test(path)) return "CONTACTS";
-  return "HOME";
+  // Home: root, /it/, /en/ (exact matches)
+  if (/^\/?$/.test(path) || /^\/(?:it|en)\/?$/.test(path)) return "HOME";
+  // Anything else is 404
+  return "NOT_FOUND";
 }
 
 /** Map ViewState to a URL path for pushState. */
@@ -71,6 +75,8 @@ function viewToPath(view: ViewState, lang: Lang, slug?: string): string {
       return `/${lang}/${s.terms}/`;
     case "CONTACTS":
       return `/${lang}/${s.contacts}/`;
+    case "NOT_FOUND":
+      return window.location.pathname;
     default:
       return "/";
   }
@@ -317,6 +323,9 @@ const App: React.FC = () => {
 
       case "CONTACTS":
         return <ContactsPage />;
+
+      case "NOT_FOUND":
+        return <NotFoundPage setView={setView} />;
 
       default:
         return (

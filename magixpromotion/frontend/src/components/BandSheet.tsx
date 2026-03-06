@@ -108,11 +108,6 @@ const BandSheet: React.FC<BandSheetProps> = ({ artist, onClose, onEventClick }) 
             <h1 className="text-4xl md:text-6xl font-heading font-extrabold tracking-tighter mb-4 text-[var(--text-main)]">
               {artist.title}
             </h1>
-            {artist.tribute_to && (
-              <p className="text-xl text-[var(--accent)] font-medium">
-                {t("bandSheet.tributeTo")}: {artist.tribute_to}
-              </p>
-            )}
           </div>
 
           {/* Info grid */}

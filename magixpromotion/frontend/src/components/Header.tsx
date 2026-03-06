@@ -102,7 +102,6 @@ const Header: React.FC<HeaderProps> = ({
 
         {/* Mobile toggle */}
         <div className="flex items-center gap-4 md:hidden">
-          <LanguageSwitcher />
           <ThemeToggle currentTheme={currentTheme} toggleTheme={toggleTheme} />
           <button
             className="text-[var(--text-main)]"

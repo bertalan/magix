@@ -2,6 +2,7 @@ import React from "react";
 import { ViewState } from "@/types";
 import { useFocusTrap } from "@/hooks/useFocusTrap";
 import { useLanguage } from "@/contexts/LanguageContext";
+import LanguageSwitcher from "./LanguageSwitcher";
 
 interface MobileMenuProps {
   navItems: Array<{ label: string; view: ViewState; icon: string }>;
@@ -49,6 +50,10 @@ const MobileMenu: React.FC<MobileMenuProps> = ({ navItems, activeView, setView, 
           ))}
         </ul>
       </nav>
+      {/* Switcher lingua nel menu mobile */}
+      <div className="mt-4">
+        <LanguageSwitcher />
+      </div>
     </div>
   );
 };

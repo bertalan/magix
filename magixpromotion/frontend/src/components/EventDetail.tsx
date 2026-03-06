@@ -303,12 +303,12 @@ const EventDetail: React.FC<EventDetailProps> = ({
             </div>
 
             {/* Titolo evento */}
-            <h1 className="text-3xl md:text-4xl lg:text-6xl font-heading font-extrabold tracking-tighter mb-6 md:mb-8 leading-none text-[var(--text-main)]">
+            <h1 className="text-2xl md:text-3xl lg:text-5xl font-heading font-extrabold tracking-tighter mb-5 md:mb-6 leading-none text-[var(--text-main)]">
               {event.title}
             </h1>
 
             {/* Data e orari */}
-            <div className="flex flex-wrap gap-6 mb-12">
+            <div className="flex flex-wrap gap-4 mb-8">
               <div className="flex items-center gap-3 text-[var(--text-muted)]">
                 <Calendar size={20} className="text-[var(--accent)]" />
                 <span className="font-semibold capitalize">{formattedDate}</span>

@@ -73,25 +73,25 @@ const EventsPage: React.FC<EventsPageProps> = ({ setView: _setView, onArtistClic
   }, [events]);
 
   return (
-    <div className="max-w-5xl mx-auto px-6 py-24">
+    <div className="max-w-5xl mx-auto px-6 py-16">
       {/* SEO: JSON-LD ItemList per gli eventi */}
       <EventsListJsonLd lang={lang} />
 
       {/* Page header */}
-      <div className="mb-16">
-        <div className="flex items-center gap-3 mb-4">
-          <Calendar className="text-[var(--accent)]" size={28} />
-          <h2 className="text-4xl md:text-6xl font-heading font-extrabold tracking-tight text-[var(--text-main)] uppercase">
+      <div className="mb-10">
+        <div className="flex items-center gap-3 mb-3">
+          <Calendar className="text-[var(--accent)]" size={24} />
+          <h2 className="text-3xl md:text-5xl font-heading font-extrabold tracking-tight text-[var(--text-main)] uppercase">
             {t("events.title")}
           </h2>
         </div>
-        <p className="text-[var(--text-muted)] text-lg max-w-xl">
+        <p className="text-[var(--text-muted)] text-base max-w-xl">
           {t("events.subtitle")}
         </p>
       </div>
 
       {/* Tabs: Prossimi / Archivio */}
-      <div className="flex gap-4 mb-8" role="tablist" aria-label={t("events.filterAria")}>
+      <div className="flex gap-3 mb-6" role="tablist" aria-label={t("events.filterAria")}>
         <button
           onClick={() => {
             setTab("upcoming");

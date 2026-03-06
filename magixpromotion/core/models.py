@@ -5,9 +5,13 @@ from django_countries.fields import CountryField
 from wagtail.contrib.settings.models import BaseSiteSetting, register_setting
 from wagtail.admin.panels import FieldPanel, MultiFieldPanel
 from wagtail.documents import get_document_model_string
-from wagtail.fields import RichTextField
+from wagtail.fields import RichTextField, StreamField
+from wagtail import blocks as wagtail_blocks
+from wagtail.images.blocks import ImageChooserBlock
 from wagtail.models import Page
 from wagtail.snippets.models import register_snippet
+
+from core.blocks import HeadingBlock, GalleryBlock, CTABlock
 
 
 class HomePage(Page):
@@ -272,10 +276,23 @@ class PressAreaPage(Page):
         verbose_name=_("Sottotitolo"),
         help_text=_("Breve sottotitolo visualizzato sotto il titolo."),
     )
-    intro_text = RichTextField(
+    intro_text = StreamField(
+        [
+            ("heading", HeadingBlock()),
+            ("richtext", wagtail_blocks.RichTextBlock(
+                features=["bold", "italic", "link", "ol", "ul", "h3", "h4"],
+            )),
+            ("image", wagtail_blocks.StructBlock([
+                ("image", ImageChooserBlock()),
+                ("caption", wagtail_blocks.CharBlock(required=False, max_length=200)),
+            ], icon="image", label=_("Immagine"))),
+            ("gallery", GalleryBlock()),
+            ("cta", CTABlock()),
+        ],
         blank=True,
-        verbose_name=_("Testo introduttivo"),
-        help_text=_("Presentazione di Magix Promotion per la press area."),
+        use_json_field=True,
+        verbose_name=_("Contenuto"),
+        help_text=_("Contenuto della press area con blocchi liberi."),
     )
     company_epk = models.ForeignKey(
         EPKPackage,

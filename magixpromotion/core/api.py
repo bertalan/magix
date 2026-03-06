@@ -69,10 +69,47 @@ def epk_list_view(request):
 
     intro = None
     if press_page:
+        # Renderizza StreamField come HTML
+        from wagtail.rich_text import RichText
+        intro_html = ""
+        if press_page.intro_text:
+            for block in press_page.intro_text:
+                if block.block_type == "richtext":
+                    intro_html += str(block.value)
+                elif block.block_type == "heading":
+                    level = block.value.get("level", "h2")
+                    intro_html += f"<{level}>{block.value.get('text', '')}</{level}>"
+                elif block.block_type == "image":
+                    image = block.value.get("image")
+                    caption = block.value.get("caption", "")
+                    if image:
+                        rendition = image.get_rendition("width-800")
+                        intro_html += f'<figure><img src="{rendition.url}" alt="{caption or image.title}" />'
+                        if caption:
+                            intro_html += f"<figcaption>{caption}</figcaption>"
+                        intro_html += "</figure>"
+                elif block.block_type == "gallery":
+                    images = block.value.get("images", [])
+                    if images:
+                        intro_html += '<div class="gallery">'
+                        for gi in images:
+                            img = gi.get("image")
+                            if img:
+                                rendition = img.get_rendition("width-600")
+                                intro_html += f'<img src="{rendition.url}" alt="{gi.get("caption", "") or img.title}" />'
+                        intro_html += "</div>"
+                elif block.block_type == "cta":
+                    text = block.value.get("text", "")
+                    url = block.value.get("url", "")
+                    page = block.value.get("page")
+                    href = url or (page.url if page else "#")
+                    style = block.value.get("style", "primary")
+                    intro_html += f'<a href="{href}" class="cta cta-{style}">{text}</a>'
+
         intro = {
             "title": press_page.title,
             "subtitle": press_page.subtitle,
-            "intro_text": press_page.intro_text,
+            "intro_text": intro_html,
             "company_epk_id": press_page.company_epk_id,
         }
 

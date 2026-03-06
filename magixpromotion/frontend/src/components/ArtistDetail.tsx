@@ -4,6 +4,7 @@ import { useFocusTrap } from "@/hooks/useFocusTrap";
 import { useImageRotator, ImagePair } from "@/hooks/useImageRotator";
 import ProgressiveImage from "./ProgressiveImage";
 import VideoModal from "./VideoModal";
+import BandSheet from "./BandSheet";
 import SEOHead from "./SEOHead";
 import { ArtistJsonLd } from "./JsonLdScript";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -18,6 +19,8 @@ import {
   MapPin,
   Ticket,
   Youtube,
+  FileText,
+  Newspaper,
 } from "lucide-react";
 
 interface ArtistDetailProps {
@@ -39,9 +42,10 @@ const ArtistDetail: React.FC<ArtistDetailProps> = ({
 }) => {
   const [isPlaying, setIsPlaying] = React.useState(false);
   const [showVideoModal, setShowVideoModal] = React.useState(false);
+  const [showBandSheet, setShowBandSheet] = React.useState(false);
   const eventsRef = React.useRef<HTMLDivElement>(null);
   const trapRef = useFocusTrap<HTMLDivElement>();
-  const { lang } = useLanguage();
+  const { lang, t } = useLanguage();
 
   // SEO: aggiorna meta tag e JSON-LD per l'artista corrente
   const seoDescription = artist.short_bio?.slice(0, 160) || `${artist.title} — artista Magix Promotion`;
@@ -71,8 +75,8 @@ const ArtistDetail: React.FC<ArtistDetailProps> = ({
   // Close on Escape key
   React.useEffect(() => {
     const handler = (e: KeyboardEvent) => {
-      // Non chiudere il detail se il video modal è aperto
-      if (e.key === "Escape" && !showVideoModal) onClose();
+      // Non chiudere il detail se un modal secondario è aperto
+      if (e.key === "Escape" && !showVideoModal && !showBandSheet) onClose();
     };
     document.addEventListener("keydown", handler);
     return () => document.removeEventListener("keydown", handler);
@@ -263,8 +267,9 @@ const ArtistDetail: React.FC<ArtistDetailProps> = ({
               </p>
             </div>
 
-            {/* Video + Tour cards */}
+            {/* Action cards — griglia 2×2 */}
             <div className="grid grid-cols-1 landscape:grid-cols-2 sm:grid-cols-2 gap-4 landscape:gap-4 sm:gap-6 mb-16">
+              {/* 1. Video Promo */}
               <div
                 onClick={handlePlayClick}
                 className="p-5 landscape:p-4 sm:p-8 glass-panel rounded-3xl border border-[var(--glass-border)] flex flex-col gap-3 group cursor-pointer hover:border-[var(--accent)]/30 transition-all active:scale-95"
@@ -281,15 +286,17 @@ const ArtistDetail: React.FC<ArtistDetailProps> = ({
                 </div>
                 <div>
                   <h4 className="font-bold text-xl uppercase text-[var(--text-main)]">
-                    Video Promo
+                    {t("artistDetail.videoPromo")}
                   </h4>
                   <p className="text-[var(--text-muted)] text-sm">
                     {artist.hero_video_url
-                      ? "Guarda su YouTube"
-                      : "Video non disponibile"}
+                      ? t("artistDetail.watchYoutube")
+                      : t("artistDetail.videoNotAvailable")}
                   </p>
                 </div>
               </div>
+
+              {/* 2. Date Live */}
               <div
                 onClick={() =>
                   eventsRef.current?.scrollIntoView({ behavior: "smooth" })
@@ -307,19 +314,63 @@ const ArtistDetail: React.FC<ArtistDetailProps> = ({
                 </div>
                 <div>
                   <h4 className="font-bold text-xl uppercase text-[var(--text-main)]">
-                    Date Live
+                    {t("artistDetail.dateLive")}
                   </h4>
                   <p className="text-[var(--text-muted)] text-sm">
-                    {artist.events?.length || 0} eventi in programma
+                    {t("artistDetail.eventsCount", { count: artist.events?.length || 0 })}
                   </p>
                 </div>
               </div>
+
+              {/* 3. Scheda Band */}
+              <div
+                onClick={() => setShowBandSheet(true)}
+                className="p-5 landscape:p-4 sm:p-8 glass-panel rounded-3xl border border-[var(--glass-border)] flex flex-col gap-3 group cursor-pointer hover:border-emerald-500/30 transition-all active:scale-95"
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => e.key === "Enter" && setShowBandSheet(true)}
+              >
+                <div className="w-12 h-12 rounded-full bg-emerald-600 flex items-center justify-center text-white group-hover:scale-110 transition-transform shadow-lg">
+                  <FileText size={20} />
+                </div>
+                <div>
+                  <h4 className="font-bold text-xl uppercase text-[var(--text-main)]">
+                    {t("artistDetail.bandSheet")}
+                  </h4>
+                  <p className="text-[var(--text-muted)] text-sm">
+                    {t("artistDetail.bandSheetDesc")}
+                  </p>
+                </div>
+              </div>
+
+              {/* 4. Press Kit EPK — visibile solo se EPK disponibile */}
+              {artist.epk && (
+                <div
+                  onClick={() => setView?.("PRESS")}
+                  className="p-5 landscape:p-4 sm:p-8 glass-panel rounded-3xl border border-[var(--glass-border)] flex flex-col gap-3 group cursor-pointer hover:border-purple-500/30 transition-all active:scale-95"
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(e) => e.key === "Enter" && setView?.("PRESS")}
+                >
+                  <div className="w-12 h-12 rounded-full bg-purple-600 flex items-center justify-center text-white group-hover:scale-110 transition-transform shadow-lg">
+                    <Newspaper size={20} />
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-xl uppercase text-[var(--text-main)]">
+                      {t("artistDetail.pressKit")}
+                    </h4>
+                    <p className="text-[var(--text-muted)] text-sm">
+                      {t("artistDetail.pressKitDesc")}
+                    </p>
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Eventi */}
             <div ref={eventsRef} className="pt-12 mb-16 scroll-mt-24">
               <h3 className="text-3xl font-heading font-extrabold mb-10 flex items-center gap-4 text-[var(--text-main)]">
-                <span className="text-[var(--accent)]">/</span> PROSSIMI EVENTI
+                <span className="text-[var(--accent)]">/</span> {t("artistDetail.upcomingEvents")}
               </h3>
               <div className="flex flex-col gap-4">
                 {(artist.events || []).length > 0 ? (
@@ -373,7 +424,7 @@ const ArtistDetail: React.FC<ArtistDetailProps> = ({
                   ))
                 ) : (
                   <p className="text-[var(--text-muted)] italic">
-                    Nessun evento in programma. Contattaci per disponibilita'.
+                    {t("artistDetail.noEvents")}
                   </p>
                 )}
               </div>
@@ -384,7 +435,7 @@ const ArtistDetail: React.FC<ArtistDetailProps> = ({
               onClick={handleBooking}
               className="w-full px-12 py-6 bg-[var(--text-main)] text-[var(--bg-color)] font-black tracking-widest hover:scale-[1.02] transition-all rounded-full text-lg shadow-xl shadow-[var(--accent)]/10"
             >
-              RICHIEDI PREVENTIVO
+              {t("artistDetail.requestQuote")}
             </button>
           </div>
         </div>
@@ -396,6 +447,14 @@ const ArtistDetail: React.FC<ArtistDetailProps> = ({
           videoUrl={artist.hero_video_url}
           artistName={artist.title}
           onClose={() => setShowVideoModal(false)}
+        />
+      )}
+
+      {/* Band Sheet modal overlay */}
+      {showBandSheet && (
+        <BandSheet
+          artist={artist}
+          onClose={() => setShowBandSheet(false)}
         />
       )}
     </div>

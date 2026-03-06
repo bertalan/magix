@@ -18,6 +18,7 @@ const BandFinder = React.lazy(() => import("./components/BandFinder"));
 const PrivacyPage = React.lazy(() => import("./components/PrivacyPage"));
 const TermsPage = React.lazy(() => import("./components/TermsPage"));
 const ContactsPage = React.lazy(() => import("./components/ContactsPage"));
+const PressAreaPage = React.lazy(() => import("./components/PressAreaPage"));
 const NotFoundPage = React.lazy(() => import("./components/NotFoundPage"));
 
 /** Parse the URL path to detect an artist slug (/it/artisti/:slug or /en/artists/:slug). */
@@ -46,6 +47,7 @@ function parseViewFromPath(): ViewState {
   if (/\/(?:it\/eventi|en\/events)(?:\/|$)/.test(path)) return "EVENTS";
   if (/\/(?:it|en)\/booking\/?$/.test(path)) return "BOOKING";
   if (/\/(?:it|en)\/scout\/?$/.test(path)) return "SCOUT";
+  if (/\/(?:it|en)\/press-area\/?$/.test(path)) return "PRESS";
   if (/\/(?:it\/privacy|en\/privacy)\/?$/.test(path)) return "PRIVACY";
   if (/\/(?:it\/termini|en\/terms)\/?$/.test(path)) return "TERMS";
   if (/\/(?:it\/contatti|en\/contacts)\/?$/.test(path)) return "CONTACTS";
@@ -69,6 +71,8 @@ function viewToPath(view: ViewState, lang: Lang, slug?: string): string {
       return `/${lang}/${s.booking}/`;
     case "SCOUT":
       return `/${lang}/${s.scout}/`;
+    case "PRESS":
+      return `/${lang}/${s.press}/`;
     case "PRIVACY":
       return `/${lang}/${s.privacy}/`;
     case "TERMS":
@@ -322,6 +326,9 @@ const App: React.FC = () => {
             preselectedArtist={bookingArtistName}
           />
         );
+
+      case "PRESS":
+        return <PressAreaPage setView={setView} onArtistClick={handleArtistClickById} />;
 
       case "PRIVACY":
         return <PrivacyPage />;

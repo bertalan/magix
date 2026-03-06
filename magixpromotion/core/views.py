@@ -1,5 +1,4 @@
 """View per download EPK con controllo permessi e SEO."""
-from django.contrib.auth.decorators import login_required
 from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404, redirect
 from wagtail.models import Site
@@ -29,16 +28,16 @@ def robots_txt(request):
     return HttpResponse("\n".join(lines), content_type="text/plain")
 
 
-@login_required
 def epk_download(request, epk_id: int, asset_type: str):
     """
     Download di un asset EPK.
     asset_type: 'photo' | 'rider' | 'bio' | 'logo'
+    Se is_public=True l'accesso è libero, altrimenti richiede gruppo 'Press'.
     """
     epk = get_object_or_404(EPKPackage, pk=epk_id)
 
     if not epk.is_public:
-        if not request.user.groups.filter(name="Press").exists():
+        if not request.user.is_authenticated or not request.user.groups.filter(name="Press").exists():
             raise Http404("Accesso non autorizzato.")
 
     asset_map = {

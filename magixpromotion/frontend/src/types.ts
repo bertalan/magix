@@ -36,6 +36,21 @@ export interface MusicEvent {
   status: "AVAILABLE" | "SOLD OUT" | "CANCELLED" | "FREE";
 }
 
+export interface EPKAssets {
+  photo: string | null;
+  rider: string | null;
+  bio: string | null;
+  logo: string | null;
+}
+
+export interface EPKSummary {
+  id: number;
+  title: string;
+  description: string;
+  updated_at: string;
+  assets: EPKAssets;
+}
+
 export interface Artist {
   id: number;
   meta: {
@@ -61,6 +76,7 @@ export interface Artist {
   tags: string[];
   socials: ArtistSocials;
   events: MusicEvent[];
+  epk: EPKSummary | null;
 }
 
 // --- Events ---
@@ -172,6 +188,34 @@ export interface BookingFormData {
   privacy: boolean;
 }
 
+// --- Press Area ---
+
+export interface EPKListItem {
+  id: number;
+  title: string;
+  description: string;
+  updated_at: string;
+  is_company: boolean;
+  assets: EPKAssets;
+  artist: {
+    id: number;
+    title: string;
+    slug: string;
+  } | null;
+}
+
+export interface PressAreaIntro {
+  title: string;
+  subtitle: string;
+  intro_text: string;
+  company_epk_id: number | null;
+}
+
+export interface PressAreaData {
+  intro: PressAreaIntro | null;
+  items: EPKListItem[];
+}
+
 // --- View State ---
 
-export type ViewState = "HOME" | "TALENT" | "DETAIL" | "EVENTS" | "SCOUT" | "BOOKING" | "PRIVACY" | "TERMS" | "CONTACTS" | "NOT_FOUND";
+export type ViewState = "HOME" | "TALENT" | "DETAIL" | "EVENTS" | "SCOUT" | "BOOKING" | "PRESS" | "PRIVACY" | "TERMS" | "CONTACTS" | "NOT_FOUND";

@@ -4,7 +4,8 @@
     "artists": "ARTISTS",
     "events": "EVENTS",
     "scout": "FIND YOUR BAND",
-    "booking": "BOOKING"
+    "booking": "BOOKING",
+    "press": "PRESS AREA"
   },
   "header": {
     "logoAria": "Magix Promotion — Back to home",
@@ -222,6 +223,55 @@
     "navigateTo": "Navigate to our headquarters",
     "privacy": "PRIVACY",
     "terms": "TERMS",
-    "contacts": "CONTACTS"
+    "contacts": "CONTACTS",
+    "press": "PRESS AREA"
+  },
+  "artistDetail": {
+    "bandSheet": "Band Sheet",
+    "bandSheetDesc": "All information",
+    "pressKit": "Press Kit EPK",
+    "pressKitDesc": "Press material",
+    "videoPromo": "Video Promo",
+    "dateLive": "Live Dates",
+    "eventsCount": "{{count}} scheduled events",
+    "watchYoutube": "Watch on YouTube",
+    "videoNotAvailable": "Video not available",
+    "biography": "BIOGRAPHY",
+    "upcomingEvents": "UPCOMING EVENTS",
+    "noEvents": "No events scheduled. Contact us for availability.",
+    "requestQuote": "REQUEST A QUOTE"
+  },
+  "bandSheet": {
+    "title": "BAND SHEET",
+    "type": "Type",
+    "tributeTo": "Tribute to",
+    "genre": "Genre",
+    "location": "Home base",
+    "biography": "Biography",
+    "gallery": "Gallery",
+    "socialLinks": "Links & Social",
+    "website": "Website",
+    "close": "Close sheet",
+    "show_band": "Show Band / Party Band",
+    "tribute": "Tribute Band",
+    "original": "Original Band",
+    "dj": "DJ / Solo",
+    "cover": "Cover Band"
+  },
+  "press": {
+    "badge": "PRESS AREA",
+    "title": "PRESS",
+    "titleAccent": "AREA",
+    "subtitle": "Press material, press kits and media resources for journalists and organizers.",
+    "companyKit": "COMPANY PRESS KIT",
+    "bandKits": "ARTIST PRESS KITS",
+    "updated": "Updated on",
+    "download": "Download",
+    "photo": "HD Photo",
+    "rider": "Technical Rider",
+    "bio": "Biography PDF",
+    "logo": "Logo",
+    "viewArtist": "View artist profile",
+    "noKits": "No press kits available at this time."
   }
 }

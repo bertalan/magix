@@ -8,6 +8,7 @@ import type {
   BookingFormData,
   EventPage,
   MenuResponse,
+  PressAreaData,
   SiteSettings,
   WagtailListResponse,
 } from "@/types";
@@ -56,7 +57,7 @@ export async function fetchArtists(params?: {
   // Request extra fields in detail mode
   searchParams.set(
     "fields",
-    "short_bio,artist_type,image_url,genre_display,tags,socials,events,tribute_to,hero_video_url,base_country,base_region,base_city",
+    "short_bio,artist_type,image_url,genre_display,tags,socials,events,epk,tribute_to,hero_video_url,base_country,base_region,base_city",
   );
 
   const qs = searchParams.toString();
@@ -83,7 +84,7 @@ export async function fetchArtistBySlug(slug: string, locale?: string): Promise<
   if (locale) params.set("locale", locale);
   params.set(
     "fields",
-    "short_bio,artist_type,image_url,image_thumb,gallery_images,gallery_thumbs,genre_display,tags,socials,events,tribute_to,hero_video_url,base_country,base_region,base_city",
+    "short_bio,artist_type,image_url,image_thumb,gallery_images,gallery_thumbs,genre_display,tags,socials,events,epk,tribute_to,hero_video_url,base_country,base_region,base_city",
   );
   const res = await apiFetch<WagtailListResponse<Artist>>(
     `${API_BASE}/artists/?${params.toString()}`,
@@ -174,6 +175,15 @@ export async function fetchMenu(
  */
 export async function fetchSiteSettings(): Promise<SiteSettings> {
   return apiFetch<SiteSettings>(`${API_BASE}/site-settings/`);
+}
+
+// --- Press Area ---
+
+/**
+ * Fetch press area data: intro text + list of public EPKs.
+ */
+export async function fetchPressArea(locale: string = "it"): Promise<PressAreaData> {
+  return apiFetch<PressAreaData>(`${API_BASE}/site-settings/epk/?locale=${locale}`);
 }
 
 // --- Booking ---

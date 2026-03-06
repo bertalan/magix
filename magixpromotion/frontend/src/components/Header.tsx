@@ -6,7 +6,7 @@ import MobileMenu from "./MobileMenu";
 import ThemeToggle from "./ThemeToggle";
 import LanguageSwitcher from "./LanguageSwitcher";
 import MagixLogo from "./MagixLogo";
-import { Music, Users, Search, Calendar, Mail, Menu, X } from "lucide-react";
+import { Music, Users, Search, Calendar, Mail, Menu, X, Newspaper } from "lucide-react";
 
 /** Mappa icone Lucide per nome stringa (da API menu) */
 const ICON_MAP: Record<string, React.ElementType> = {
@@ -15,15 +15,16 @@ const ICON_MAP: Record<string, React.ElementType> = {
   search: Search,
   calendar: Calendar,
   mail: Mail,
+  newspaper: Newspaper,
 };
 
 /** Chiavi i18n per la navigazione statica di fallback */
 const FALLBACK_NAV_KEYS: Array<{ i18nKey: string; view: ViewState; icon: string }> = [
-  { i18nKey: "nav.home", view: "HOME", icon: "music" },
   { i18nKey: "nav.artists", view: "TALENT", icon: "users" },
   { i18nKey: "nav.events", view: "EVENTS", icon: "calendar" },
   { i18nKey: "nav.scout", view: "SCOUT", icon: "search" },
   { i18nKey: "nav.booking", view: "BOOKING", icon: "mail" },
+  { i18nKey: "nav.press", view: "PRESS", icon: "newspaper" },
 ];
 
 interface HeaderProps {
@@ -145,6 +146,7 @@ function urlToView(url: string): ViewState {
     "/events/": "EVENTS",
     "/scout/": "SCOUT",
     "/booking/": "BOOKING",
+    "/press-area/": "PRESS",
   };
   return map[url] || "HOME";
 }

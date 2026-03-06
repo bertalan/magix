@@ -5,6 +5,7 @@ from django_countries.fields import CountryField
 from wagtail.contrib.settings.models import BaseSiteSetting, register_setting
 from wagtail.admin.panels import FieldPanel, MultiFieldPanel
 from wagtail.documents import get_document_model_string
+from wagtail.fields import RichTextField
 from wagtail.models import Page
 from wagtail.snippets.models import register_snippet
 
@@ -17,6 +18,7 @@ class HomePage(Page):
         "artists.ArtistListingPage",
         "events.EventListingPage",
         "booking.BookingFormPage",
+        "core.PressAreaPage",
     ]
 
     class Meta:
@@ -259,3 +261,42 @@ class EPKPackage(models.Model):
 
     def __str__(self) -> str:
         return self.title
+
+
+class PressAreaPage(Page):
+    """Pagina Press Area con testo introduttivo e riferimento all'EPK aziendale."""
+
+    subtitle = models.CharField(
+        max_length=300,
+        blank=True,
+        verbose_name=_("Sottotitolo"),
+        help_text=_("Breve sottotitolo visualizzato sotto il titolo."),
+    )
+    intro_text = RichTextField(
+        blank=True,
+        verbose_name=_("Testo introduttivo"),
+        help_text=_("Presentazione di Magix Promotion per la press area."),
+    )
+    company_epk = models.ForeignKey(
+        EPKPackage,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="+",
+        verbose_name=_("EPK Aziendale"),
+        help_text=_("Press kit di Magix Promotion (mostrato in evidenza)."),
+    )
+
+    content_panels = Page.content_panels + [
+        FieldPanel("subtitle"),
+        FieldPanel("intro_text"),
+        FieldPanel("company_epk"),
+    ]
+
+    parent_page_types = ["core.HomePage"]
+    subpage_types = []
+    max_count = 1
+
+    class Meta:
+        verbose_name = _("Press Area")
+        verbose_name_plural = _("Press Area")

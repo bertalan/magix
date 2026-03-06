@@ -51,7 +51,7 @@ const ArtistGrid: React.FC<ArtistGridProps> = ({ onArtistClick }) => {
   const sentinelRef = useInfiniteScroll(loadMore, scrollDisabled);
 
   // Estrai generi unici per filtri (da tutti gli artisti caricati)
-  const artistTypes = ["ALL", "show_band", "tribute", "original", "dj", "cover"];
+  const artistTypes = ["ALL", "show_band", "tribute", "cover", "dj", "original"];
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-24">

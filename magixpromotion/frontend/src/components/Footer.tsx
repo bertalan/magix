@@ -115,6 +115,12 @@ const Footer: React.FC<FooterProps> = ({ setView }) => {
               >
                 {t("footer.contacts")}
               </button>
+              <button
+                onClick={() => setView("PRESS")}
+                className="hover:text-[var(--text-main)] transition-colors text-left"
+              >
+                {t("footer.press")}
+              </button>
             </>
           )}
         </div>

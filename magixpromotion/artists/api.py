@@ -76,6 +76,36 @@ class ArtistEventsField(Field):
         ]
 
 
+class EPKField(Field):
+    """Campo custom: EPK (press kit) associato all'artista, se pubblico."""
+
+    def get_attribute(self, instance):
+        return instance
+
+    def to_representation(self, page):
+        from core.models import EPKPackage
+
+        epk = (
+            EPKPackage.objects.filter(artist=page, is_public=True)
+            .order_by("-updated_at")
+            .first()
+        )
+        if not epk:
+            return None
+        return {
+            "id": epk.pk,
+            "title": epk.title,
+            "description": epk.description or "",
+            "updated_at": epk.updated_at.isoformat(),
+            "assets": {
+                "photo": epk.press_photo_hires.file.url if epk.press_photo_hires else None,
+                "rider": epk.technical_rider.url if epk.technical_rider else None,
+                "bio": epk.biography_pdf.url if epk.biography_pdf else None,
+                "logo": epk.logo_vector.url if epk.logo_vector else None,
+            },
+        }
+
+
 class ImageUrlField(Field):
     """Campo custom: URL rendition immagine principale."""
 
@@ -176,6 +206,7 @@ class ArtistAPIViewSet(PagesAPIViewSet):
         "tags",
         "socials",
         "events",
+        "epk",
     ]
 
     listing_default_fields = PagesAPIViewSet.listing_default_fields + [
@@ -189,6 +220,7 @@ class ArtistAPIViewSet(PagesAPIViewSet):
         "tags",
         "socials",
         "events",
+        "epk",
     ]
 
     known_query_parameters = PagesAPIViewSet.known_query_parameters.union(
@@ -208,6 +240,7 @@ class ArtistAPIViewSet(PagesAPIViewSet):
             tags = TagsListField(read_only=True)
             socials = SocialsField(read_only=True)
             events = ArtistEventsField(read_only=True)
+            epk = EPKField(read_only=True)
 
         return CustomSerializer
 

@@ -52,6 +52,7 @@ export const mockArtist: Artist = {
       status: "AVAILABLE",
     },
   ],
+  epk: null,
 };
 
 export const mockArtist2: Artist = {
@@ -84,6 +85,7 @@ export const mockArtist2: Artist = {
     website: null,
   },
   events: [],
+  epk: null,
 };
 
 export const mockArtistsResponse: WagtailListResponse<Artist> = {

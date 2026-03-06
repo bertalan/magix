@@ -4,7 +4,8 @@
     "artists": "ARTISTI",
     "events": "EVENTI",
     "scout": "TROVA LA TUA BAND",
-    "booking": "BOOKING"
+    "booking": "BOOKING",
+    "press": "PRESS AREA"
   },
   "header": {
     "logoAria": "Magix Promotion — Torna alla home",
@@ -40,7 +41,7 @@
     "searchAria": "Cerca artista per nome o genere",
     "allTypes": "TUTTI",
     "typeShowBand": "SHOW BAND",
-    "typeTribute": "TRIBUTO",
+    "typeTribute": "TRIBUTI",
     "typeOriginal": "ORIGINALE",
     "typeDj": "DJ",
     "typeCover": "COVER",
@@ -222,6 +223,55 @@
     "navigateTo": "Naviga verso la nostra sede",
     "privacy": "PRIVACY",
     "terms": "TERMINI",
-    "contacts": "CONTATTI"
+    "contacts": "CONTATTI",
+    "press": "PRESS AREA"
+  },
+  "artistDetail": {
+    "bandSheet": "Scheda Band",
+    "bandSheetDesc": "Tutte le informazioni",
+    "pressKit": "Press Kit EPK",
+    "pressKitDesc": "Materiale stampa",
+    "videoPromo": "Video Promo",
+    "dateLive": "Date Live",
+    "eventsCount": "{{count}} eventi in programma",
+    "watchYoutube": "Guarda su YouTube",
+    "videoNotAvailable": "Video non disponibile",
+    "biography": "BIOGRAFIA",
+    "upcomingEvents": "PROSSIMI EVENTI",
+    "noEvents": "Nessun evento in programma. Contattaci per disponibilita'.",
+    "requestQuote": "RICHIEDI PREVENTIVO"
+  },
+  "bandSheet": {
+    "title": "SCHEDA BAND",
+    "type": "Tipologia",
+    "tributeTo": "Tributo a",
+    "genre": "Genere",
+    "location": "Base operativa",
+    "biography": "Biografia",
+    "gallery": "Gallery",
+    "socialLinks": "Link & Social",
+    "website": "Sito web",
+    "close": "Chiudi scheda",
+    "show_band": "Show Band / Party Band",
+    "tribute": "Tribute Band",
+    "original": "Band Originale",
+    "dj": "DJ / Solista",
+    "cover": "Cover Band"
+  },
+  "press": {
+    "badge": "PRESS AREA",
+    "title": "PRESS",
+    "titleAccent": "AREA",
+    "subtitle": "Materiale stampa, press kit e risorse media per giornalisti e organizzatori.",
+    "companyKit": "PRESS KIT AZIENDALE",
+    "bandKits": "PRESS KIT ARTISTI",
+    "updated": "Aggiornato il",
+    "download": "Scarica",
+    "photo": "Foto HD",
+    "rider": "Rider Tecnico",
+    "bio": "Biografia PDF",
+    "logo": "Logo",
+    "viewArtist": "Vedi scheda artista",
+    "noKits": "Nessun press kit disponibile al momento."
   }
 }

@@ -2,8 +2,18 @@ import React from "react";
 import { Artist } from "@/types";
 import { Plus, Play } from "lucide-react";
 import { useImageRotator, ImagePair } from "@/hooks/useImageRotator";
+import { useLanguage } from "@/contexts/LanguageContext";
 import ProgressiveImage from "./ProgressiveImage";
 import VideoModal from "./VideoModal";
+
+/** Map artist_type API values to i18n keys */
+const TYPE_I18N_KEYS: Record<string, string> = {
+  show_band: "artists.typeShowBand",
+  tribute: "artists.typeTribute",
+  original: "artists.typeOriginal",
+  dj: "artists.typeDj",
+  cover: "artists.typeCover",
+};
 
 interface ArtistCardProps {
   artist: Artist;
@@ -14,6 +24,7 @@ interface ArtistCardProps {
 
 const ArtistCard: React.FC<ArtistCardProps> = ({ artist, onClick, priority }) => {
   const [showVideo, setShowVideo] = React.useState(false);
+  const { t } = useLanguage();
 
   // Costruisci array immagini paired: full-res + LQIP thumb
   const allImages = React.useMemo<ImagePair[]>(() => {
@@ -119,7 +130,11 @@ const ArtistCard: React.FC<ArtistCardProps> = ({ artist, onClick, priority }) =>
           {artist.title}
         </h3>
         <p className="text-[var(--text-muted)] text-sm font-medium tracking-wide">
-          {artist.genre_display.toUpperCase()}
+          {artist.tribute_to
+            ? artist.tribute_to.toUpperCase()
+            : (TYPE_I18N_KEYS[artist.artist_type ?? ""]
+                ? t(TYPE_I18N_KEYS[artist.artist_type!])
+                : artist.genre_display.toUpperCase())}
         </p>
       </div>
 

@@ -264,10 +264,10 @@ const ArtistDetail: React.FC<ArtistDetailProps> = ({
             </div>
 
             {/* Video + Tour cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-16">
+            <div className="grid grid-cols-1 landscape:grid-cols-2 sm:grid-cols-2 gap-4 landscape:gap-4 sm:gap-6 mb-16">
               <div
                 onClick={handlePlayClick}
-                className="p-8 glass-panel rounded-3xl border border-[var(--glass-border)] flex flex-col gap-4 group cursor-pointer hover:border-[var(--accent)]/30 transition-all active:scale-95"
+                className="p-5 landscape:p-4 sm:p-8 glass-panel rounded-3xl border border-[var(--glass-border)] flex flex-col gap-3 group cursor-pointer hover:border-[var(--accent)]/30 transition-all active:scale-95"
                 role="button"
                 tabIndex={0}
                 onKeyDown={(e) => e.key === "Enter" && handlePlayClick()}
@@ -294,7 +294,7 @@ const ArtistDetail: React.FC<ArtistDetailProps> = ({
                 onClick={() =>
                   eventsRef.current?.scrollIntoView({ behavior: "smooth" })
                 }
-                className="p-8 glass-panel rounded-3xl border border-[var(--glass-border)] flex flex-col gap-4 group cursor-pointer hover:border-[var(--accent-secondary)]/30 transition-all active:scale-95"
+                className="p-5 landscape:p-4 sm:p-8 glass-panel rounded-3xl border border-[var(--glass-border)] flex flex-col gap-3 group cursor-pointer hover:border-[var(--accent-secondary)]/30 transition-all active:scale-95"
                 role="button"
                 tabIndex={0}
                 onKeyDown={(e) =>

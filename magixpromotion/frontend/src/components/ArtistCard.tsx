@@ -64,7 +64,7 @@ const ArtistCard: React.FC<ArtistCardProps> = ({ artist, onClick, priority }) =>
               src={prevSrc}
               alt=""
               aria-hidden="true"
-              className="absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-[600ms] grayscale group-hover:grayscale-0"
+              className="absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-[600ms] md:grayscale group-hover:grayscale-0"
             />
           )}
           {/* Immagine corrente con caricamento progressivo */}
@@ -72,7 +72,7 @@ const ArtistCard: React.FC<ArtistCardProps> = ({ artist, onClick, priority }) =>
             src={currentSrc}
             placeholder={currentThumb}
             alt={artist.title}
-            className={`transition-all duration-700 group-hover:scale-110 grayscale group-hover:grayscale-0 opacity-60 group-hover:opacity-100 ${
+            className={`transition-all duration-700 group-hover:scale-110 md:grayscale group-hover:grayscale-0 opacity-90 md:opacity-60 group-hover:opacity-100 ${
               transitioning ? "animate-fade-in" : ""
             }`}
             loading={priority ? "eager" : "lazy"}

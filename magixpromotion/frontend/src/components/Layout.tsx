@@ -32,7 +32,7 @@ const Layout: React.FC<LayoutProps> = ({
         currentTheme={currentTheme}
         toggleTheme={toggleTheme}
       />
-      <main id="main-content" className="flex-grow pt-20 relative z-10" role="main">
+      <main id="main-content" className="flex-grow pt-20 relative" role="main">
         {children}
       </main>
       <Footer setView={setView} />

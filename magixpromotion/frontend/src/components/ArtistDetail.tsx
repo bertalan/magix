@@ -155,18 +155,18 @@ const ArtistDetail: React.FC<ArtistDetailProps> = ({
         </div>
       )}
 
-      {/* Close */}
+      {/* Close — spostato sotto l'header (80px) su mobile portrait, posizione normale in landscape/desktop */}
       <button
         onClick={onClose}
-        className="fixed top-8 right-8 z-[70] p-4 glass-panel rounded-full text-[var(--text-main)] hover:bg-[var(--glass)] transition-colors"
+        className="fixed top-24 right-5 landscape:top-6 landscape:right-5 md:top-8 md:right-8 z-[70] p-4 glass-panel rounded-full text-[var(--text-main)] hover:bg-[var(--glass)] transition-colors"
         aria-label="Chiudi profilo artista"
       >
-        <X size={32} />
+        <X size={28} className="md:w-8 md:h-8" />
       </button>
 
-      <div className="flex flex-col lg:flex-row min-h-screen">
-        {/* Lato sinistro: Immagine */}
-        <div className="lg:w-1/2 relative h-[50vh] lg:h-screen lg:sticky lg:top-0 overflow-hidden">
+      <div className="flex flex-col landscape:flex-row lg:flex-row min-h-screen">
+        {/* Lato sinistro: Immagine — 75vh portrait, full-screen in landscape e desktop */}
+        <div className="relative h-[75vh] landscape:w-1/2 landscape:h-screen landscape:sticky landscape:top-0 lg:w-1/2 lg:h-screen lg:sticky lg:top-0 overflow-hidden">
           {currentSrc ? (
             <>
               {/* Immagine precedente (in uscita) */}
@@ -183,7 +183,7 @@ const ArtistDetail: React.FC<ArtistDetailProps> = ({
                 src={currentSrc}
                 placeholder={currentThumb}
                 alt={artist.title}
-                className={`grayscale brightness-75 lg:brightness-100 ${
+                className={`md:grayscale brightness-90 md:brightness-75 lg:brightness-100 ${
                   transitioning ? "animate-fade-in" : ""
                 }`}
                 loading="eager"
@@ -192,19 +192,21 @@ const ArtistDetail: React.FC<ArtistDetailProps> = ({
           ) : (
             <div className="w-full h-full bg-gradient-to-br from-[var(--glass)] to-[var(--bg-color)]" aria-hidden="true" />
           )}
-          <div className="absolute inset-0 bg-gradient-to-r from-transparent to-[var(--bg-color)] lg:block hidden" />
-          <div className="absolute inset-0 bg-gradient-to-t from-[var(--bg-color)] to-transparent lg:hidden block" />
+          {/* Gradiente laterale (landscape + desktop) */}
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent to-[var(--bg-color)] hidden landscape:block lg:block" />
+          {/* Gradiente dal basso (solo portrait mobile) */}
+          <div className="absolute inset-0 bg-gradient-to-t from-[var(--bg-color)] to-transparent block landscape:hidden lg:hidden" />
         </div>
 
-        {/* Lato destro: Contenuto */}
-        <div className="lg:w-1/2 px-6 py-20 lg:p-24 flex flex-col">
+        {/* Lato destro: Contenuto — scrollabile in landscape */}
+        <div className="landscape:w-1/2 landscape:overflow-y-auto landscape:h-screen lg:w-1/2 px-6 py-12 landscape:py-8 landscape:px-8 lg:p-24 flex flex-col">
           <div className="animate-in slide-in-from-right-12 duration-700">
             {/* Tipo artista */}
             <span className="text-[var(--accent)] font-bold tracking-[0.4em] text-sm mb-6 block uppercase">
               {artist.artist_type?.replace("_", " ") || "Artista"}
             </span>
 
-            <h1 className="text-6xl lg:text-9xl font-heading font-extrabold tracking-tighter mb-8 leading-none text-[var(--text-main)]">
+            <h1 className="text-5xl md:text-6xl lg:text-9xl font-heading font-extrabold tracking-tighter mb-6 md:mb-8 leading-none text-[var(--text-main)]">
               {artist.title}
             </h1>
 

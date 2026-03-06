@@ -308,6 +308,7 @@ class ArtistAPIViewSet(PagesAPIViewSet):
         "socials",
         "events",
         "epk",
+        "body_html",
     ]
 
     known_query_parameters = PagesAPIViewSet.known_query_parameters.union(

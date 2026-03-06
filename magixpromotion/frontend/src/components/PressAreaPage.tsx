@@ -12,6 +12,7 @@ import {
   Image as ImageIcon,
   ExternalLink,
   Loader2,
+  Archive,
 } from "lucide-react";
 
 const API_BASE = import.meta.env.VITE_API_BASE ?? "";
@@ -26,16 +27,19 @@ interface PressAreaPageProps {
 
 /* ------------------------------------------------------------------
  * Asset card helper — singolo bottone scarica
+ * Usa endpoint /press/epk/{id}/download/{type}/ per rename automatico.
  * ----------------------------------------------------------------*/
+const downloadUrl = (epkId: number, assetType: string) =>
+  `${API_BASE}/press/epk/${epkId}/download/${assetType}/`;
+
 const AssetButton: React.FC<{
-  href: string;
+  epkId: number;
+  assetType: string;
   icon: React.ReactNode;
   label: string;
-}> = ({ href, icon, label }) => (
+}> = ({ epkId, assetType, icon, label }) => (
   <a
-    href={href.startsWith("http") ? href : `${API_BASE}${href}`}
-    target="_blank"
-    rel="noopener noreferrer"
+    href={downloadUrl(epkId, assetType)}
     className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl glass-panel border border-[var(--glass-border)] text-sm font-bold text-[var(--text-muted)] hover:text-[var(--accent)] hover:border-[var(--accent)]/40 transition-all group"
     download
   >
@@ -88,30 +92,46 @@ const EPKCard: React.FC<{
 
       {/* Asset download buttons */}
       <div className="flex flex-wrap gap-3 mb-6">
+        {/* ZIP press kit completo — in evidenza */}
+        {assets.zip && (
+          <a
+            href={downloadUrl(item.id, "zip")}
+            className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-[var(--accent)]/10 border border-[var(--accent)]/40 text-sm font-black text-[var(--accent)] hover:bg-[var(--accent)]/20 hover:border-[var(--accent)] transition-all group"
+            download
+            aria-label={t("press.zipDownload")}
+          >
+            <Archive size={18} className="group-hover:scale-110 transition-transform" />
+            {t("press.zipDownload")}
+          </a>
+        )}
         {assets.photo && (
           <AssetButton
-            href={assets.photo}
+            epkId={item.id}
+            assetType="photo"
             icon={<Camera size={16} />}
             label={t("press.photo")}
           />
         )}
         {assets.rider && (
           <AssetButton
-            href={assets.rider}
+            epkId={item.id}
+            assetType="rider"
             icon={<FileText size={16} />}
             label={t("press.rider")}
           />
         )}
         {assets.bio && (
           <AssetButton
-            href={assets.bio}
+            epkId={item.id}
+            assetType="bio"
             icon={<Music size={16} />}
             label={t("press.bio")}
           />
         )}
         {assets.logo && (
           <AssetButton
-            href={assets.logo}
+            epkId={item.id}
+            assetType="logo"
             icon={<ImageIcon size={16} />}
             label={t("press.logo")}
           />

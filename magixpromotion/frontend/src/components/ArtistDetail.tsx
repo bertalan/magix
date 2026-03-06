@@ -455,6 +455,7 @@ const ArtistDetail: React.FC<ArtistDetailProps> = ({
         <BandSheet
           artist={artist}
           onClose={() => setShowBandSheet(false)}
+          onEventClick={onEventClick}
         />
       )}
     </div>

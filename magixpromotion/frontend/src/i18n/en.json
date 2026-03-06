@@ -252,6 +252,10 @@
     "socialLinks": "Links & Social",
     "website": "Website",
     "close": "Close sheet",
+    "pageContent": "Content",
+    "heroVideo": "Promo Video",
+    "watchVideo": "Watch video on YouTube",
+    "upcomingEvents": "Upcoming Events",
     "show_band": "Show Band / Party Band",
     "tribute": "Tribute Band",
     "original": "Original Band",
@@ -271,6 +275,7 @@
     "rider": "Technical Rider",
     "bio": "Biography PDF",
     "logo": "Logo",
+    "zipDownload": "Download Full Kit",
     "viewArtist": "View artist profile",
     "noKits": "No press kits available at this time."
   }

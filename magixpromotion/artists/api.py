@@ -102,8 +102,94 @@ class EPKField(Field):
                 "rider": epk.technical_rider.url if epk.technical_rider else None,
                 "bio": epk.biography_pdf.url if epk.biography_pdf else None,
                 "logo": epk.logo_vector.url if epk.logo_vector else None,
+                "zip": epk.press_kit_zip.url if epk.press_kit_zip else None,
             },
         }
+
+
+class BodyHTMLField(Field):
+    """Campo custom: renderizza StreamField body come HTML per il frontend."""
+
+    def get_attribute(self, instance):
+        return instance
+
+    def to_representation(self, page):
+        if not page.body:
+            return ""
+        html_parts: list[str] = []
+        for block in page.body:
+            bt = block.block_type
+            val = block.value
+            if bt == "richtext":
+                html_parts.append(str(val))
+            elif bt == "heading":
+                level = val.get("level", "h2")
+                html_parts.append(f"<{level}>{val.get('text', '')}</{level}>")
+            elif bt == "bio":
+                body_html = str(val.get("body", ""))
+                quote = val.get("quote", "")
+                attribution = val.get("quote_attribution", "")
+                html_parts.append(f'<div class="artist-bio">{body_html}')
+                if quote:
+                    html_parts.append(f'<blockquote>{quote}')
+                    if attribution:
+                        html_parts.append(f"<cite>— {attribution}</cite>")
+                    html_parts.append("</blockquote>")
+                html_parts.append("</div>")
+            elif bt == "discography":
+                heading = val.get("heading", "Discografia")
+                albums = val.get("albums", [])
+                html_parts.append(f'<div class="discography"><h3>{heading}</h3>')
+                for album in albums:
+                    title = album.get("title", "")
+                    year = album.get("year", "")
+                    cover = album.get("cover_image")
+                    spotify = album.get("spotify_url", "")
+                    html_parts.append(f'<div class="album">')
+                    if cover:
+                        try:
+                            rendition = cover.get_rendition("fill-200x200|format-webp")
+                            html_parts.append(f'<img src="{rendition.url}" alt="{title}" />')
+                        except Exception:
+                            pass
+                    html_parts.append(f"<strong>{title}</strong> ({year})")
+                    if spotify:
+                        html_parts.append(f' <a href="{spotify}" target="_blank" rel="noopener">Spotify</a>')
+                    html_parts.append("</div>")
+                html_parts.append("</div>")
+            elif bt == "video":
+                caption = val.get("caption", "")
+                video_embed = val.get("video")
+                if video_embed:
+                    try:
+                        html_parts.append(f'<div class="video-embed">{video_embed.html}')
+                        if caption:
+                            html_parts.append(f"<p>{caption}</p>")
+                        html_parts.append("</div>")
+                    except Exception:
+                        pass
+            elif bt == "gallery":
+                images = val.get("images", [])
+                if images:
+                    html_parts.append('<div class="gallery">')
+                    for gi in images:
+                        img = gi.get("image")
+                        if img:
+                            try:
+                                rendition = img.get_rendition("width-600|format-webp")
+                                cap = gi.get("caption", "") or img.title
+                                html_parts.append(f'<img src="{rendition.url}" alt="{cap}" />')
+                            except Exception:
+                                continue
+                    html_parts.append("</div>")
+            elif bt == "cta":
+                text = val.get("text", "")
+                url = val.get("url", "")
+                cta_page = val.get("page")
+                href = url or (cta_page.url if cta_page else "#")
+                style = val.get("style", "primary")
+                html_parts.append(f'<a href="{href}" class="cta cta-{style}">{text}</a>')
+        return "".join(html_parts)
 
 
 class ImageUrlField(Field):
@@ -207,6 +293,7 @@ class ArtistAPIViewSet(PagesAPIViewSet):
         "socials",
         "events",
         "epk",
+        "body_html",
     ]
 
     listing_default_fields = PagesAPIViewSet.listing_default_fields + [
@@ -241,6 +328,7 @@ class ArtistAPIViewSet(PagesAPIViewSet):
             socials = SocialsField(read_only=True)
             events = ArtistEventsField(read_only=True)
             epk = EPKField(read_only=True)
+            body_html = BodyHTMLField(read_only=True)
 
         return CustomSerializer
 

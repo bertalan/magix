@@ -53,6 +53,7 @@ export const mockArtist: Artist = {
     },
   ],
   epk: null,
+  body_html: "",
 };
 
 export const mockArtist2: Artist = {
@@ -86,6 +87,7 @@ export const mockArtist2: Artist = {
   },
   events: [],
   epk: null,
+  body_html: "",
 };
 
 export const mockArtistsResponse: WagtailListResponse<Artist> = {

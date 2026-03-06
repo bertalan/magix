@@ -10,18 +10,21 @@ import {
   MapPin,
   ChevronLeft,
   ChevronRight,
+  Youtube,
 } from "lucide-react";
 
 interface BandSheetProps {
   artist: Artist;
   onClose: () => void;
+  /** Callback per aprire dettaglio evento */
+  onEventClick?: (eventSlug: string) => void;
 }
 
 /**
  * BandSheet — Scheda band completa con tutte le info e lightbox gallery.
  * Overlay full-screen modale, stile coerente con ArtistDetail.
  */
-const BandSheet: React.FC<BandSheetProps> = ({ artist, onClose }) => {
+const BandSheet: React.FC<BandSheetProps> = ({ artist, onClose, onEventClick }) => {
   const { t } = useLanguage();
   const [lightboxOpen, setLightboxOpen] = React.useState(false);
   const [lightboxIndex, setLightboxIndex] = React.useState(0);
@@ -203,16 +206,116 @@ const BandSheet: React.FC<BandSheetProps> = ({ artist, onClose }) => {
             </div>
           </div>
 
-          {/* Biografia */}
-          <div className="mb-12">
-            <h3 className="text-xl font-bold mb-4 flex items-center gap-2 text-[var(--text-main)]">
-              <div className="w-8 h-[2px] bg-[var(--accent)]" />
-              {t("bandSheet.biography")}
-            </h3>
-            <p className="text-lg text-[var(--text-muted)] font-light leading-relaxed max-w-3xl">
-              {artist.short_bio}
-            </p>
-          </div>
+          {/* Biografia (short_bio) */}
+          {artist.short_bio && (
+            <div className="mb-12">
+              <h3 className="text-xl font-bold mb-4 flex items-center gap-2 text-[var(--text-main)]">
+                <div className="w-8 h-[2px] bg-[var(--accent)]" />
+                {t("bandSheet.biography")}
+              </h3>
+              <p className="text-lg text-[var(--text-muted)] font-light leading-relaxed max-w-3xl">
+                {artist.short_bio}
+              </p>
+            </div>
+          )}
+
+          {/* Contenuto pagina (StreamField body) */}
+          {artist.body_html && (
+            <div className="mb-12">
+              <h3 className="text-xl font-bold mb-4 flex items-center gap-2 text-[var(--text-main)]">
+                <div className="w-8 h-[2px] bg-[var(--accent)]" />
+                {t("bandSheet.pageContent")}
+              </h3>
+              <div
+                className="prose prose-invert prose-lg max-w-none text-[var(--text-muted)]
+                  [&_h2]:text-[var(--text-main)] [&_h2]:font-heading [&_h2]:font-extrabold
+                  [&_h3]:text-[var(--text-main)] [&_h3]:font-heading
+                  [&_a]:text-[var(--accent)] [&_a]:no-underline [&_a:hover]:underline
+                  [&_strong]:text-[var(--text-main)]
+                  [&_blockquote]:border-l-4 [&_blockquote]:border-[var(--accent)] [&_blockquote]:pl-4 [&_blockquote]:italic
+                  [&_.gallery]:grid [&_.gallery]:grid-cols-2 [&_.gallery]:sm:grid-cols-3 [&_.gallery]:gap-3
+                  [&_.gallery_img]:rounded-xl [&_.gallery_img]:border [&_.gallery_img]:border-[var(--glass-border)]
+                  [&_.video-embed]:rounded-xl [&_.video-embed]:overflow-hidden
+                  [&_.discography]:space-y-2
+                  [&_.album]:flex [&_.album]:items-center [&_.album]:gap-3"
+                dangerouslySetInnerHTML={{ __html: artist.body_html }}
+              />
+            </div>
+          )}
+
+          {/* Video Promo */}
+          {artist.hero_video_url && (
+            <div className="mb-12">
+              <h3 className="text-xl font-bold mb-4 flex items-center gap-2 text-[var(--text-main)]">
+                <div className="w-8 h-[2px] bg-[var(--accent)]" />
+                {t("bandSheet.heroVideo")}
+              </h3>
+              <a
+                href={artist.hero_video_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-3 px-6 py-3 rounded-2xl glass-panel border border-[var(--glass-border)] text-[var(--text-muted)] hover:text-[var(--accent)] hover:border-[var(--accent)]/40 transition-all group"
+              >
+                <Youtube size={20} className="text-red-500 group-hover:scale-110 transition-transform" />
+                <span className="font-bold text-sm">{t("bandSheet.watchVideo")}</span>
+              </a>
+            </div>
+          )}
+
+          {/* Prossimi eventi */}
+          {artist.events && artist.events.length > 0 && (
+            <div className="mb-12">
+              <h3 className="text-xl font-bold mb-6 flex items-center gap-2 text-[var(--text-main)]">
+                <div className="w-8 h-[2px] bg-[var(--accent)]" />
+                {t("bandSheet.upcomingEvents")}
+              </h3>
+              <div className="flex flex-col gap-3">
+                {artist.events.map((event) => (
+                  <div
+                    key={event.id}
+                    onClick={() => onEventClick?.(event.slug)}
+                    role={onEventClick ? "button" : undefined}
+                    tabIndex={onEventClick ? 0 : undefined}
+                    onKeyDown={(e) => e.key === "Enter" && onEventClick?.(event.slug)}
+                    className={`glass-panel p-4 rounded-2xl border border-[var(--glass-border)] flex items-center gap-4 ${
+                      onEventClick ? "cursor-pointer hover:border-[var(--accent)]/30 transition-all" : ""
+                    }`}
+                  >
+                    <div className="flex flex-col items-center justify-center min-w-[56px] h-[56px] rounded-xl bg-[var(--bg-secondary)] border border-[var(--glass-border)] text-center">
+                      <span className="text-[10px] font-bold text-[var(--text-muted)] uppercase leading-none mb-0.5">
+                        {new Date(event.date).toLocaleDateString("it-IT", { month: "short" })}
+                      </span>
+                      <span className="text-xl font-black text-[var(--text-main)] leading-none">
+                        {new Date(event.date).getDate()}
+                      </span>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h4 className="text-base font-bold text-[var(--text-main)] truncate">
+                        {event.venue}
+                      </h4>
+                      <div className="flex items-center gap-1.5 text-[var(--text-muted)] text-sm">
+                        <MapPin size={12} className="text-[var(--accent)]/60 flex-shrink-0" />
+                        {event.city}
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className={`text-[9px] font-black tracking-[0.15em] px-2 py-1 rounded border ${
+                        event.status === "FREE" ? "text-emerald-500 border-emerald-500/30 bg-emerald-500/5" :
+                        event.status === "SOLD OUT" ? "text-rose-500 border-rose-500/30 bg-rose-500/5" :
+                        event.status === "CANCELLED" ? "text-gray-500 border-gray-500/30 bg-gray-500/5" :
+                        "text-[var(--accent)] border-[var(--glass-border)] bg-[var(--accent)]/5"
+                      }`}>
+                        {event.status === "FREE" ? "INGRESSO LIBERO" :
+                         event.status === "SOLD OUT" ? "SOLD OUT" :
+                         event.status === "CANCELLED" ? "ANNULLATO" :
+                         event.status.toUpperCase()}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Gallery */}
           {allImages.length > 0 && (

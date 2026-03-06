@@ -116,7 +116,7 @@ def epk_list_view(request):
     # Tutti gli EPK pubblici
     epks = (
         EPKPackage.objects.filter(is_public=True)
-        .select_related("artist", "press_photo_hires", "technical_rider", "biography_pdf", "logo_vector")
+        .select_related("artist", "press_photo_hires", "technical_rider", "biography_pdf", "logo_vector", "press_kit_zip")
         .order_by("-updated_at")
     )
 
@@ -133,6 +133,8 @@ def epk_list_view(request):
             assets["bio"] = epk.biography_pdf.url
         if epk.logo_vector:
             assets["logo"] = epk.logo_vector.url
+        if epk.press_kit_zip:
+            assets["zip"] = epk.press_kit_zip.url
 
         items.append({
             "id": epk.pk,

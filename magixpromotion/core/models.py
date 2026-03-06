@@ -240,6 +240,15 @@ class EPKPackage(models.Model):
         related_name="+",
         verbose_name=_("Logo vettoriale (SVG/AI)"),
     )
+    press_kit_zip = models.ForeignKey(
+        get_document_model_string(),
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="+",
+        verbose_name=_("Press Kit completo (ZIP/RAR)"),
+        help_text=_("Archivio compresso con tutti i materiali stampa."),
+    )
     is_public = models.BooleanField(
         default=False,
         verbose_name=_("Pubblicamente accessibile"),
@@ -256,6 +265,7 @@ class EPKPackage(models.Model):
         FieldPanel("technical_rider"),
         FieldPanel("biography_pdf"),
         FieldPanel("logo_vector"),
+        FieldPanel("press_kit_zip"),
     ]
 
     class Meta:

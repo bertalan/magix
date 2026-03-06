@@ -41,6 +41,7 @@ export interface EPKAssets {
   rider: string | null;
   bio: string | null;
   logo: string | null;
+  zip: string | null;
 }
 
 export interface EPKSummary {
@@ -77,6 +78,7 @@ export interface Artist {
   socials: ArtistSocials;
   events: MusicEvent[];
   epk: EPKSummary | null;
+  body_html: string;
 }
 
 // --- Events ---

@@ -58,11 +58,29 @@ class ArtistEventsField(Field):
     def to_representation(self, page):
         from events.models import EventPage
 
-        events = (
-            EventPage.objects.live()
-            .filter(related_artist=page, start_date__gte=timezone.now().date())
-            .order_by("start_date")[:10]
-        )
+        base_qs = EventPage.objects.live().filter(start_date__gte=timezone.now().date())
+        events = list(base_qs.filter(related_artist=page).order_by("start_date")[:10])
+
+        if page.locale.language_code != "it":
+            source_artist = (
+                page.__class__.objects.filter(
+                    translation_key=page.translation_key,
+                    locale__language_code="it",
+                )
+                .first()
+            )
+            if source_artist:
+                translated_keys = {event.translation_key for event in events}
+                fallback_events = (
+                    base_qs.filter(related_artist=source_artist)
+                    .exclude(translation_key__in=translated_keys)
+                    .order_by("start_date")
+                )
+                for fallback_event in fallback_events:
+                    events.append(fallback_event)
+                    if len(events) >= 10:
+                        break
+
         return [
             {
                 "id": str(e.pk),

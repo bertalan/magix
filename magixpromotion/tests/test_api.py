@@ -1,11 +1,16 @@
 """Test integrazione per API endpoints."""
 import pytest
 from django.test import Client
+from rest_framework.request import Request
+from rest_framework.test import APIRequestFactory
 from wagtail.models import Locale, Page
 
+from artists.api import ArtistEventsField
+from events.api import EventAPIViewSet
 from tests.factories import (
     ArtistListingPageFactory,
     ArtistPageFactory,
+    EventListingPageFactory,
     EventPageFactory,
     HomePageFactory,
 )
@@ -87,6 +92,49 @@ class TestArtistAPI:
         client = Client()
         response = client.get("/api/v2/artists/?daily_seed=2026-02-19")
         assert response.status_code == 200
+
+    def test_artist_detail_falls_back_to_italian_events_for_english_locale(self, home_page):
+        import datetime
+
+        locale_en, _ = Locale.objects.get_or_create(language_code="en")
+        root = Page.objects.get(depth=1)
+
+        artist_listing_it = ArtistListingPageFactory(parent=home_page)
+        artist_it = ArtistPageFactory(parent=artist_listing_it, title="Band Fallback")
+
+        home_page_en = HomePageFactory(
+            parent=root,
+            locale=locale_en,
+            title="Home EN",
+            slug="home-en-artists-events",
+        )
+        artist_listing_en = ArtistListingPageFactory(
+            parent=home_page_en,
+            locale=locale_en,
+            title="Artists",
+            slug="artists-en-fallback",
+        )
+        artist_en = ArtistPageFactory(
+            parent=artist_listing_en,
+            locale=locale_en,
+            title="Band Fallback",
+            slug=artist_it.slug,
+        )
+        artist_en.translation_key = artist_it.translation_key
+        artist_en.save()
+
+        event_listing_it = EventListingPageFactory(parent=home_page)
+        EventPageFactory(
+            parent=event_listing_it,
+            title="Evento Originale",
+            start_date=datetime.date(2099, 1, 1),
+            related_artist=artist_it,
+        )
+
+        data = ArtistEventsField().to_representation(artist_en)
+
+        assert len(data) == 1
+        assert data[0]["slug"] == "evento-originale"
 
 
 @pytest.mark.django_db
@@ -281,6 +329,118 @@ class TestEventAPI:
         titles = [item["title"] for item in data["items"]]
         assert "Future Event" in titles
         assert "Past Event" not in titles
+
+    def test_events_api_falls_back_to_italian_originals_for_english_locale(self, home_page):
+        import datetime
+
+        locale_en, _ = Locale.objects.get_or_create(language_code="en")
+        root = Page.objects.get(depth=1)
+
+        artist_listing_it = ArtistListingPageFactory(parent=home_page)
+        artist_it = ArtistPageFactory(parent=artist_listing_it, title="Band Eventi")
+
+        event_listing_it = EventListingPageFactory(parent=home_page)
+        original_event = EventPageFactory(
+            parent=event_listing_it,
+            title="Evento Originale",
+            slug="evento-originale",
+            start_date=datetime.date(2099, 6, 1),
+            related_artist=artist_it,
+        )
+
+        home_page_en = HomePageFactory(
+            parent=root,
+            locale=locale_en,
+            title="Home EN",
+            slug="home-en-events-fallback",
+        )
+        EventListingPageFactory(
+            parent=home_page_en,
+            locale=locale_en,
+            title="Events",
+            slug="events-en-fallback",
+        )
+
+        request = Request(APIRequestFactory().get("/api/v2/events/", {"locale": "en", "future_only": "true"}))
+        viewset = EventAPIViewSet()
+        viewset.request = request
+
+        translated_qs = viewset._apply_filters(
+            EventPageFactory._meta.model.objects.live().public().filter(locale__language_code="en")
+        )
+        items = list(viewset._apply_ordering(viewset._with_locale_fallback(translated_qs)))
+
+        assert len(items) == 1
+        assert items[0].id == original_event.id
+        assert items[0].title == "Evento Originale"
+
+    def test_events_api_prefers_translated_event_when_available(self, home_page):
+        import datetime
+
+        locale_en, _ = Locale.objects.get_or_create(language_code="en")
+        root = Page.objects.get(depth=1)
+
+        artist_listing_it = ArtistListingPageFactory(parent=home_page)
+        artist_it = ArtistPageFactory(parent=artist_listing_it, title="Band Eventi Tradotti")
+
+        event_listing_it = EventListingPageFactory(parent=home_page)
+        original_event = EventPageFactory(
+            parent=event_listing_it,
+            title="Evento Italiano",
+            slug="evento-tradotto",
+            start_date=datetime.date(2099, 7, 1),
+            related_artist=artist_it,
+        )
+
+        home_page_en = HomePageFactory(
+            parent=root,
+            locale=locale_en,
+            title="Home EN",
+            slug="home-en-events-translated",
+        )
+        event_listing_en = EventListingPageFactory(
+            parent=home_page_en,
+            locale=locale_en,
+            title="Events",
+            slug="events-en-translated",
+        )
+
+        artist_en = ArtistPageFactory(
+            parent=ArtistListingPageFactory(
+                parent=home_page_en,
+                locale=locale_en,
+                title="Artists",
+                slug="artists-en-events-translated",
+            ),
+            locale=locale_en,
+            title="Band Eventi Tradotti",
+            slug=artist_it.slug,
+        )
+        artist_en.translation_key = artist_it.translation_key
+        artist_en.save()
+        translated_event = EventPageFactory(
+            parent=event_listing_en,
+            locale=locale_en,
+            title="Translated Event",
+            slug=original_event.slug,
+            start_date=original_event.start_date,
+            related_artist=artist_en,
+        )
+        translated_event.translation_key = original_event.translation_key
+        translated_event.save()
+
+        request = Request(APIRequestFactory().get("/api/v2/events/", {"locale": "en", "future_only": "true"}))
+        viewset = EventAPIViewSet()
+        viewset.request = request
+
+        translated_qs = viewset._apply_filters(
+            EventPageFactory._meta.model.objects.live().public().filter(locale__language_code="en")
+        )
+        items = list(viewset._apply_ordering(viewset._with_locale_fallback(translated_qs)))
+
+        assert len(items) == 1
+        assert items[0].id == translated_event.id
+        assert items[0].title == "Translated Event"
 
 
 @pytest.mark.django_db

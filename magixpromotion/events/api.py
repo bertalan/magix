@@ -1,4 +1,5 @@
 """API endpoint custom per EventPage."""
+from django.db.models import QuerySet
 from django.utils import timezone
 from rest_framework.fields import Field
 from wagtail.api.v2.serializers import PageSerializer
@@ -143,18 +144,8 @@ class EventAPIViewSet(PagesAPIViewSet):
 
         return CustomSerializer
 
-    def get_queryset(self):
-        qs = super().get_queryset()
-
-        # Ordinamento per data (prossimi in ordine cronologico, archivio decrescente)
-        date_to = self.request.query_params.get("date_to")
-        if date_to:
-            # Tab ARCHIVIO: dal più recente al più lontano
-            qs = qs.order_by("-start_date")
-        else:
-            # Tab PROSSIMI (o default): dal più vicino al più lontano
-            qs = qs.order_by("start_date")
-
+    def _apply_filters(self, qs: QuerySet[EventPage]) -> QuerySet[EventPage]:
+        """Applica i filtri custom agli eventi."""
         artist = self.request.query_params.get("artist")
         if artist:
             qs = qs.filter(related_artist__slug=artist)
@@ -179,6 +170,7 @@ class EventAPIViewSet(PagesAPIViewSet):
         if date_from:
             qs = qs.filter(start_date__gte=date_from)
 
+        date_to = self.request.query_params.get("date_to")
         if date_to:
             qs = qs.filter(start_date__lte=date_to)
 
@@ -186,4 +178,32 @@ class EventAPIViewSet(PagesAPIViewSet):
         if city:
             qs = qs.filter(venue__city__iexact=city)
 
+        return qs
+
+    def _apply_ordering(self, qs: QuerySet[EventPage]) -> QuerySet[EventPage]:
+        """Applica l'ordinamento corretto per prossimi eventi o archivio."""
+        date_to = self.request.query_params.get("date_to")
+        if date_to:
+            return qs.order_by("-start_date")
+        return qs.order_by("start_date")
+
+    def _with_locale_fallback(self, qs: QuerySet[EventPage]) -> QuerySet[EventPage]:
+        """Per lingue non originali, include gli eventi italiani non tradotti."""
+        locale = self.request.query_params.get("locale")
+        if not locale or locale == "it":
+            return qs
+
+        fallback_qs = EventPage.objects.live().public().filter(locale__language_code="it")
+        fallback_qs = self._apply_filters(fallback_qs)
+
+        translated_keys = qs.values_list("translation_key", flat=True)
+        fallback_qs = fallback_qs.exclude(translation_key__in=translated_keys)
+
+        return qs | fallback_qs
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        qs = self._apply_filters(qs)
+        qs = self._with_locale_fallback(qs)
+        qs = self._apply_ordering(qs)
         return qs.select_related("venue", "related_artist", "featured_image")

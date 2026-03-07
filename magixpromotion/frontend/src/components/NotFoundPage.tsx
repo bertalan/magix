@@ -44,8 +44,8 @@ const NotFoundPage: React.FC<NotFoundPageProps> = ({ setView }) => {
   return (
     <div className="flex flex-col items-center justify-center min-h-[70vh] px-4 text-center">
       <SEOHead
-        title="404 — Page Not Found"
-        description="The page you are looking for does not exist."
+        title={t("notFound.title")}
+        description={t("notFound.description")}
         noindex
       />
       {/* Glitch 404 */}

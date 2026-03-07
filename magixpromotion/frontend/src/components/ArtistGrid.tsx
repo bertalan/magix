@@ -47,8 +47,9 @@ const ArtistGrid: React.FC<ArtistGridProps> = ({ onArtistClick }) => {
 
   // Con la ricerca server-side non serve più filtrare lato client
   const artists = allArtists;
+  const isSearching = debouncedSearch.length > 0;
 
-  const scrollDisabled = loading || loadingMore || !hasMore;
+  const scrollDisabled = loading || loadingMore || !hasMore || isSearching;
   const sentinelRef = useInfiniteScroll(loadMore, scrollDisabled);
 
   // Estrai generi unici per filtri (da tutti gli artisti caricati)
@@ -93,8 +94,8 @@ const ArtistGrid: React.FC<ArtistGridProps> = ({ onArtistClick }) => {
       {/* Conteggio risultati */}
       {!loading && totalCount > 0 && (
         <p className="text-sm text-[var(--text-muted)] mb-6">
-          {debouncedSearch
-            ? t("artists.results", { count: artists.length })
+          {isSearching
+            ? t("artists.results", { count: totalCount })
             : t("artists.countOf", { loaded: artists.length, total: totalCount })}
         </p>
       )}

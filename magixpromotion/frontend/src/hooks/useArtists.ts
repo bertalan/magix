@@ -14,6 +14,7 @@ export interface ArtistFilterParams {
 
 /** Dimensione pagina per il caricamento incrementale */
 const PAGE_SIZE = 6;
+const SEARCH_PAGE_SIZE = 50;
 
 /** Genera la seed giornaliera in formato YYYY-MM-DD */
 function todaySeed(): string {
@@ -43,6 +44,8 @@ export function useArtists(filters?: ArtistFilterParams) {
 
   // Seed giornaliera calcolata una sola volta per sessione del componente
   const seed = useMemo(() => todaySeed(), []);
+  const hasSearch = Boolean(filters?.search?.trim());
+  const pageSize = hasSearch ? SEARCH_PAGE_SIZE : PAGE_SIZE;
 
   // Chiave filtri serializzata per rilevare cambi
   const filterKey = JSON.stringify(filters ?? {});
@@ -55,7 +58,13 @@ export function useArtists(filters?: ArtistFilterParams) {
     setLoading(true);
     setError(null);
 
-    fetchArtists({ ...filters, limit: PAGE_SIZE, offset: 0, daily_seed: seed, locale: lang })
+    fetchArtists({
+      ...filters,
+      limit: pageSize,
+      offset: 0,
+      daily_seed: hasSearch ? undefined : seed,
+      locale: lang,
+    })
       .then((res) => {
         if (!cancelled) {
           setItems(res.items);
@@ -74,7 +83,7 @@ export function useArtists(filters?: ArtistFilterParams) {
       cancelled = true;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filterKey, lang]);
+  }, [filterKey, hasSearch, lang, pageSize, seed]);
 
   const hasMore = items.length < totalCount;
 
@@ -83,7 +92,13 @@ export function useArtists(filters?: ArtistFilterParams) {
     if (loadingMore || !hasMore) return;
     setLoadingMore(true);
 
-    fetchArtists({ ...filters, limit: PAGE_SIZE, offset: offsetRef.current, daily_seed: seed, locale: lang })
+    fetchArtists({
+      ...filters,
+      limit: pageSize,
+      offset: offsetRef.current,
+      daily_seed: hasSearch ? undefined : seed,
+      locale: lang,
+    })
       .then((res) => {
         setItems((prev) => [...prev, ...res.items]);
         setTotalCount(res.meta.total_count);
@@ -96,7 +111,7 @@ export function useArtists(filters?: ArtistFilterParams) {
         setLoadingMore(false);
       });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [loadingMore, hasMore, filterKey, lang]);
+  }, [filterKey, hasMore, hasSearch, lang, loadingMore, pageSize, seed]);
 
   // Retrocompatibilità: esponi anche `data` nella forma WagtailListResponse
   const data: WagtailListResponse<Artist> | null =

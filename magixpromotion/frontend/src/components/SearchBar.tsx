@@ -162,15 +162,15 @@ const SearchBar: React.FC<SearchBarProps> = ({
                     {r.type === "artist" ? "Artista" : "Evento"}
                   </span>
                   <span className="search-item-name">{r.title}</span>
-                  {r.genre && (
+                  {r.type === "artist" && r.genre && (
                     <span className="search-item-meta">{r.genre}</span>
                   )}
-                  {r.venue_name && (
+                  {r.type === "event" && r.venue_name && (
                     <span className="search-item-meta">
                       {r.venue_name} - {r.city}
                     </span>
                   )}
-                  {r.start_date && (
+                  {r.type === "event" && r.start_date && (
                     <span className="search-item-date">{r.start_date}</span>
                   )}
                 </button>

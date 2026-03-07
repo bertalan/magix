@@ -9,6 +9,7 @@ import { http, HttpResponse } from "msw";
 import { server } from "../mocks/server";
 import ArtistGrid from "@/components/ArtistGrid";
 import { renderWithProviders } from "../test-utils";
+import { mockArtist2, mockArtistsResponse } from "../mocks/fixtures";
 
 describe("ArtistGrid", () => {
   it("shows loading skeleton initially", () => {
@@ -50,8 +51,65 @@ describe("ArtistGrid", () => {
     });
   });
 
-  it("filters artists by search text", async () => {
+  it("uses the listing endpoint when the search query is empty", async () => {
+    let listingHits = 0;
+    let searchHits = 0;
+
+    server.use(
+      http.get("/api/v2/artists/", () => {
+        listingHits += 1;
+        return HttpResponse.json(mockArtistsResponse);
+      }),
+      http.get("/api/v2/search/", () => {
+        searchHits += 1;
+        return HttpResponse.json({ query: "", total: 0, results: [] });
+      }),
+    );
+
+    renderWithProviders(<ArtistGrid onArtistClick={() => {}} />);
+
+    await waitFor(() => {
+      expect(screen.getByText("The Groove Machine")).toBeInTheDocument();
+    });
+
+    expect(listingHits).toBeGreaterThan(0);
+    expect(searchHits).toBe(0);
+  });
+
+  it("uses the artist search API when the query is valued", async () => {
     const user = userEvent.setup();
+    let requestedType: string | null = null;
+
+    server.use(
+      http.get("/api/v2/search/", ({ request }) => {
+        requestedType = new URL(request.url).searchParams.get("type");
+        return HttpResponse.json({
+          query: "queen",
+          total: 1,
+          results: [
+            {
+              type: "artist",
+              id: 2,
+              title: "Queen Forever",
+              slug: "queen-tribute",
+              genre: "Rock",
+              genre_display: "Rock",
+              image_url: "/media/images/queen-forever.jpg",
+              image_thumb: "/media/images/queen-forever-thumb.jpg",
+              artist_type: "tribute",
+              short_bio: mockArtist2.short_bio,
+              tags: mockArtist2.tags,
+              tribute_to: "Queen",
+              hero_video_url: "",
+              base_country: mockArtist2.base_country,
+              base_region: mockArtist2.base_region,
+              base_city: mockArtist2.base_city,
+            },
+          ],
+        });
+      }),
+    );
+
     renderWithProviders(<ArtistGrid onArtistClick={() => {}} />);
 
     await waitFor(() => {
@@ -61,13 +119,22 @@ describe("ArtistGrid", () => {
     const searchInput = screen.getByPlaceholderText("Cerca artista...");
     await user.type(searchInput, "Queen");
 
-    // Queen Forever should appear, Groove Machine should not
-    expect(screen.getByText("Queen Forever")).toBeInTheDocument();
+    await waitFor(() => {
+      expect(requestedType).toBe("artists");
+      expect(screen.getByText("Queen Forever")).toBeInTheDocument();
+    });
+
     expect(screen.queryByText("The Groove Machine")).not.toBeInTheDocument();
   });
 
   it("shows empty message when no artists match search", async () => {
     const user = userEvent.setup();
+    server.use(
+      http.get("/api/v2/search/", () => {
+        return HttpResponse.json({ query: "zzznonexistent", total: 0, results: [] });
+      }),
+    );
+
     renderWithProviders(<ArtistGrid onArtistClick={() => {}} />);
 
     await waitFor(() => {
@@ -77,12 +144,69 @@ describe("ArtistGrid", () => {
     const searchInput = screen.getByPlaceholderText("Cerca artista...");
     await user.type(searchInput, "zzznonexistent");
 
-    expect(
-      screen.getByText("Nessun artista trovato con questi filtri."),
-    ).toBeInTheDocument();
+    await waitFor(() => {
+      expect(
+        screen.getByText("Nessun artista trovato con questi filtri."),
+      ).toBeInTheDocument();
+    });
   });
 
-  it("calls onArtistClick when an artist card is clicked", async () => {
+  it("disables classic infinite scroll while in search mode", async () => {
+    const user = userEvent.setup();
+
+    server.use(
+      http.get("/api/v2/artists/", () => {
+        return HttpResponse.json({
+          meta: { total_count: 8 },
+          items: [mockArtistsResponse.items[0]],
+        });
+      }),
+      http.get("/api/v2/search/", () => {
+        return HttpResponse.json({
+          query: "queen",
+          total: 1,
+          results: [
+            {
+              type: "artist",
+              id: 2,
+              title: "Queen Forever",
+              slug: "queen-tribute",
+              genre: "Rock",
+              genre_display: "Rock",
+              image_url: "/media/images/queen-forever.jpg",
+              image_thumb: "/media/images/queen-forever-thumb.jpg",
+              artist_type: "tribute",
+              short_bio: mockArtist2.short_bio,
+              tags: mockArtist2.tags,
+              tribute_to: "Queen",
+              hero_video_url: "",
+              base_country: mockArtist2.base_country,
+              base_region: mockArtist2.base_region,
+              base_city: mockArtist2.base_city,
+            },
+          ],
+        });
+      }),
+    );
+
+    renderWithProviders(<ArtistGrid onArtistClick={() => {}} />);
+
+    await waitFor(() => {
+      expect(screen.getByRole("status")).toHaveAttribute("aria-label", "Caricamento altri artisti");
+      expect(screen.queryByText("Queen Forever")).not.toBeInTheDocument();
+    });
+
+    const searchInput = screen.getByPlaceholderText("Cerca artista...");
+    await user.type(searchInput, "Queen");
+
+    await waitFor(() => {
+      expect(screen.getByText("Queen Forever")).toBeInTheDocument();
+    });
+
+    expect(screen.getByRole("status")).toHaveAttribute("aria-label", "");
+  });
+
+  it("calls onArtistClick with the full artist when a search result card is clicked", async () => {
     const user = userEvent.setup();
     const onArtistClick = vi.fn();
 
@@ -92,14 +216,24 @@ describe("ArtistGrid", () => {
       expect(screen.getByText("The Groove Machine")).toBeInTheDocument();
     });
 
+    const searchInput = screen.getByPlaceholderText("Cerca artista...");
+    await user.type(searchInput, "Queen");
+
+    await waitFor(() => {
+      expect(screen.getByText("Queen Forever")).toBeInTheDocument();
+    });
+
     const card = screen.getByRole("button", {
-      name: "Vedi dettagli di The Groove Machine",
+      name: "Vedi dettagli di Queen Forever",
     });
     await user.click(card);
 
     expect(onArtistClick).toHaveBeenCalledTimes(1);
     expect(onArtistClick).toHaveBeenCalledWith(
-      expect.objectContaining({ title: "The Groove Machine" }),
+      expect.objectContaining({
+        title: "Queen Forever",
+        meta: expect.objectContaining({ slug: "queen-tribute" }),
+      }),
     );
   });
 

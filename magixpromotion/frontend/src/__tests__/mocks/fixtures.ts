@@ -5,7 +5,9 @@
 
 import type {
   Artist,
+  ArtistSearchResult,
   EventPage,
+  EventSearchResult,
   MenuResponse,
   SiteSettings,
   WagtailListResponse,
@@ -229,26 +231,58 @@ export const mockSiteSettings: SiteSettings = {
 
 // --- Search ---
 
+export const mockArtistSearchResult: ArtistSearchResult = {
+  type: "artist",
+  id: 1,
+  title: "The Groove Machine",
+  slug: "the-groove-machine",
+  genre: "Dance / Pop",
+  genre_display: "Dance / Pop",
+  image_url: "/media/images/groove-machine.jpg",
+  image_thumb: "/media/images/groove-machine-thumb.jpg",
+  artist_type: "show_band",
+  short_bio: mockArtist.short_bio,
+  tags: mockArtist.tags,
+  tribute_to: "",
+  hero_video_url: "",
+  base_country: mockArtist.base_country,
+  base_region: mockArtist.base_region,
+  base_city: mockArtist.base_city,
+};
+
+export const mockArtistSearchResult2: ArtistSearchResult = {
+  type: "artist",
+  id: 2,
+  title: "Queen Forever",
+  slug: "queen-tribute",
+  genre: "Rock",
+  genre_display: "Rock",
+  image_url: "/media/images/queen-forever.jpg",
+  image_thumb: "/media/images/queen-forever-thumb.jpg",
+  artist_type: "tribute",
+  short_bio: mockArtist2.short_bio,
+  tags: mockArtist2.tags,
+  tribute_to: "Queen",
+  hero_video_url: "",
+  base_country: mockArtist2.base_country,
+  base_region: mockArtist2.base_region,
+  base_city: mockArtist2.base_city,
+};
+
+export const mockEventSearchResult: EventSearchResult = {
+  type: "event",
+  id: 10,
+  title: "Concerto in Piazza Duomo",
+  slug: "concerto-piazza-duomo",
+  start_date: "2025-07-20",
+  venue_name: "Piazza Duomo",
+  city: "Milano",
+};
+
 export const mockSearchResults = {
-  results: [
-    {
-      type: "artist" as const,
-      id: 1,
-      title: "The Groove Machine",
-      slug: "the-groove-machine",
-      genre: "Dance / Pop",
-      image_url: "/media/images/groove-machine.jpg",
-    },
-    {
-      type: "event" as const,
-      id: 10,
-      title: "Concerto in Piazza Duomo",
-      slug: "concerto-piazza-duomo",
-      start_date: "2025-07-20",
-      venue_name: "Piazza Duomo",
-      city: "Milano",
-    },
-  ],
+  query: "groove",
+  total: 2,
+  results: [mockArtistSearchResult, mockEventSearchResult],
 };
 
 export const mockAutocompleteSuggestions = {

@@ -6,6 +6,9 @@
 import { http, HttpResponse } from "msw";
 import {
   mockArtistsResponse,
+  mockArtistSearchResult,
+  mockArtistSearchResult2,
+  mockEventSearchResult,
   mockEventsResponse,
   mockMenuResponse,
   mockSiteSettings,
@@ -18,16 +21,25 @@ export const handlers = [
   http.get("/api/v2/artists/", ({ request }) => {
     const url = new URL(request.url);
     const slugFilter = url.searchParams.get("slug");
+    const artistType = url.searchParams.get("artist_type");
+    const limit = Number(url.searchParams.get("limit") || mockArtistsResponse.items.length);
+    const offset = Number(url.searchParams.get("offset") || 0);
+    let filtered = mockArtistsResponse.items;
+
     if (slugFilter) {
-      const filtered = mockArtistsResponse.items.filter(
+      filtered = filtered.filter(
         (a) => a.meta.slug === slugFilter,
       );
-      return HttpResponse.json({
-        meta: { total_count: filtered.length },
-        items: filtered,
-      });
     }
-    return HttpResponse.json(mockArtistsResponse);
+
+    if (artistType) {
+      filtered = filtered.filter((artist) => artist.artist_type === artistType);
+    }
+
+    return HttpResponse.json({
+      meta: { total_count: filtered.length },
+      items: filtered.slice(offset, offset + limit),
+    });
   }),
 
   // --- Single artist ---
@@ -67,8 +79,40 @@ export const handlers = [
   }),
 
   // --- Search ---
-  http.get("/api/v2/search/", () => {
-    return HttpResponse.json(mockSearchResults);
+  http.get("/api/v2/search/", ({ request }) => {
+    const url = new URL(request.url);
+    const query = (url.searchParams.get("q") || "").trim().toLowerCase();
+    const type = url.searchParams.get("type") || "all";
+
+    if (!query || query.length < 2) {
+      return HttpResponse.json({ query, total: 0, results: [] });
+    }
+
+    const artistResults = [mockArtistSearchResult, mockArtistSearchResult2];
+    const eventResults = [mockEventSearchResult];
+    const haystack = [
+      ...(type === "all" || type === "artists" ? artistResults : []),
+      ...(type === "all" || type === "events" ? eventResults : []),
+    ];
+
+    const results = haystack.filter((item) => {
+      if (item.type === "artist") {
+        return [item.title, item.genre, item.short_bio, item.tribute_to]
+          .filter(Boolean)
+          .some((value) => value!.toLowerCase().includes(query));
+      }
+
+      return [item.title, item.venue_name, item.city]
+        .filter(Boolean)
+        .some((value) => value!.toLowerCase().includes(query));
+    });
+
+    return HttpResponse.json({
+      ...mockSearchResults,
+      query,
+      total: results.length,
+      results,
+    });
   }),
 
   // --- Autocomplete ---

@@ -2,6 +2,8 @@
 import pytest
 from django.test import Client
 
+from tests.factories import ArtistPageFactory, EventPageFactory
+
 
 @pytest.mark.django_db
 class TestArtistAPI:
@@ -79,6 +81,94 @@ class TestArtistAPI:
         client = Client()
         response = client.get("/api/v2/artists/?daily_seed=2026-02-19")
         assert response.status_code == 200
+
+
+@pytest.mark.django_db
+class TestSearchAPI:
+    def test_search_artists_returns_enriched_payload(self, artist):
+        client = Client()
+
+        response = client.get("/api/v2/search/?q=Red&type=artists")
+
+        assert response.status_code == 200
+        data = response.json()
+        assert data["total"] == 1
+        result = data["results"][0]
+        assert result["type"] == "artist"
+        assert result["id"] == artist.id
+        assert result["title"] == artist.title
+        assert result["slug"] == artist.slug
+        assert result["artist_type"] == artist.artist_type
+        assert result["short_bio"] == artist.short_bio
+        assert result["genre"] == "Dance Show Band"
+        assert result["genre_display"] == "Dance Show Band"
+        assert "tags" in result
+        assert "image_url" in result
+        assert "image_thumb" in result
+
+    def test_search_artists_matches_short_bio(self, artist):
+        client = Client()
+
+        response = client.get("/api/v2/search/?q=artist&type=artists")
+
+        assert response.status_code == 200
+        data = response.json()
+        assert data["total"] == 1
+        assert data["results"][0]["id"] == artist.id
+
+    def test_search_artists_matches_genre(self, artist):
+        client = Client()
+
+        response = client.get("/api/v2/search/?q=Dance&type=artists")
+
+        assert response.status_code == 200
+        data = response.json()
+        assert data["total"] == 1
+        assert data["results"][0]["id"] == artist.id
+
+    def test_search_artists_excludes_events(self, artist, event_listing, venue):
+        EventPageFactory(
+            parent=event_listing,
+            title="Red Moon Live",
+            venue=venue,
+        )
+        client = Client()
+
+        response = client.get("/api/v2/search/?q=Red&type=artists")
+
+        assert response.status_code == 200
+        data = response.json()
+        assert data["total"] == 1
+        assert all(item["type"] == "artist" for item in data["results"])
+
+    def test_search_query_too_short_returns_empty(self, artist):
+        client = Client()
+
+        response = client.get("/api/v2/search/?q=r&type=artists")
+
+        assert response.status_code == 200
+        data = response.json()
+        assert data["total"] == 0
+        assert data["results"] == []
+
+    def test_search_artists_limit_is_respected(self, artist_listing, genres):
+        for idx in range(3):
+            page = ArtistPageFactory(
+                parent=artist_listing,
+                title=f"Red Artist {idx}",
+                short_bio="Red artist bio",
+                artist_type="show_band",
+            )
+            page.genres.add(genres[0])
+            page.save()
+
+        client = Client()
+        response = client.get("/api/v2/search/?q=Red&type=artists&limit=2")
+
+        assert response.status_code == 200
+        data = response.json()
+        assert data["total"] == 2
+        assert len(data["results"]) == 2
 
 
 @pytest.mark.django_db

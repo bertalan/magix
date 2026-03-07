@@ -1,30 +1,28 @@
-import { useState, useCallback, useRef, useEffect } from "react";
-
-interface SearchResult {
-  type: "artist" | "event";
-  id: number;
-  title: string;
-  slug: string;
-  genre?: string;
-  image_url?: string;
-  start_date?: string;
-  venue_name?: string;
-  city?: string;
-}
-
-interface AutocompleteSuggestion {
-  id: number;
-  name: string;
-  slug: string;
-  genre?: string;
-}
+import { useState, useCallback, useRef, useEffect, useMemo } from "react";
+import type {
+  ArtistSearchResult,
+  AutocompleteSuggestion,
+  SearchResponse,
+  SearchResult,
+} from "@/types";
 
 interface UseSearchReturn {
   results: SearchResult[];
   suggestions: AutocompleteSuggestion[];
   loading: boolean;
+  error: Error | null;
+  total: number;
   search: (query: string, type?: string) => Promise<void>;
   autocomplete: (query: string) => Promise<void>;
+  clearResults: () => void;
+}
+
+interface UseArtistSearchReturn {
+  results: ArtistSearchResult[];
+  loading: boolean;
+  error: Error | null;
+  total: number;
+  search: (query: string) => Promise<void>;
   clearResults: () => void;
 }
 
@@ -41,6 +39,8 @@ export function useSearch(debounceMs = 300): UseSearchReturn {
   const [results, setResults] = useState<SearchResult[]>([]);
   const [suggestions, setSuggestions] = useState<AutocompleteSuggestion[]>([]);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+  const [total, setTotal] = useState(0);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Cleanup debounce timer on unmount
@@ -56,7 +56,9 @@ export function useSearch(debounceMs = 300): UseSearchReturn {
     async (query: string, type = "all") => {
       if (query.length < 2) {
         setResults([]);
-        return;
+        setTotal(0);
+        setError(null);
+        return Promise.resolve();
       }
 
       // Cancel any pending debounce
@@ -71,10 +73,17 @@ export function useSearch(debounceMs = 300): UseSearchReturn {
             const res = await fetch(
               `/api/v2/search/?q=${encodeURIComponent(query)}&type=${type}`
             );
-            const data = await res.json();
+            if (!res.ok) {
+              throw new Error(`API error ${res.status}: ${res.statusText}`);
+            }
+            const data = await res.json() as SearchResponse;
             setResults(data.results);
-          } catch {
+            setTotal(data.total ?? data.results.length);
+            setError(null);
+          } catch (err) {
             setResults([]);
+            setTotal(0);
+            setError(err instanceof Error ? err : new Error("Search failed"));
           } finally {
             setLoading(false);
             resolve();
@@ -89,7 +98,7 @@ export function useSearch(debounceMs = 300): UseSearchReturn {
     async (query: string) => {
       if (query.length < 2) {
         setSuggestions([]);
-        return;
+        return Promise.resolve();
       }
 
       if (debounceRef.current) {
@@ -102,8 +111,12 @@ export function useSearch(debounceMs = 300): UseSearchReturn {
             const res = await fetch(
               `/api/v2/search/autocomplete/?q=${encodeURIComponent(query)}`
             );
+            if (!res.ok) {
+              throw new Error(`API error ${res.status}: ${res.statusText}`);
+            }
             const data = await res.json();
             setSuggestions(data.suggestions);
+            setError(null);
           } catch {
             setSuggestions([]);
           } finally {
@@ -118,7 +131,32 @@ export function useSearch(debounceMs = 300): UseSearchReturn {
   const clearResults = useCallback(() => {
     setResults([]);
     setSuggestions([]);
+    setTotal(0);
+    setError(null);
   }, []);
 
-  return { results, suggestions, loading, search, autocomplete, clearResults };
+  return { results, suggestions, loading, error, total, search, autocomplete, clearResults };
+}
+
+export function useArtistSearch(debounceMs = 300): UseArtistSearchReturn {
+  const { results, loading, error, total, search, clearResults } = useSearch(debounceMs);
+
+  const artistResults = useMemo(
+    () => results.filter((result): result is ArtistSearchResult => result.type === "artist"),
+    [results],
+  );
+
+  const searchArtists = useCallback(
+    async (query: string) => search(query, "artists"),
+    [search],
+  );
+
+  return {
+    results: artistResults,
+    loading,
+    error,
+    total,
+    search: searchArtists,
+    clearResults,
+  };
 }

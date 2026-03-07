@@ -81,6 +81,50 @@ export interface Artist {
   body_html: string;
 }
 
+export interface ArtistSearchResult {
+  type: "artist";
+  id: number;
+  title: string;
+  slug: string;
+  genre?: string;
+  genre_display?: string;
+  image_url?: string | null;
+  image_thumb?: string | null;
+  artist_type?: Artist["artist_type"];
+  short_bio?: string;
+  tags?: string[];
+  tribute_to?: string;
+  hero_video_url?: string;
+  base_country?: string;
+  base_region?: string;
+  base_city?: string;
+}
+
+export interface EventSearchResult {
+  type: "event";
+  id: number;
+  title: string;
+  slug: string;
+  start_date?: string;
+  venue_name?: string;
+  city?: string;
+}
+
+export type SearchResult = ArtistSearchResult | EventSearchResult;
+
+export interface SearchResponse {
+  query: string;
+  total: number;
+  results: SearchResult[];
+}
+
+export interface AutocompleteSuggestion {
+  id: number;
+  name: string;
+  slug: string;
+  genre?: string;
+}
+
 // --- Events ---
 
 export interface EventArtist {

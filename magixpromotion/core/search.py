@@ -1,5 +1,49 @@
 """API per ricerca globale su artisti ed eventi."""
+from django.db.models import Q
 from django.http import JsonResponse
+
+
+def _safe_rendition_url(image, spec):
+    """Ritorna la URL di una rendition, se disponibile."""
+    if not image:
+        return None
+    try:
+        return image.get_rendition(spec).full_url
+    except Exception:
+        return None
+
+
+def _serialize_artist_result(page):
+    """Serializza un artista in formato compatibile con la UI roster."""
+    genre_display = ", ".join(g.name for g in page.genres.all())
+    tags = [g.name for g in page.genres.all()]
+    if hasattr(page, "target_events"):
+        tags += [target.name for target in page.target_events.all()]
+
+    return {
+        "type": "artist",
+        "id": page.id,
+        "title": page.title,
+        "slug": page.slug,
+        "genre": genre_display,
+        "genre_display": genre_display,
+        "image_url": _safe_rendition_url(
+            page.main_image,
+            "fill-800x1200|format-webp",
+        ),
+        "image_thumb": _safe_rendition_url(
+            page.main_image,
+            "fill-40x60|format-webp",
+        ),
+        "artist_type": page.artist_type,
+        "short_bio": page.short_bio,
+        "tags": tags,
+        "tribute_to": page.tribute_to,
+        "hero_video_url": page.hero_video_url,
+        "base_country": str(page.base_country) if page.base_country else "",
+        "base_region": page.base_region,
+        "base_city": page.base_city,
+    }
 
 
 def search_api(request):
@@ -23,7 +67,7 @@ def search_api(request):
         limit = 10
 
     if not query_string or len(query_string) < 2:
-        return JsonResponse({"results": [], "query": query_string})
+        return JsonResponse({"results": [], "query": query_string, "total": 0})
 
     results = []
 
@@ -33,36 +77,31 @@ def search_api(request):
         artist_results = ArtistPage.objects.live().search(
             query_string, operator="or"
         )[:limit]
-        # Prefetch genres e immagine per evitare N+1 query
+        if not artist_results:
+            artist_results = (
+                ArtistPage.objects.live()
+                .filter(
+                    Q(title__icontains=query_string)
+                    | Q(short_bio__icontains=query_string)
+                    | Q(tribute_to__icontains=query_string)
+                    | Q(genres__name__icontains=query_string)
+                )
+                .distinct()
+                .order_by("title")[:limit]
+            )
+        # Prefetch generi, target event e immagine per evitare N+1 query
         artist_ids = [p.id for p in artist_results]
         prefetched = {
             a.id: a
             for a in ArtistPage.objects.filter(
                 id__in=artist_ids
-            ).prefetch_related("genres").select_related("main_image")
+            ).prefetch_related("genres", "target_events").select_related("main_image")
         }
         for page_id in artist_ids:
             page = prefetched.get(page_id)
             if not page:
                 continue
-            image_url = None
-            if page.main_image:
-                try:
-                    image_url = page.main_image.get_rendition(
-                        "fill-200x200|format-webp"
-                    ).url
-                except Exception:
-                    pass
-            results.append(
-                {
-                    "type": "artist",
-                    "id": page.id,
-                    "title": page.title,
-                    "slug": page.slug,
-                    "genre": ", ".join(g.name for g in page.genres.all()),
-                    "image_url": image_url,
-                }
-            )
+            results.append(_serialize_artist_result(page))
 
     if search_type in ("all", "events"):
         from events.models import EventPage
@@ -72,6 +111,19 @@ def search_api(request):
             .filter(is_archived=False)
             .search(query_string, operator="or")[:limit]
         )
+        if not event_results:
+            event_results = (
+                EventPage.objects.live()
+                .filter(is_archived=False)
+                .filter(
+                    Q(title__icontains=query_string)
+                    | Q(description__icontains=query_string)
+                    | Q(venue__name__icontains=query_string)
+                    | Q(venue__city__icontains=query_string)
+                )
+                .distinct()
+                .order_by("start_date")[:limit]
+            )
         for page in event_results:
             results.append(
                 {

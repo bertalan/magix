@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load wagtailcore_tags i18n %}
 {% block title %}{{ page.title }} — MagixPromotion{% endblock %}
 
 {% block meta_description %}
@@ -17,15 +18,31 @@
 {% block canonical %}<link rel="canonical" href="{{ page.full_url }}">{% endblock %}
 
 {% block content %}
-{# Contenuto SEO visibile ai crawler prima del redirect alla SPA #}
+{# SEO content for crawlers — JS redirect for normal users #}
 <h1>{{ page.title }}</h1>
 {% if page.start_date %}<time datetime="{{ page.start_date|date:'Y-m-d' }}">{{ page.start_date }}</time>{% endif %}
 {% if page.venue %}<p>{{ page.venue.name }} — {{ page.venue.city }}</p>{% endif %}
-{% if page.related_artist %}<p>Artista: {{ page.related_artist.title }}</p>{% endif %}
+{% if page.related_artist %}
+{% if page.locale.language_code == 'en' %}
+<p>Artist: {{ page.related_artist.title }}</p>
+{% else %}
+<p>Artista: {{ page.related_artist.title }}</p>
+{% endif %}
+{% endif %}
 
+{% with lc=page.locale.language_code %}
+{% if lc == 'en' %}
+<script>window.location.replace("/en/events/{{ page.slug }}/");</script>
+<noscript>
+  <meta http-equiv="refresh" content="0;url=/en/events/{{ page.slug }}/">
+  <p><a href="/en/events/{{ page.slug }}/">{{ page.title }}</a></p>
+</noscript>
+{% else %}
 <script>window.location.replace("/it/eventi/{{ page.slug }}/");</script>
 <noscript>
   <meta http-equiv="refresh" content="0;url=/it/eventi/{{ page.slug }}/">
   <p><a href="/it/eventi/{{ page.slug }}/">{{ page.title }}</a></p>
 </noscript>
+{% endif %}
+{% endwith %}
 {% endblock %}

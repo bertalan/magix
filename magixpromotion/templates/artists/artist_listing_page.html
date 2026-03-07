@@ -1,16 +1,25 @@
 {% extends "base.html" %}
-{% load wagtailcore_tags %}
+{% load wagtailcore_tags i18n %}
 
-{% block title %}Artisti e Band — Magix Promotion{% endblock %}
+{% block title %}{% if page.locale.language_code == 'en' %}Artists & Bands — Magix Promotion{% else %}Artisti e Band — Magix Promotion{% endif %}{% endblock %}
 
 {% block meta_description %}
+{% if page.locale.language_code == 'en' %}
+<meta name="description" content="Discover Magix Promotion's full roster: bands, music artists and DJs for events, concerts, weddings and private parties worldwide.">
+{% else %}
 <meta name="description" content="Scopri il roster completo di Magix Promotion: band, artisti musicali e DJ disponibili per eventi, concerti, matrimoni e feste private in tutta Italia.">
+{% endif %}
 {% endblock %}
 
 {% block og_tags %}
 {{ block.super }}
+{% if page.locale.language_code == 'en' %}
+<meta property="og:title" content="Artists & Bands — Magix Promotion">
+<meta property="og:description" content="Discover Magix Promotion's full roster: bands, music artists and DJs for events.">
+{% else %}
 <meta property="og:title" content="Artisti e Band — Magix Promotion">
 <meta property="og:description" content="Scopri il roster completo di Magix Promotion: band, artisti musicali e DJ per eventi.">
+{% endif %}
 <meta property="og:type" content="website">
 <meta property="og:url" content="{{ page.full_url }}">
 {% endblock %}
@@ -18,12 +27,20 @@
 {% block canonical %}<link rel="canonical" href="{{ page.full_url }}">{% endblock %}
 
 {% block content %}
-{# Contenuto SEO per i crawler — redirect alla SPA per utenti normali #}
+{# SEO content for crawlers — JS redirect for normal users #}
+{% if page.locale.language_code == 'en' %}
+<h1>Artists & Bands — Magix Promotion</h1>
+<p>
+  Our roster includes bands, music artists and DJs for every type of event:
+  concerts, weddings, corporate events and private parties worldwide.
+</p>
+{% else %}
 <h1>Artisti e Band — Magix Promotion</h1>
 <p>
   Il nostro roster include band, artisti musicali e DJ per ogni tipo di evento:
   concerti, matrimoni, feste aziendali e private. Scopri tutti i nostri artisti.
 </p>
+{% endif %}
 
 {% for artist in page.get_children.live.public %}
 <article>
@@ -34,9 +51,19 @@
 </article>
 {% endfor %}
 
+{% with lc=page.locale.language_code %}
+{% if lc == 'en' %}
+<script>window.location.replace("/en/artists/");</script>
+<noscript>
+  <meta http-equiv="refresh" content="0;url=/en/artists/">
+  <p><a href="/en/artists/">Go to artists page</a></p>
+</noscript>
+{% else %}
 <script>window.location.replace("/it/artisti/");</script>
 <noscript>
   <meta http-equiv="refresh" content="0;url=/it/artisti/">
   <p><a href="/it/artisti/">Vai alla pagina artisti</a></p>
 </noscript>
+{% endif %}
+{% endwith %}
 {% endblock %}

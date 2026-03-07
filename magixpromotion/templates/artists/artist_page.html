@@ -1,8 +1,13 @@
 {% extends "base.html" %}
+{% load wagtailcore_tags i18n %}
 {% block title %}{{ page.title }} — MagixPromotion{% endblock %}
 
 {% block meta_description %}
+{% if page.locale.language_code == 'en' %}
+<meta name="description" content="{{ page.short_bio|truncatewords:30|default:'Artist managed by Magix Promotion' }}">
+{% else %}
 <meta name="description" content="{{ page.short_bio|truncatewords:30|default:'Artista gestito da Magix Promotion' }}">
+{% endif %}
 {% endblock %}
 
 {% block og_tags %}
@@ -17,14 +22,24 @@
 {% block canonical %}<link rel="canonical" href="{{ page.full_url }}">{% endblock %}
 
 {% block content %}
-{# Contenuto SEO visibile ai crawler prima del redirect alla SPA #}
+{# SEO content for crawlers — JS redirect for normal users #}
 <h1>{{ page.title }}</h1>
 {% if page.short_bio %}<p>{{ page.short_bio }}</p>{% endif %}
 {% for genre in page.genres.all %}<span>{{ genre.name }}</span>{% endfor %}
 
+{% with lc=page.locale.language_code %}
+{% if lc == 'en' %}
+<script>window.location.replace("/en/artists/{{ page.slug }}/");</script>
+<noscript>
+  <meta http-equiv="refresh" content="0;url=/en/artists/{{ page.slug }}/">
+  <p><a href="/en/artists/{{ page.slug }}/">{{ page.title }}</a></p>
+</noscript>
+{% else %}
 <script>window.location.replace("/it/artisti/{{ page.slug }}/");</script>
 <noscript>
   <meta http-equiv="refresh" content="0;url=/it/artisti/{{ page.slug }}/">
   <p><a href="/it/artisti/{{ page.slug }}/">{{ page.title }}</a></p>
 </noscript>
+{% endif %}
+{% endwith %}
 {% endblock %}

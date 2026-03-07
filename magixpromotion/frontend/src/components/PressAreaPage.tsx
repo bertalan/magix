@@ -246,10 +246,15 @@ const PressAreaPage: React.FC<PressAreaPageProps> = ({
             <div className="mb-16 glass-panel rounded-3xl border border-[var(--accent)]/20 p-8 sm:p-12">
               <div
                 className="prose prose-invert prose-lg max-w-none text-[var(--text-muted)]
-                  [&_h2]:text-[var(--text-main)] [&_h2]:font-heading [&_h2]:font-extrabold
-                  [&_h3]:text-[var(--text-main)] [&_h3]:font-heading
+                  [&_h2]:text-[var(--text-main)] [&_h2]:font-heading [&_h2]:font-extrabold [&_h2]:text-2xl [&_h2]:mt-8 [&_h2]:mb-4
+                  [&_h3]:text-[var(--text-main)] [&_h3]:font-heading [&_h3]:text-xl [&_h3]:mt-6 [&_h3]:mb-3
+                  [&_p]:leading-relaxed [&_p]:mb-4 [&_p]:text-base
+                  [&_ul]:list-disc [&_ul]:pl-6 [&_ul]:my-4 [&_ul]:space-y-2
+                  [&_ol]:list-decimal [&_ol]:pl-6 [&_ol]:my-4 [&_ol]:space-y-2
+                  [&_li]:leading-relaxed [&_li]:text-base [&_li]:pl-1
                   [&_a]:text-[var(--accent)] [&_a]:no-underline [&_a:hover]:underline
-                  [&_strong]:text-[var(--text-main)]"
+                  [&_strong]:text-[var(--text-main)] [&_strong]:font-bold
+                  [&_blockquote]:border-l-4 [&_blockquote]:border-[var(--accent)] [&_blockquote]:pl-4 [&_blockquote]:italic [&_blockquote]:my-6"
                 dangerouslySetInnerHTML={{ __html: data.intro.intro_text }}
               />
             </div>

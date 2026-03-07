@@ -434,8 +434,12 @@ const EventDetail: React.FC<EventDetailProps> = ({
                 </h3>
                 <div
                   className="prose prose-invert max-w-xl text-[var(--text-muted)] leading-relaxed
-                    [&_p]:mb-4 [&_a]:text-[var(--accent)] [&_a]:underline [&_a:hover]:no-underline
-                    [&_strong]:text-[var(--text-main)]"
+                    [&_p]:mb-4 [&_p]:leading-relaxed [&_p]:text-base
+                    [&_ul]:list-disc [&_ul]:pl-6 [&_ul]:my-4 [&_ul]:space-y-2
+                    [&_ol]:list-decimal [&_ol]:pl-6 [&_ol]:my-4 [&_ol]:space-y-2
+                    [&_li]:leading-relaxed [&_li]:text-base [&_li]:pl-1
+                    [&_a]:text-[var(--accent)] [&_a]:underline [&_a:hover]:no-underline
+                    [&_strong]:text-[var(--text-main)] [&_strong]:font-bold"
                   dangerouslySetInnerHTML={{ __html: processDescription(event.description) }}
                 />
               </div>

@@ -228,11 +228,15 @@ const BandSheet: React.FC<BandSheetProps> = ({ artist, onClose, onEventClick }) 
               </h3>
               <div
                 className="prose prose-invert prose-lg max-w-none text-[var(--text-muted)]
-                  [&_h2]:text-[var(--text-main)] [&_h2]:font-heading [&_h2]:font-extrabold
-                  [&_h3]:text-[var(--text-main)] [&_h3]:font-heading
+                  [&_h2]:text-[var(--text-main)] [&_h2]:font-heading [&_h2]:font-extrabold [&_h2]:text-2xl [&_h2]:mt-8 [&_h2]:mb-4
+                  [&_h3]:text-[var(--text-main)] [&_h3]:font-heading [&_h3]:text-xl [&_h3]:mt-6 [&_h3]:mb-3
+                  [&_p]:leading-relaxed [&_p]:mb-4 [&_p]:text-base
+                  [&_ul]:list-disc [&_ul]:pl-6 [&_ul]:my-4 [&_ul]:space-y-2
+                  [&_ol]:list-decimal [&_ol]:pl-6 [&_ol]:my-4 [&_ol]:space-y-2
+                  [&_li]:leading-relaxed [&_li]:text-base [&_li]:pl-1
                   [&_a]:text-[var(--accent)] [&_a]:no-underline [&_a:hover]:underline
-                  [&_strong]:text-[var(--text-main)]
-                  [&_blockquote]:border-l-4 [&_blockquote]:border-[var(--accent)] [&_blockquote]:pl-4 [&_blockquote]:italic
+                  [&_strong]:text-[var(--text-main)] [&_strong]:font-bold
+                  [&_blockquote]:border-l-4 [&_blockquote]:border-[var(--accent)] [&_blockquote]:pl-4 [&_blockquote]:italic [&_blockquote]:my-6
                   [&_.gallery]:grid [&_.gallery]:grid-cols-2 [&_.gallery]:sm:grid-cols-3 [&_.gallery]:gap-3
                   [&_.gallery_img]:rounded-xl [&_.gallery_img]:border [&_.gallery_img]:border-[var(--glass-border)]
                   [&_.video-embed]:rounded-xl [&_.video-embed]:overflow-hidden

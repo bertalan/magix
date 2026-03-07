@@ -5,6 +5,7 @@ import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import { useLanguage } from "@/contexts/LanguageContext";
 import EventCard from "./EventCard";
 import EventFilters from "./EventFilters";
+import SEOHead from "./SEOHead";
 import { EventsListJsonLd } from "./JsonLdScript";
 import { Calendar } from "lucide-react";
 
@@ -74,6 +75,11 @@ const EventsPage: React.FC<EventsPageProps> = ({ setView: _setView, onArtistClic
 
   return (
     <div className="max-w-5xl mx-auto px-6 py-16">
+      <SEOHead
+        title={t("events.title")}
+        description={t("events.subtitle")}
+        type="website"
+      />
       {/* SEO: JSON-LD ItemList per gli eventi */}
       <EventsListJsonLd lang={lang} />
 

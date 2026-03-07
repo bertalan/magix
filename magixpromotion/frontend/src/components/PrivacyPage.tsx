@@ -5,6 +5,7 @@
 import React from "react";
 import { useSiteSettings } from "@/hooks/useSiteSettings";
 import { useLanguage } from "@/contexts/LanguageContext";
+import SEOHead from "./SEOHead";
 import { Shield } from "lucide-react";
 
 const PrivacyPage: React.FC = () => {
@@ -19,6 +20,11 @@ const PrivacyPage: React.FC = () => {
 
   return (
     <div className="max-w-3xl mx-auto px-6 py-24">
+      <SEOHead
+        title={t("privacy.title")}
+        description={t("privacy.subtitle")}
+        type="website"
+      />
       {/* Header */}
       <div className="text-center mb-16">
         <div className="inline-flex items-center gap-2 px-4 py-2 glass-panel rounded-full text-[var(--accent)] text-sm font-bold tracking-widest mb-6">

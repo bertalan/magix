@@ -4,6 +4,7 @@ import { scoutTalent, ScoutResult } from "@/services/geminiService";
 import { Artist } from "@/types";
 import { useArtists } from "@/hooks/useArtists";
 import { useLanguage } from "@/contexts/LanguageContext";
+import SEOHead from "./SEOHead";
 
 interface BandFinderProps {
   onArtistSelect: (artist: Artist) => void;
@@ -62,6 +63,12 @@ const BandFinder: React.FC<BandFinderProps> = ({ onArtistSelect }) => {
 
   return (
     <div className="max-w-4xl mx-auto px-6 py-24 theme-transition">
+      <SEOHead
+        title={t("scout.title")}
+        description={t("scout.subtitle")}
+        type="website"
+        noindex
+      />
       {/* Header */}
       <div className="text-center mb-16">
         <div className="inline-flex items-center gap-2 px-4 py-2 glass-panel rounded-full text-[var(--accent)] text-sm font-bold tracking-widest mb-6">

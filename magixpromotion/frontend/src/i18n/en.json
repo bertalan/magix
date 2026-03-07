@@ -34,6 +34,8 @@
     "deeJay": "Dee-Jay"
   },
   "artists": {
+    "pageTitle": "Artists & Bands",
+    "pageDescription": "Discover Magix Promotion's full roster: bands, music artists and DJs for events, concerts, weddings and private parties.",
     "rosterTitle": "Our Roster",
     "loadMore": "Load more",
     "noResults": "No artists found with these filters.",

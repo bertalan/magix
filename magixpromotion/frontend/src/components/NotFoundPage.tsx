@@ -2,6 +2,7 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { ROUTE_SLUGS } from "@/lib/routes";
+import SEOHead from "./SEOHead";
 import { Search, Home, Mail } from "lucide-react";
 
 interface NotFoundPageProps {
@@ -42,6 +43,11 @@ const NotFoundPage: React.FC<NotFoundPageProps> = ({ setView }) => {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-[70vh] px-4 text-center">
+      <SEOHead
+        title="404 — Page Not Found"
+        description="The page you are looking for does not exist."
+        noindex
+      />
       {/* Glitch 404 */}
       <h1
         className="font-heading font-bold leading-none mb-2 select-none animate-[glitch_3s_infinite]"

@@ -6,6 +6,7 @@
 import React from "react";
 import { useSiteSettings } from "@/hooks/useSiteSettings";
 import { useLanguage } from "@/contexts/LanguageContext";
+import SEOHead from "./SEOHead";
 import { MapPin, Phone, Mail, Globe, Facebook, Youtube } from "lucide-react";
 
 const ContactsPage: React.FC = () => {
@@ -29,6 +30,11 @@ const ContactsPage: React.FC = () => {
 
   return (
     <div className="max-w-3xl mx-auto px-6 py-24">
+      <SEOHead
+        title={t("contacts.title")}
+        description={t("contacts.subtitle")}
+        type="website"
+      />
       {/* Header */}
       <div className="text-center mb-16">
         <div className="inline-flex items-center gap-2 px-4 py-2 glass-panel rounded-full text-[var(--accent)] text-sm font-bold tracking-widest mb-6">

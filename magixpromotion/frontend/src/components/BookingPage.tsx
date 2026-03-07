@@ -1,5 +1,6 @@
 import React from "react";
 import BookingForm from "./BookingForm";
+import SEOHead from "./SEOHead";
 import { useSiteSettings } from "@/hooks/useSiteSettings";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Mail } from "lucide-react";
@@ -21,6 +22,11 @@ const BookingPage: React.FC<BookingPageProps> = ({ preselectedArtist }) => {
 
   return (
     <div className="max-w-3xl mx-auto px-6 py-24">
+      <SEOHead
+        title={t("booking.title")}
+        description={t("booking.subtitle")}
+        type="website"
+      />
       {/* Header */}
       <div className="text-center mb-16">
         <div className="inline-flex items-center gap-2 px-4 py-2 glass-panel rounded-full text-[var(--accent)] text-sm font-bold tracking-widest mb-6">

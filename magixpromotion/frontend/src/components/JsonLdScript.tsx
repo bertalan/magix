@@ -10,22 +10,24 @@ const API_BASE = "/api/v2";
  * Rimuove lo script precedente quando il componente viene smontato o i dati cambiano.
  */
 
-const JSONLD_SCRIPT_ID = "magix-jsonld";
-
-function injectJsonLd(data: Record<string, unknown>) {
-  // Rimuovi script precedente
-  const existing = document.getElementById(JSONLD_SCRIPT_ID);
+/**
+ * Ogni componente JSON-LD usa un proprio ID univoco in modo che
+ * più script possano coesistere nel DOM (es. Homepage + EntertainmentBusiness).
+ * Quando un componente si smonta, rimuove solo il proprio script.
+ */
+function injectJsonLd(scriptId: string, data: Record<string, unknown>) {
+  const existing = document.getElementById(scriptId);
   if (existing) existing.remove();
 
   const script = document.createElement("script");
-  script.id = JSONLD_SCRIPT_ID;
+  script.id = scriptId;
   script.type = "application/ld+json";
   script.textContent = JSON.stringify(data);
   document.head.appendChild(script);
 }
 
-function removeJsonLd() {
-  const existing = document.getElementById(JSONLD_SCRIPT_ID);
+function removeJsonLd(scriptId: string) {
+  const existing = document.getElementById(scriptId);
   if (existing) existing.remove();
 }
 
@@ -311,27 +313,30 @@ export function homepageToJsonLd(settings?: SiteSettings | null, siteUrl = "http
 
 /** Inietta JSON-LD per un artista. */
 export const ArtistJsonLd: React.FC<{ artist: Artist; lang?: "it" | "en" }> = ({ artist, lang = "it" }) => {
+  const scriptId = `magix-jsonld-artist-${artist.id}`;
   React.useEffect(() => {
-    injectJsonLd(artistToJsonLd(artist, undefined, lang));
-    return removeJsonLd;
+    injectJsonLd(scriptId, artistToJsonLd(artist, undefined, lang));
+    return () => removeJsonLd(scriptId);
   }, [artist.id, lang]);
   return null;
 };
 
 /** Inietta JSON-LD per un evento. */
 export const EventJsonLd: React.FC<{ event: EventPage; lang?: "it" | "en" }> = ({ event, lang = "it" }) => {
+  const scriptId = `magix-jsonld-event-${event.id}`;
   React.useEffect(() => {
-    injectJsonLd(eventToJsonLd(event, undefined, lang));
-    return removeJsonLd;
+    injectJsonLd(scriptId, eventToJsonLd(event, undefined, lang));
+    return () => removeJsonLd(scriptId);
   }, [event.id, lang]);
   return null;
 };
 
 /** Inietta JSON-LD per la homepage. */
 export const HomepageJsonLd: React.FC<{ settings?: SiteSettings | null }> = ({ settings }) => {
+  const scriptId = "magix-jsonld-homepage";
   React.useEffect(() => {
-    injectJsonLd(homepageToJsonLd(settings));
-    return removeJsonLd;
+    injectJsonLd(scriptId, homepageToJsonLd(settings));
+    return () => removeJsonLd(scriptId);
   }, [settings?.company_name]);
   return null;
 };
@@ -342,6 +347,7 @@ export const HomepageJsonLd: React.FC<{ settings?: SiteSettings | null }> = ({ s
  * indipendentemente da quanti ne ha caricati l'infinite scroll.
  */
 export const RosterJsonLd: React.FC<{ lang?: "it" | "en" }> = ({ lang = "it" }) => {
+  const scriptId = "magix-jsonld-roster";
   React.useEffect(() => {
     const params = new URLSearchParams();
     params.set("limit", "50");
@@ -352,12 +358,12 @@ export const RosterJsonLd: React.FC<{ lang?: "it" | "en" }> = ({ lang = "it" }) 
       .then((r) => r.ok ? r.json() as Promise<WagtailListResponse<Artist>> : null)
       .then((res) => {
         if (res && res.items.length > 0) {
-          injectJsonLd(rosterToJsonLd(res.items, res.meta.total_count, undefined, lang));
+          injectJsonLd(scriptId, rosterToJsonLd(res.items, res.meta.total_count, undefined, lang));
         }
       })
       .catch(() => { /* non-blocking — SEO opzionale */ });
 
-    return removeJsonLd;
+    return () => removeJsonLd(scriptId);
   }, [lang]);
   return null;
 };
@@ -367,6 +373,7 @@ export const RosterJsonLd: React.FC<{ lang?: "it" | "en" }> = ({ lang = "it" }) 
  * Esegue un fetch autonomo con limit=50 per avere tutti gli eventi nel JSON-LD.
  */
 export const EventsListJsonLd: React.FC<{ lang?: "it" | "en" }> = ({ lang = "it" }) => {
+  const scriptId = "magix-jsonld-events-list";
   React.useEffect(() => {
     const params = new URLSearchParams();
     params.set("limit", "50");
@@ -377,12 +384,12 @@ export const EventsListJsonLd: React.FC<{ lang?: "it" | "en" }> = ({ lang = "it"
       .then((r) => r.ok ? r.json() as Promise<WagtailListResponse<EventPage>> : null)
       .then((res) => {
         if (res && res.items.length > 0) {
-          injectJsonLd(eventsListToJsonLd(res.items, res.meta.total_count, undefined, lang));
+          injectJsonLd(scriptId, eventsListToJsonLd(res.items, res.meta.total_count, undefined, lang));
         }
       })
       .catch(() => { /* non-blocking — SEO opzionale */ });
 
-    return removeJsonLd;
+    return () => removeJsonLd(scriptId);
   }, [lang]);
   return null;
 };

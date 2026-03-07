@@ -5,6 +5,7 @@ import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import { useLanguage } from "@/contexts/LanguageContext";
 import ArtistCard from "./ArtistCard";
 import ArtistFilters from "./ArtistFilters";
+import SEOHead from "./SEOHead";
 import { RosterJsonLd } from "./JsonLdScript";
 
 interface ArtistGridProps {
@@ -55,6 +56,11 @@ const ArtistGrid: React.FC<ArtistGridProps> = ({ onArtistClick }) => {
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-24">
+      <SEOHead
+        title={t("artists.pageTitle")}
+        description={t("artists.pageDescription")}
+        type="website"
+      />
       {/* SEO: JSON-LD ItemList per il roster */}
       <RosterJsonLd lang={lang} />
 

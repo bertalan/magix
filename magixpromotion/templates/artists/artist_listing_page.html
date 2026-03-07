@@ -1,9 +1,42 @@
 {% extends "base.html" %}
-{% block title %}Artisti — MagixPromotion{% endblock %}
+{% load wagtailcore_tags %}
+
+{% block title %}Artisti e Band — Magix Promotion{% endblock %}
+
+{% block meta_description %}
+<meta name="description" content="Scopri il roster completo di Magix Promotion: band, artisti musicali e DJ disponibili per eventi, concerti, matrimoni e feste private in tutta Italia.">
+{% endblock %}
+
+{% block og_tags %}
+{{ block.super }}
+<meta property="og:title" content="Artisti e Band — Magix Promotion">
+<meta property="og:description" content="Scopri il roster completo di Magix Promotion: band, artisti musicali e DJ per eventi.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="{{ page.full_url }}">
+{% endblock %}
+
+{% block canonical %}<link rel="canonical" href="{{ page.full_url }}">{% endblock %}
+
 {% block content %}
+{# Contenuto SEO per i crawler — redirect alla SPA per utenti normali #}
+<h1>Artisti e Band — Magix Promotion</h1>
+<p>
+  Il nostro roster include band, artisti musicali e DJ per ogni tipo di evento:
+  concerti, matrimoni, feste aziendali e private. Scopri tutti i nostri artisti.
+</p>
+
+{% for artist in page.get_children.live.public %}
+<article>
+  <h2><a href="{% pageurl artist %}">{{ artist.title }}</a></h2>
+  {% with artist.specific as ap %}
+    {% if ap.short_bio %}<p>{{ ap.short_bio|truncatewords:30 }}</p>{% endif %}
+  {% endwith %}
+</article>
+{% endfor %}
+
 <script>window.location.replace("/it/artisti/");</script>
 <noscript>
   <meta http-equiv="refresh" content="0;url=/it/artisti/">
-  <p><a href="/it/artisti/">Artisti</a></p>
+  <p><a href="/it/artisti/">Vai alla pagina artisti</a></p>
 </noscript>
 {% endblock %}

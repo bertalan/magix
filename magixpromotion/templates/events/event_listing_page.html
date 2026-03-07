@@ -1,9 +1,43 @@
 {% extends "base.html" %}
-{% block title %}Eventi — MagixPromotion{% endblock %}
+{% load wagtailcore_tags %}
+
+{% block title %}Eventi e Concerti — Magix Promotion{% endblock %}
+
+{% block meta_description %}
+<meta name="description" content="Calendario eventi e concerti: tutte le prossime date live delle band e artisti di Magix Promotion in Italia e nel mondo.">
+{% endblock %}
+
+{% block og_tags %}
+{{ block.super }}
+<meta property="og:title" content="Eventi e Concerti — Magix Promotion">
+<meta property="og:description" content="Tutte le prossime date live delle band e artisti di Magix Promotion.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="{{ page.full_url }}">
+{% endblock %}
+
+{% block canonical %}<link rel="canonical" href="{{ page.full_url }}">{% endblock %}
+
 {% block content %}
+{# Contenuto SEO per i crawler — redirect alla SPA per utenti normali #}
+<h1>Eventi e Concerti — Magix Promotion</h1>
+<p>
+  Scopri tutte le prossime date live delle nostre band e artisti.
+  Concerti, festival, eventi aziendali e matrimoni in tutta Italia.
+</p>
+
+{% for event in page.get_children.live.public %}
+<article>
+  <h2><a href="{% pageurl event %}">{{ event.title }}</a></h2>
+  {% with event.specific as ep %}
+    {% if ep.start_date %}<time datetime="{{ ep.start_date|date:'Y-m-d' }}">{{ ep.start_date|date:'d/m/Y' }}</time>{% endif %}
+    {% if ep.venue %}<p>{{ ep.venue.name }} — {{ ep.venue.city }}</p>{% endif %}
+  {% endwith %}
+</article>
+{% endfor %}
+
 <script>window.location.replace("/it/eventi/");</script>
 <noscript>
   <meta http-equiv="refresh" content="0;url=/it/eventi/">
-  <p><a href="/it/eventi/">Eventi</a></p>
+  <p><a href="/it/eventi/">Vai alla pagina eventi</a></p>
 </noscript>
 {% endblock %}

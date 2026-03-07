@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { useSearch } from "../hooks/useSearch";
 
 interface SearchBarProps {
@@ -24,6 +25,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
 }) => {
   const [query, setQuery] = useState("");
   const [isOpen, setIsOpen] = useState(false);
+  const { lang } = useLanguage();
   const { results, suggestions, loading, search, autocomplete, clearResults } =
     useSearch();
   const wrapperRef = useRef<HTMLDivElement>(null);
@@ -46,7 +48,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
     const value = e.target.value;
     setQuery(value);
     if (value.length >= 2) {
-      autocomplete(value);
+      autocomplete(value, lang);
       setIsOpen(true);
     } else {
       clearResults();
@@ -56,7 +58,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" && query.length >= 2) {
-      search(query);
+      search(query, "all", lang);
       setIsOpen(true);
     }
     if (e.key === "Escape") {

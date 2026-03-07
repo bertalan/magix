@@ -47,6 +47,32 @@ describe("useSearch", () => {
     vi.useRealTimers();
   });
 
+  it("passes locale to the search API when provided", async () => {
+    vi.useFakeTimers();
+    const fetchSpy = vi.spyOn(global, "fetch");
+    const { result } = renderHook(() => useSearch(50));
+
+    let searchPromise: Promise<void> | undefined;
+    act(() => {
+      searchPromise = result.current.search("queen", "artists", "en");
+    });
+
+    await act(async () => {
+      vi.advanceTimersByTime(100);
+    });
+
+    await act(async () => {
+      await searchPromise;
+    });
+
+    expect(fetchSpy).toHaveBeenCalledWith(
+      expect.stringContaining("locale=en"),
+    );
+
+    fetchSpy.mockRestore();
+    vi.useRealTimers();
+  });
+
   it("autocomplete does not search with short query", async () => {
     const { result } = renderHook(() => useSearch(0));
 

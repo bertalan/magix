@@ -1,8 +1,14 @@
 """Test integrazione per API endpoints."""
 import pytest
 from django.test import Client
+from wagtail.models import Locale, Page
 
-from tests.factories import ArtistPageFactory, EventPageFactory
+from tests.factories import (
+    ArtistListingPageFactory,
+    ArtistPageFactory,
+    EventPageFactory,
+    HomePageFactory,
+)
 
 
 @pytest.mark.django_db
@@ -125,6 +131,73 @@ class TestSearchAPI:
         data = response.json()
         assert data["total"] == 1
         assert data["results"][0]["id"] == artist.id
+
+    def test_search_artists_tolerates_minor_typos(self, artist_listing, genres):
+        page = ArtistPageFactory(
+            parent=artist_listing,
+            title="Queen Forever",
+            short_bio="Queen tribute band",
+            artist_type="tribute",
+        )
+        page.genres.add(genres[2])
+        page.save()
+
+        client = Client()
+        response = client.get("/api/v2/search/?q=qeen&type=artists")
+
+        assert response.status_code == 200
+        data = response.json()
+        assert data["total"] == 1
+        assert data["results"][0]["title"] == "Queen Forever"
+
+    def test_search_artists_respects_requested_locale(self, home_page, artist_listing, genres):
+        locale_en, _ = Locale.objects.get_or_create(language_code="en")
+        root = Page.objects.get(depth=1)
+
+        home_page_en = HomePageFactory(
+            parent=root,
+            locale=locale_en,
+            title="Home EN",
+            slug="home-en",
+        )
+        artist_listing_en = ArtistListingPageFactory(
+            parent=home_page_en,
+            locale=locale_en,
+            title="Artists",
+            slug="artists-en",
+        )
+
+        artist_it = ArtistPageFactory(
+            parent=artist_listing,
+            title="Queen Italiano",
+            short_bio="Tributo italiano ai Queen",
+            artist_type="tribute",
+        )
+        artist_it.genres.add(genres[1])
+        artist_it.save()
+
+        artist_en = ArtistPageFactory(
+            parent=artist_listing_en,
+            locale=locale_en,
+            title="Queen English",
+            short_bio="English Queen tribute band",
+            artist_type="tribute",
+        )
+        artist_en.genres.add(genres[2])
+        artist_en.save()
+
+        client = Client()
+        response_it = client.get("/api/v2/search/?q=Queen&type=artists&locale=it")
+        response_en = client.get("/api/v2/search/?q=Queen&type=artists&locale=en")
+
+        assert response_it.status_code == 200
+        assert response_en.status_code == 200
+
+        data_it = response_it.json()
+        data_en = response_en.json()
+
+        assert [item["title"] for item in data_it["results"]] == ["Queen Italiano"]
+        assert [item["title"] for item in data_en["results"]] == ["Queen English"]
 
     def test_search_artists_excludes_events(self, artist, event_listing, venue):
         EventPageFactory(

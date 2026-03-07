@@ -97,8 +97,8 @@ const ArtistGrid: React.FC<ArtistGridProps> = ({ onArtistClick }) => {
       return;
     }
 
-    void searchArtists(debouncedSearch);
-  }, [clearResults, debouncedSearch, searchArtists]);
+    void searchArtists(debouncedSearch, lang);
+  }, [clearResults, debouncedSearch, lang, searchArtists]);
 
   const isSearching = debouncedSearch.length > 0;
   const filteredSearchResults = React.useMemo(

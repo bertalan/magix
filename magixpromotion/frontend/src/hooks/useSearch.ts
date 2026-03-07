@@ -12,8 +12,8 @@ interface UseSearchReturn {
   loading: boolean;
   error: Error | null;
   total: number;
-  search: (query: string, type?: string) => Promise<void>;
-  autocomplete: (query: string) => Promise<void>;
+  search: (query: string, type?: string, locale?: string) => Promise<void>;
+  autocomplete: (query: string, locale?: string) => Promise<void>;
   clearResults: () => void;
 }
 
@@ -22,7 +22,7 @@ interface UseArtistSearchReturn {
   loading: boolean;
   error: Error | null;
   total: number;
-  search: (query: string) => Promise<void>;
+  search: (query: string, locale?: string) => Promise<void>;
   clearResults: () => void;
 }
 
@@ -53,7 +53,7 @@ export function useSearch(debounceMs = 300): UseSearchReturn {
   }, []);
 
   const search = useCallback(
-    async (query: string, type = "all") => {
+    async (query: string, type = "all", locale?: string) => {
       if (query.length < 2) {
         setResults([]);
         setTotal(0);
@@ -70,8 +70,15 @@ export function useSearch(debounceMs = 300): UseSearchReturn {
         debounceRef.current = setTimeout(async () => {
           setLoading(true);
           try {
+            const params = new URLSearchParams({
+              q: query,
+              type,
+            });
+            if (locale) {
+              params.set("locale", locale);
+            }
             const res = await fetch(
-              `/api/v2/search/?q=${encodeURIComponent(query)}&type=${type}`
+              `/api/v2/search/?${params.toString()}`
             );
             if (!res.ok) {
               throw new Error(`API error ${res.status}: ${res.statusText}`);
@@ -95,7 +102,7 @@ export function useSearch(debounceMs = 300): UseSearchReturn {
   );
 
   const autocomplete = useCallback(
-    async (query: string) => {
+    async (query: string, locale?: string) => {
       if (query.length < 2) {
         setSuggestions([]);
         return Promise.resolve();
@@ -108,8 +115,12 @@ export function useSearch(debounceMs = 300): UseSearchReturn {
       return new Promise<void>((resolve) => {
         debounceRef.current = setTimeout(async () => {
           try {
+            const params = new URLSearchParams({ q: query });
+            if (locale) {
+              params.set("locale", locale);
+            }
             const res = await fetch(
-              `/api/v2/search/autocomplete/?q=${encodeURIComponent(query)}`
+              `/api/v2/search/autocomplete/?${params.toString()}`
             );
             if (!res.ok) {
               throw new Error(`API error ${res.status}: ${res.statusText}`);
@@ -147,7 +158,7 @@ export function useArtistSearch(debounceMs = 300): UseArtistSearchReturn {
   );
 
   const searchArtists = useCallback(
-    async (query: string) => search(query, "artists"),
+    async (query: string, locale?: string) => search(query, "artists", locale),
     [search],
   );
 

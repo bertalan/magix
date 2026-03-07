@@ -1,4 +1,7 @@
 """API per ricerca globale su artisti ed eventi."""
+from difflib import SequenceMatcher
+import unicodedata
+
 from django.db.models import Q
 from django.http import JsonResponse
 
@@ -11,6 +14,113 @@ def _safe_rendition_url(image, spec):
         return image.get_rendition(spec).full_url
     except Exception:
         return None
+
+
+def _normalize_search_text(value):
+    """Normalizza il testo per confronti search/fuzzy."""
+    normalized = unicodedata.normalize("NFKD", value or "")
+    ascii_text = normalized.encode("ascii", "ignore").decode("ascii")
+    return " ".join(ascii_text.lower().split())
+
+
+def _resolve_locale_code(request):
+    """Ricava il codice lingua da querystring o header."""
+    locale = request.GET.get("locale") or request.GET.get("lang")
+    if not locale:
+        locale = request.headers.get("Accept-Language", "")
+
+    locale = (locale or "").split(",")[0].strip().lower()
+    if not locale:
+        return None
+    return locale.split("-")[0]
+
+
+def _apply_locale_filter(queryset, locale_code):
+    """Filtra il queryset sulla lingua richiesta, se presente."""
+    if not locale_code:
+        return queryset
+    return queryset.filter(locale__language_code=locale_code)
+
+
+def _filter_pages_for_locale(pages, locale_code, limit):
+    """Filtra una sequenza di pagine per lingua dopo una full-text search."""
+    if not locale_code:
+        return list(pages)[:limit]
+
+    filtered = [
+        page for page in pages
+        if getattr(getattr(page, "locale", None), "language_code", None) == locale_code
+    ]
+    return filtered[:limit]
+
+
+def _fuzzy_score(query_string, *values):
+    """Ritorna uno score fuzzy basato sui token disponibili."""
+    normalized_query = _normalize_search_text(query_string)
+    if len(normalized_query) < 3:
+        return 0.0
+
+    best_score = 0.0
+    for value in values:
+        normalized_value = _normalize_search_text(value)
+        if not normalized_value:
+            continue
+
+        if normalized_query in normalized_value:
+            return 1.0
+
+        best_score = max(
+            best_score,
+            SequenceMatcher(None, normalized_query, normalized_value).ratio(),
+        )
+
+        for token in normalized_value.split():
+            best_score = max(
+                best_score,
+                SequenceMatcher(None, normalized_query, token).ratio(),
+            )
+
+    return best_score
+
+
+def _fuzzy_match_artists(queryset, query_string, limit):
+    """Fallback fuzzy per artisti quando la full-text non trova risultati."""
+    candidates = list(
+        queryset.select_related("main_image").prefetch_related("genres", "target_events")
+    )
+    scored = []
+    for page in candidates:
+        score = _fuzzy_score(
+            query_string,
+            page.title,
+            page.short_bio,
+            page.tribute_to,
+            " ".join(g.name for g in page.genres.all()),
+        )
+        if score >= 0.78:
+            scored.append((score, page.title.lower(), page))
+
+    scored.sort(key=lambda item: (-item[0], item[1]))
+    return [page for _, _, page in scored[:limit]]
+
+
+def _fuzzy_match_events(queryset, query_string, limit):
+    """Fallback fuzzy per eventi quando la full-text non trova risultati."""
+    candidates = list(queryset.select_related("venue"))
+    scored = []
+    for page in candidates:
+        score = _fuzzy_score(
+            query_string,
+            page.title,
+            page.description,
+            page.venue.name if page.venue else "",
+            page.venue.city if page.venue else "",
+        )
+        if score >= 0.78:
+            scored.append((score, page.title.lower(), page))
+
+    scored.sort(key=lambda item: (-item[0], item[1]))
+    return [page for _, _, page in scored[:limit]]
 
 
 def _serialize_artist_result(page):
@@ -60,6 +170,7 @@ def search_api(request):
     """
     query_string = request.GET.get("q", "").strip()
     search_type = request.GET.get("type", "all")
+    locale_code = _resolve_locale_code(request)
 
     try:
         limit = min(int(request.GET.get("limit", "10")), 50)
@@ -74,12 +185,17 @@ def search_api(request):
     if search_type in ("all", "artists"):
         from artists.models import ArtistPage
 
-        artist_results = ArtistPage.objects.live().search(
-            query_string, operator="or"
-        )[:limit]
+        artist_search_qs = ArtistPage.objects.live()
+        artist_base_qs = _apply_locale_filter(artist_search_qs, locale_code)
+
+        artist_results = _filter_pages_for_locale(
+            artist_search_qs.search(query_string, operator="or")[: limit * 4],
+            locale_code,
+            limit,
+        )
         if not artist_results:
             artist_results = (
-                ArtistPage.objects.live()
+                artist_base_qs
                 .filter(
                     Q(title__icontains=query_string)
                     | Q(short_bio__icontains=query_string)
@@ -89,6 +205,8 @@ def search_api(request):
                 .distinct()
                 .order_by("title")[:limit]
             )
+        if not artist_results:
+            artist_results = _fuzzy_match_artists(artist_base_qs, query_string, limit)
         # Prefetch generi, target event e immagine per evitare N+1 query
         artist_ids = [p.id for p in artist_results]
         prefetched = {
@@ -106,15 +224,20 @@ def search_api(request):
     if search_type in ("all", "events"):
         from events.models import EventPage
 
-        event_results = (
-            EventPage.objects.live()
-            .filter(is_archived=False)
-            .search(query_string, operator="or")[:limit]
+        event_search_qs = EventPage.objects.live().filter(is_archived=False)
+        event_base_qs = _apply_locale_filter(
+            EventPage.objects.live().filter(is_archived=False),
+            locale_code,
+        )
+
+        event_results = _filter_pages_for_locale(
+            event_search_qs.search(query_string, operator="or")[: limit * 4],
+            locale_code,
+            limit,
         )
         if not event_results:
             event_results = (
-                EventPage.objects.live()
-                .filter(is_archived=False)
+                event_base_qs
                 .filter(
                     Q(title__icontains=query_string)
                     | Q(description__icontains=query_string)
@@ -124,6 +247,8 @@ def search_api(request):
                 .distinct()
                 .order_by("start_date")[:limit]
             )
+        if not event_results:
+            event_results = _fuzzy_match_events(event_base_qs, query_string, limit)
         for page in event_results:
             results.append(
                 {
@@ -160,6 +285,7 @@ def autocomplete_api(request):
     Ritorna JSON con suggerimenti artisti.
     """
     query_string = request.GET.get("q", "").strip()
+    locale_code = _resolve_locale_code(request)
 
     try:
         limit = min(int(request.GET.get("limit", "5")), 20)
@@ -171,7 +297,16 @@ def autocomplete_api(request):
 
     from artists.models import ArtistPage
 
-    results = ArtistPage.objects.live().autocomplete(query_string)[:limit]
+    search_qs = ArtistPage.objects.live()
+    base_qs = _apply_locale_filter(search_qs, locale_code)
+
+    results = _filter_pages_for_locale(
+        search_qs.autocomplete(query_string)[: limit * 4],
+        locale_code,
+        limit,
+    )
+    if not results:
+        results = _fuzzy_match_artists(base_qs, query_string, limit)
 
     # Prefetch genres per evitare N+1 query
     result_ids = [p.id for p in results]

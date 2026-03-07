@@ -28,12 +28,16 @@ ssh -p $SSH_PORT $SERVER "source ${VENV_DIR}/bin/activate && \
 echo "[3/5] Building frontend..."
 ssh -p $SSH_PORT $SERVER "cd ${APP_DIR}/frontend && npm ci --production=false --silent && npm run build"
 
-# 4. Restart servizi
-echo "[4/5] Restarting services..."
+# 4. Nginx config
+echo "[4/6] Updating Nginx config..."
+ssh -p $SSH_PORT $SERVER "cp ${APP_DIR}/deploy/live/magixpromotion.com.conf /www/server/panel/vhost/nginx/magixpromotion.com.conf && /www/server/nginx/sbin/nginx -t"
+
+# 5. Restart servizi
+echo "[5/6] Restarting services..."
 ssh -p $SSH_PORT $SERVER "systemctl restart gunicorn-magix celery-magix && /www/server/nginx/sbin/nginx -s reload"
 
-# 5. Verifica
-echo "[5/5] Verifying deployment..."
+# 6. Verifica
+echo "[6/6] Verifying deployment..."
 sleep 2
 ssh -p $SSH_PORT $SERVER "curl -sf https://new.magixpromotion.com/api/v2/pages/ > /dev/null && echo 'API OK' || echo 'API FAILED'"
 

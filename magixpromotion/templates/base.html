@@ -1,6 +1,6 @@
 {% load seo_tags %}
 <!DOCTYPE html>
-<html lang="{{ LANGUAGE_CODE|default:'it' }}">
+<html lang="{{ page.locale.language_code|default:LANGUAGE_CODE|default:'it' }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,7 +12,11 @@
     {# SEO: Open Graph #}
     {% block og_tags %}
     <meta property="og:site_name" content="Magix Promotion">
-    <meta property="og:locale" content="{{ LANGUAGE_CODE|default:'it' }}_{{ LANGUAGE_CODE|default:'IT'|upper }}">
+    {% if page.locale.language_code == 'en' %}
+    <meta property="og:locale" content="en_US">
+    {% else %}
+    <meta property="og:locale" content="it_IT">
+    {% endif %}
     {% endblock %}
 
     {# SEO: Twitter Cards #}
